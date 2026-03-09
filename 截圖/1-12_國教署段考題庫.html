@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Google Sans', 'Segoe UI', Arial, sans-serif; background: #fff; width: 780px; }
+  .header { background: #1a73e8; padding: 16px 32px; display: flex; align-items: center; }
+  .header-title { color: #fff; font-size: 20px; font-weight: 500; }
+  .header-subtitle { color: rgba(255,255,255,0.85); font-size: 13px; margin-left: 16px; }
+  .search-area { background: #f8f9fa; border-bottom: 1px solid #e0e0e0; padding: 24px 32px; }
+  .search-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 12px; color: #5f6368; font-weight: 500; }
+  .field select { padding: 8px 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; color: #3c4043; background: #fff; min-width: 140px; appearance: auto; }
+  .search-btn { background: #1a73e8; color: #fff; border: none; border-radius: 4px; padding: 9px 28px; font-size: 14px; font-weight: 500; cursor: pointer; height: 38px; }
+  .search-btn:hover { background: #1765cc; }
+  .results { padding: 24px 32px; }
+  .results-title { font-size: 14px; color: #5f6368; margin-bottom: 16px; }
+  .result-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 10px; background: #fff; }
+  .result-item:hover { background: #f8f9fa; }
+  .result-icon { width: 36px; height: 36px; background: #e8f0fe; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #1a73e8; font-size: 16px; margin-right: 14px; flex-shrink: 0; }
+  .result-info { flex: 1; }
+  .result-name { font-size: 14px; color: #202124; font-weight: 500; }
+  .result-meta { font-size: 12px; color: #5f6368; margin-top: 2px; }
+  .result-download { color: #1a73e8; font-size: 13px; font-weight: 500; text-decoration: none; cursor: pointer; white-space: nowrap; }
+  .result-download:hover { text-decoration: underline; }
+  .result-left { display: flex; align-items: center; }
+  .callout { margin: 20px 32px; background: #e8f0fe; border-left: 4px solid #1a73e8; border-radius: 4px; padding: 12px 16px; font-size: 14px; color: #1a73e8; }
+  .nav { display: flex; gap: 24px; padding: 0 32px; border-bottom: 1px solid #e0e0e0; background: #fff; }
+  .nav-item { padding: 12px 0; font-size: 14px; color: #5f6368; cursor: pointer; border-bottom: 2px solid transparent; }
+  .nav-item.active { color: #1a73e8; border-bottom-color: #1a73e8; font-weight: 500; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-title">📚 國教署全國段考題庫</div>
+    <div class="header-subtitle">教育部國民及學前教育署</div>
+  </div>
+
+  <div class="nav">
+    <div class="nav-item active">試題搜尋</div>
+    <div class="nav-item">最新上傳</div>
+    <div class="nav-item">使用說明</div>
+  </div>
+
+  <div class="search-area">
+    <div class="search-row">
+      <div class="field">
+        <label>學制</label>
+        <select><option>高中</option></select>
+      </div>
+      <div class="field">
+        <label>科目</label>
+        <select><option>物理</option></select>
+      </div>
+      <div class="field">
+        <label>年度</label>
+        <select><option>113 學年度</option></select>
+      </div>
+      <div class="field">
+        <label>學期</label>
+        <select><option>第一學期</option></select>
+      </div>
+      <div class="field">
+        <label>考試類型</label>
+        <select><option>全部</option></select>
+      </div>
+      <button class="search-btn">🔍 搜尋</button>
+    </div>
+  </div>
+
+  <div class="results">
+    <div class="results-title">搜尋結果：共找到 4 筆資料</div>
+
+    <div class="result-item">
+      <div class="result-left">
+        <div class="result-icon">📄</div>
+        <div class="result-info">
+          <div class="result-name">臺北市立建國中學 113 學年度第一學期 高二物理 第一次段考</div>
+          <div class="result-meta">上傳日期：2024/11/15 ・ 含答案卷</div>
+        </div>
+      </div>
+      <a class="result-download">📥 下載試題</a>
+    </div>
+
+    <div class="result-item">
+      <div class="result-left">
+        <div class="result-icon">📄</div>
+        <div class="result-info">
+          <div class="result-name">臺北市立永春高中 113 學年度第一學期 高二物理 第一次段考</div>
+          <div class="result-meta">上傳日期：2024/11/12 ・ 含答案卷</div>
+        </div>
+      </div>
+      <a class="result-download">📥 下載試題</a>
+    </div>
+
+    <div class="result-item">
+      <div class="result-left">
+        <div class="result-icon">📄</div>
+        <div class="result-info">
+          <div class="result-name">新北市立板橋高中 113 學年度第一學期 高二物理 第二次段考</div>
+          <div class="result-meta">上傳日期：2024/12/20 ・ 含答案卷</div>
+        </div>
+      </div>
+      <a class="result-download">📥 下載試題</a>
+    </div>
+
+    <div class="result-item">
+      <div class="result-left">
+        <div class="result-icon">📄</div>
+        <div class="result-info">
+          <div class="result-name">臺北市立中山女中 113 學年度第一學期 高二物理 第一次段考</div>
+          <div class="result-meta">上傳日期：2024/11/18 ・ 含答案卷</div>
+        </div>
+      </div>
+      <a class="result-download">📥 下載試題</a>
+    </div>
+  </div>
+
+  <div class="callout">
+    💡 沒有段考卷？來這裡下載一份練習用，搭配「段考 AI 審題助手」一起使用效果更佳！
+  </div>
+</body>
+</html>

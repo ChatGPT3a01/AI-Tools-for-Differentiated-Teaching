@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 4：多元評量 Rubric + AI 學生回饋系統</title>
+    <style>
+        /* ===== Reset & Base ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; height: 100%;
+            overflow: hidden;
+            font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0d5f5c 0%, #1abc9c 100%);
+            color: #333;
+            line-height: 1.8;
+            font-size: 20px;
+        }
+        h1 { font-size: 48px; line-height: 1.3; }
+        h2 { font-size: 36px; line-height: 1.4; }
+        h3 { font-size: 26px; line-height: 1.5; }
+        p, li { font-size: 20px; line-height: 1.8; }
+        a { color: inherit; text-decoration: none; }
+        ul { list-style: none; }
+        img.slide-img {
+            max-width: 90%;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            margin: 15px auto;
+            display: block;
+        }
+
+        /* ===== Fixed Nav Bar ===== */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 54px;
+            background: rgba(13, 95, 92, 0.95);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1000;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+        }
+        .navbar .nav-title {
+            color: #fff;
+            font-size: 17px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .navbar .nav-links {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .navbar .nav-links a,
+        .navbar .nav-links button {
+            color: #fff;
+            font-size: 14px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .navbar .nav-links a:hover,
+        .navbar .nav-links button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* ===== Slides Container ===== */
+        .slides-wrapper {
+            position: fixed;
+            top: 54px; left: 0; right: 0; bottom: 0;
+            overflow: hidden;
+        }
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            overflow-y: auto;
+            padding: 40px 60px 80px;
+            display: none;
+            animation: fadeSlide 0.45s ease;
+        }
+        .slide.active { display: block; }
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateX(30px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        /* ===== Content Card ===== */
+        .card {
+            background: rgba(255,255,255,0.97);
+            border-radius: 22px;
+            padding: 40px 48px;
+            max-width: 1100px;
+            margin: 0 auto;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+        }
+        .card h2 {
+            color: #0d5f5c;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 4px solid #14b8a6;
+        }
+        .card h3 {
+            color: #0d5f5c;
+            margin-top: 20px;
+            margin-bottom: 12px;
+        }
+
+        /* ===== Boxes ===== */
+        .box {
+            padding: 18px 22px;
+            border-radius: 12px;
+            margin: 16px 0;
+            font-size: 19px;
+            line-height: 1.8;
+        }
+        .box.info {
+            background: #e8f4fd;
+            border-left: 5px solid #3b82f6;
+            color: #1e40af;
+        }
+        .box.warning {
+            background: #fef9e7;
+            border-left: 5px solid #f59e0b;
+            color: #92400e;
+        }
+        .box.success {
+            background: #ecfdf5;
+            border-left: 5px solid #10b981;
+            color: #065f46;
+        }
+
+        /* ===== Concept Grid ===== */
+        .concept-grid {
+            display: grid;
+            gap: 18px;
+            margin: 20px 0;
+        }
+        .concept-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+        .concept-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+        .concept-grid.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+        .concept-card {
+            background: #f0fdfa;
+            border: 2px solid #99f6e4;
+            border-radius: 16px;
+            padding: 22px;
+            text-align: center;
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+        .concept-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        .concept-card .icon { font-size: 40px; margin-bottom: 10px; }
+        .concept-card h4 {
+            font-size: 20px;
+            color: #0d5f5c;
+            margin-bottom: 8px;
+        }
+        .concept-card p {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        /* ===== Problem / Feature Cards ===== */
+        .feature-card {
+            background: #fff;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin: 12px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            transition: border-color 0.2s;
+        }
+        .feature-card:hover { border-color: #14b8a6; }
+        .feature-card .fc-num {
+            flex-shrink: 0;
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #0d5f5c, #1abc9c);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+        .feature-card .fc-body h4 {
+            font-size: 20px;
+            color: #0d5f5c;
+            margin-bottom: 4px;
+        }
+        .feature-card .fc-body p {
+            font-size: 17px;
+            color: #555;
+        }
+
+        /* ===== Code Block ===== */
+        pre.code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 24px 28px;
+            border-radius: 14px;
+            font-size: 17px;
+            line-height: 1.7;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Source Code Pro', monospace;
+            margin: 16px 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* ===== Tables ===== */
+        table.styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 18px;
+        }
+        table.styled-table thead th {
+            background: linear-gradient(135deg, #0d5f5c, #1abc9c);
+            color: #fff;
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 700;
+        }
+        table.styled-table thead th:first-child { border-radius: 12px 0 0 0; }
+        table.styled-table thead th:last-child  { border-radius: 0 12px 0 0; }
+        table.styled-table tbody td {
+            padding: 12px 18px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        table.styled-table tbody tr:nth-child(even) { background: #f8fffe; }
+        table.styled-table tbody tr:hover { background: #ecfdf5; }
+
+        /* ===== Two Column ===== */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin: 16px 0;
+        }
+
+        /* ===== Flow Diagram ===== */
+        .flow-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            margin: 20px 0;
+        }
+        .flow-box {
+            background: linear-gradient(135deg, #0d5f5c, #1abc9c);
+            color: #fff;
+            padding: 16px 30px;
+            border-radius: 14px;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .flow-box.alt {
+            background: linear-gradient(135deg, #f0fdfa, #d1fae5);
+            color: #0d5f5c;
+            border: 2px solid #14b8a6;
+        }
+        .flow-arrow {
+            font-size: 28px;
+            color: #14b8a6;
+            padding: 4px 0;
+            font-weight: 700;
+        }
+
+        /* ===== Steps ===== */
+        .step-list {
+            counter-reset: step-counter;
+            list-style: none;
+            padding: 0;
+        }
+        .step-list li {
+            counter-increment: step-counter;
+            padding: 10px 0 10px 56px;
+            position: relative;
+            font-size: 19px;
+            line-height: 1.7;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .step-list li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0; top: 10px;
+            width: 38px; height: 38px;
+            background: linear-gradient(135deg, #0d5f5c, #1abc9c);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 17px;
+        }
+
+        /* ===== Tags ===== */
+        .tag {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 4px;
+        }
+        .tag.teal { background: #ccfbf1; color: #0d5f5c; }
+        .tag.blue { background: #dbeafe; color: #1e40af; }
+
+        /* ===== Cover Slide ===== */
+        .cover-slide {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: calc(100vh - 134px);
+            color: #fff;
+        }
+        .cover-slide .part-label {
+            font-size: 28px;
+            font-weight: 700;
+            color: #14b8a6;
+            background: rgba(255,255,255,0.15);
+            padding: 8px 32px;
+            border-radius: 30px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(6px);
+        }
+        .cover-slide h1 {
+            font-size: 52px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .cover-slide .subtitle {
+            font-size: 24px;
+            opacity: 0.92;
+            margin-bottom: 36px;
+            max-width: 750px;
+        }
+        .cover-slide .download-link {
+            display: inline-block;
+            margin-top: 18px;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 28px;
+            border-radius: 30px;
+            font-size: 16px;
+            backdrop-filter: blur(6px);
+            transition: background 0.2s;
+        }
+        .cover-slide .download-link:hover { background: rgba(255,255,255,0.35); }
+        .cover-tags {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .cover-tags .tag {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            font-size: 15px;
+            padding: 6px 18px;
+        }
+
+        /* ===== Navigation Arrows ===== */
+        .nav-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 52px; height: 52px;
+            background: rgba(13, 95, 92, 0.7);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            font-size: 26px;
+            cursor: pointer;
+            z-index: 900;
+            transition: background 0.25s, transform 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+        .nav-arrow:hover {
+            background: rgba(13, 95, 92, 0.95);
+            transform: translateY(-50%) scale(1.1);
+        }
+        .nav-arrow.left  { left: 18px; }
+        .nav-arrow.right { right: 18px; }
+        .nav-arrow:disabled {
+            opacity: 0.3;
+            cursor: default;
+            transform: translateY(-50%);
+        }
+
+        /* ===== Page Indicator Dots ===== */
+        .page-dots {
+            position: fixed;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 900;
+            background: rgba(0,0,0,0.35);
+            padding: 8px 16px;
+            border-radius: 30px;
+            backdrop-filter: blur(8px);
+        }
+        .page-dots .dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.35);
+            cursor: pointer;
+            transition: all 0.25s;
+            border: none;
+        }
+        .page-dots .dot.active {
+            background: #14b8a6;
+            transform: scale(1.3);
+            box-shadow: 0 0 8px rgba(20,184,166,0.5);
+        }
+        .page-dots .dot:hover:not(.active) {
+            background: rgba(255,255,255,0.6);
+        }
+        .page-counter {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+            z-index: 900;
+        }
+
+        /* ===== Highlight Text ===== */
+        .highlight {
+            background: linear-gradient(135deg, #ccfbf1, #a7f3d0);
+            padding: 2px 8px;
+            border-radius: 6px;
+            color: #0d5f5c;
+            font-weight: 600;
+        }
+        strong { color: #0d5f5c; }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 900px) {
+            .slide { padding: 24px 20px 80px; }
+            .card { padding: 24px 20px; }
+            .concept-grid.cols-3,
+            .concept-grid.cols-4 { grid-template-columns: 1fr 1fr; }
+            .two-col { grid-template-columns: 1fr; }
+            h1 { font-size: 34px; }
+            h2 { font-size: 28px; }
+            pre.code-block { font-size: 14px; padding: 16px; }
+        }
+        @media (max-width: 600px) {
+            .concept-grid.cols-2,
+            .concept-grid.cols-3,
+            .concept-grid.cols-4 { grid-template-columns: 1fr; }
+            .navbar .nav-title { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== NAV BAR ===== -->
+<nav class="navbar">
+    <span class="nav-title">Part 4：多元評量 Rubric + AI 學生回饋系統</span>
+    <div class="nav-links">
+        <a href="index.html">&#x1F3E0; 回首頁</a>
+        <button onclick="toggleFullscreen()">&#x1F5A5; 全螢幕</button>
+        <a href="https://www.facebook.com/groups/2754139931432955" target="_blank">&#x1F4D8; FB</a>
+        <a href="https://www.youtube.com/@Liang-yt02" target="_blank">&#x1F3A5; YT</a>
+    </div>
+</nav>
+
+<!-- ===== NAVIGATION ARROWS ===== -->
+<button class="nav-arrow left" onclick="prevSlide()" id="prevBtn">&#10094;</button>
+<button class="nav-arrow right" onclick="nextSlide()" id="nextBtn">&#10095;</button>
+
+<!-- ===== PAGE DOTS ===== -->
+<div class="page-counter" id="pageCounter">1 / 16</div>
+<div class="page-dots" id="pageDots"></div>
+
+<!-- ===== SLIDES ===== -->
+<div class="slides-wrapper">
+
+    <!-- ==================== Slide 1: Cover ==================== -->
+    <div class="slide active" data-slide="1">
+        <div class="cover-slide">
+            <div class="part-label">Part 4</div>
+            <h1>多元評量 Rubric + AI 學生回饋系統</h1>
+            <p class="subtitle">讓學生選擇擅長的方式，再用 AI 給出誠實回饋</p>
+
+            <div class="concept-grid cols-4" style="max-width:900px; margin-top: 30px;">
+                <div class="concept-card" style="background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.25); color:#fff;">
+                    <div class="icon">&#x1F4CA;</div>
+                    <h4 style="color:#fff;">多元評量設計</h4>
+                    <p style="color:rgba(255,255,255,0.85);">三種形式對應多元智能</p>
+                </div>
+                <div class="concept-card" style="background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.25); color:#fff;">
+                    <div class="icon">&#x1F4DD;</div>
+                    <h4 style="color:#fff;">Gemini 產 Rubric</h4>
+                    <p style="color:rgba(255,255,255,0.85);">一次產出三種評分規準</p>
+                </div>
+                <div class="concept-card" style="background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.25); color:#fff;">
+                    <div class="icon">&#x1F4D3;</div>
+                    <h4 style="color:#fff;">NotebookLM 知識庫</h4>
+                    <p style="color:rgba(255,255,255,0.85);">上傳教材提升 AI 準確度</p>
+                </div>
+                <div class="concept-card" style="background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.25); color:#fff;">
+                    <div class="icon">&#x1F4AC;</div>
+                    <h4 style="color:#fff;">工具③ 實作</h4>
+                    <p style="color:rgba(255,255,255,0.85);">AI 學生回饋系統</p>
+                </div>
+            </div>
+
+            <div class="download-link">&#x1F4E5; 下載：工具3_AI學生回饋系統.js</div>
+
+            <div class="cover-tags">
+                <span class="tag">&#x1F3AF; 自主性 Autonomy</span>
+                <span class="tag">&#x1F4AC; 關係 Relatedness</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== Slide 2: 核心概念 — 選擇增加動機 ==================== -->
+    <div class="slide" data-slide="2">
+        <div class="card">
+            <h2>核心概念：選擇 = 自主性 = 動機</h2>
+
+            <div class="box info" style="margin-bottom:20px;">
+                <strong>&#x1F501; 回顧 Part 1：</strong>SDT 自我決定理論的三大心理需求之一 ——「<strong>自主性（Autonomy）</strong>」：當學生感覺自己有選擇權時，內在動機會顯著提升。
+            </div>
+
+            <div style="background:linear-gradient(135deg,#0d5f5c,#1abc9c); color:#fff; padding:30px 36px; border-radius:18px; margin:24px 0; text-align:center;">
+                <p style="font-size:32px; font-weight:700; color:#fff; margin-bottom:10px;">「這是我自己選的」</p>
+                <p style="font-size:22px; color:rgba(255,255,255,0.9);">&#x2192; 動機自然提升，投入度更高，成果更好</p>
+            </div>
+
+            <h3>實例說明</h3>
+            <p>同一個學習目標（例如「理解牛頓第二定律的應用」），提供 <strong>3 種不同的評量形式</strong>讓學生自己選擇：</p>
+
+            <div class="concept-grid cols-3" style="margin-top:16px;">
+                <div class="concept-card">
+                    <div class="icon">&#x1F4DD;</div>
+                    <h4>文字報告</h4>
+                    <p>擅長文字表達的學生</p>
+                </div>
+                <div class="concept-card">
+                    <div class="icon">&#x1F3A8;</div>
+                    <h4>視覺圖表</h4>
+                    <p>擅長視覺思考的學生</p>
+                </div>
+                <div class="concept-card">
+                    <div class="icon">&#x1F399;</div>
+                    <h4>口說 Podcast</h4>
+                    <p>擅長口語表達的學生</p>
+                </div>
+            </div>
+
+            <div class="box success">
+                <strong>&#x1F4A1; 關鍵：</strong>三種形式評量的是<strong>同一個學習目標</strong>，只是表達方式不同。學生選擇自己擅長的方式，更能展現真實能力。
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== Slide 3: 三種評量形式 ==================== -->
+    <div class="slide" data-slide="3">
+        <div class="card">
+            <h2>三種評量形式（對應多元智能）</h2>
+
+            <div class="concept-grid cols-3">
+                <div class="concept-card" style="padding:28px; border-color:#3b82f6; background:#eff6ff;">
+                    <div class="icon">&#x1F4DD;</div>
+                    <h4 style="color:#1e40af; font-size:22px;">文字報告型</h4>
+                    <p style="margin-top:8px;"><strong>對應智能：</strong>語文智能、邏輯智能</p>
+                    <p style="margin-top:6px;"><strong>形式：</strong>800 字書面報告</p>
+                    <p style="margin-top:6px;"><strong>適合學生：</strong>喜歡閱讀、寫作、條理分析</p>
+                    <div style="margin-top:12px; background:#dbeafe; padding:8px 14px; border-radius:8px; font-size:15px; color:#1e40af;">
+                        例：以文字說明 F=ma 在三種日常情境的應用
+                    </div>
+                </div>
+                <div class="concept-card" style="padding:28px; border-color:#8b5cf6; background:#f5f3ff;">
+                    <div class="icon">&#x1F3A8;</div>
+                    <h4 style="color:#6d28d9; font-size:22px;">視覺圖像型</h4>
+                    <p style="margin-top:8px;"><strong>對應智能：</strong>空間智能、觀察力</p>
+                    <p style="margin-top:6px;"><strong>形式：</strong>資訊圖表 / 心智圖</p>
+                    <p style="margin-top:6px;"><strong>適合學生：</strong>喜歡畫圖、視覺化、設計排版</p>
+                    <div style="margin-top:12px; background:#ede9fe; padding:8px 14px; border-radius:8px; font-size:15px; color:#6d28d9;">
+                        例：用資訊圖表呈現 F=ma 的概念關係與實例
+                    </div>
+                </div>
+                <div class="concept-card" style="padding:28px; border-color:#f59e0b; background:#fffbeb;">
+                    <div class="icon">&#x1F399;</div>
+                    <h4 style="color:#b45309; font-size:22px;">口說 Podcast 型</h4>
+                    <p style="margin-top:8px;"><strong>對應智能：</strong>人際智能、音樂智能</p>
+                    <p style="margin-top:6px;"><strong>形式：</strong>3 分鐘 Podcast 說明</p>
+                    <p style="margin-top:6px;"><strong>適合學生：</strong>喜歡說話、討論、表演</p>
+                    <div style="margin-top:12px; background:#fef3c7; padding:8px 14px; border-radius:8px; font-size:15px; color:#b45309;">
+                        例：錄製 3 分鐘 Podcast 講解 F=ma 的生活應用
+                    </div>
+                </div>
+            </div>
+
+            <div class="box info">
+                <strong>&#x2757; 重要原則：</strong>三種形式都評量<strong>同一個學習目標</strong>，只是表達方式不同。這不是降低難度，而是讓學生用最擅長的方式展現學習成果。
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== Slide 4: Gemini 產 Rubric ==================== -->
+    <div class="slide" data-slide="4">
+        <div class="card">
+            <h2>用 Gemini 一次產出三種 Rubric</h2>
+
+            <p>手動設計三種 Rubric 很花時間？交給 Gemini！一個 Prompt 搞定三套評分規準。</p>
+
+            <h3>Prompt 範例（直接複製使用）</h3>
+            <pre class="code-block">請為「牛頓第二定律的應用」這個學習目標，
+設計三種不同評量形式的 Rubric：
+
+1. 文字報告（800字）
+2. 視覺圖表（資訊圖表或心智圖）
+3. 口說 Podcast（3分鐘錄音）
+
+每種形式請設計 3-4 個評分面向，
+每個面向分三等級：
+- 優（5分）
+- 中（3分）
+- 再加強（1分）
+
+重要：三種形式的總分要相同，確保公平性。</pre>
+
+            <div class="box success">
+                <strong>&#x2705; Gemini 會產出：</strong>三種形式各自的 Rubric 表格，每個面向都有明確的等級描述，總分統一為 20 分，確保公平。
+            </div>
+
+            <img src="img/4-1_三種Rubric.png" alt="三種 Rubric 產出結果" class="slide-img">
+        </div>
+    </div>
+
+    <!-- ==================== Slide 5: 選擇策略 — 加更難選項 ==================== -->
+    <div class="slide" data-slide="5">
+        <div class="card">
+            <h2>選擇策略：加一個「更難」的選項</h2>
+
+            <p>還記得 Part 1 的<strong>滷肉飯策略</strong>嗎？讓我們應用在多元評量上。</p>
+
+            <div style="margin:24px 0;">
+                <h3>原本 3 個選項</h3>
+                <div class="concept-grid cols-3" style="margin-bottom:16px;">
+                    <div class="concept-card" style="border-color:#14b8a6;">
+                        <h4>A. 文字報告</h4>
+                        <p>800 字書面報告</p>
+                    </div>
+                    <div class="concept-card" style="border-color:#14b8a6;">
+                        <h4>B. 視覺圖表</h4>
+                        <p>資訊圖表 / 心智圖</p>
+                    </div>
+                    <div class="concept-card" style="border-color:#14b8a6;">
+                        <h4>C. Podcast</h4>
+                        <p>3 分鐘口說錄音</p>
+                    </div>
+                </div>
+
+                <div style="text-align:center; font-size:32px; color:#0d5f5c; margin:10px 0;">&#x2B07; 新增一個選項</div>
+
+                <div class="concept-card" style="border-color:#ef4444; background:#fef2f2; max-width:400px; margin:0 auto;">
+                    <div class="icon">&#x1F525;</div>
+                    <h4 style="color:#dc2626;">D. 文字報告 + 口頭發表</h4>
+                    <p style="color:#991b1b;">寫完報告還要上台發表（更難！）</p>
+                </div>
+            </div>
+
+            <div style="background:linear-gradient(135deg,#f0fdfa,#d1fae5); padding:24px 30px; border-radius:16px; border:2px solid #14b8a6; margin:20px 0;">
+                <h3 style="margin-top:0;">&#x1F9E0; 心理效果</h3>
+                <p>學生選 A / B / C 時覺得：「<strong>至少不用做 D</strong>」&#x2192; 選擇感提升 &#x2192; 動機提升</p>
+                <p style="margin-top:8px; font-size:17px; color:#555;">（回顧 Part 1 的滷肉飯策略：大碗 $60 讓小碗 $40 看起來超划算）</p>
+            </div>
+
+            <div class="box success">
+                <strong>&#x1F4A1; 關鍵：</strong>你不需要真的期待有人選 D。D 的存在本身就讓其他選項更有吸引力，讓學生覺得「我做的選擇很合理」。
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== Slide 6: AI 討好問題 ==================== -->
+    <div class="slide" data-slide="6">
+        <div class="card">
+            <h2>AI 討好問題：為什麼 AI 都給高分？</h2>
+
+            <p>如果你直接丟作品給 AI 評分，你會發現一個嚴重問題：</p>
+
+            <div class="concept-grid cols-2" style="margin:20px 0;">
+                <div class="concept-card" style="border-color:#ef4444; background:#fef2f2;">
+                    <div class="icon">&#x274C;</div>
+                    <h4 style="color:#dc2626;">錯誤問法 1</h4>
+                    <p style="color:#333;">問 AI：「請幫我改這份作業」</p>
+                    <div style="background:#fee2e2; padding:10px; border-radius:8px; margin-top:10px; font-size:16px;">
+                        AI 回：「寫得很好！內容豐富，觀點清晰，90 分！」
+                    </div>
+                </div>
+                <div class="concept-card" style="border-color:#ef4444; background:#fef2f2;">
+                    <div class="icon">&#x274C;</div>
+                    <h4 style="color:#dc2626;">錯誤問法 2</h4>
+                    <p style="color:#333;">問 AI：「請給這份作品評語」</p>
+                    <div style="background:#fee2e2; padding:10px; border-radius:8px; margin-top:10px; font-size:16px;">
+                        AI 回：「表現優秀，繼續加油！很有創意！」
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align:center; font-size:22px; color:#dc2626; font-weight:700; margin:10px 0;">
+                結果：每個人都 90 分，評語都一樣 &#x1F612;
+            </div>
+
+            <div class="box warning">
+                <strong>&#x26A0; 為什麼會這樣？</strong><br>
+                AI 在訓練過程中，「友善、肯定」的回應會被獎勵（RLHF 機制）。所以 AI 天生傾向「說好話」、「避免否定」—— 這就是所謂的 <strong>AI 討好問題（Sycophancy）</strong>。
+            </div>
+
+            <h3 style="margin-top:24px;">問法對比</h3>
+            <div class="two-col">
+                <div style="background:#fef2f2; padding:20px; border-radius:14px; border:2px solid #fca5a5;">
+                    <h4 style="color:#dc2626; margin-bottom:10px;">&#x274C; 錯誤問法</h4>
+                    <ul style="list-style:disc; padding-left:20px;">
+                        <li>「幫我改作業」</li>
+                        <li>「給評語」</li>
+                        <li>「這份報告寫得好嗎？」</li>
+                        <li>「請評分」</li>
+                    </ul>
+                    <p style="margin-top:10px; font-size:16px; color:#991b1b;">&#x2192; AI 只會說好話</p>
+                </div>
+                <div style="background:#ecfdf5; padding:20px; border-radius:14px; border:2px solid #6ee7b7;">
+                    <h4 style="color:#065f46; margin-bottom:10px;">&#x2705; 正確問法</h4>
+                    <ul style="list-style:disc; padding-left:20px;">
+                        <li>「根據 Rubric 逐項評估」</li>
+                        <li>「先指出不足再說優點」</li>
+                        <li>「如果要扣分，在哪裡扣？」</li>
+                        <li>「你是嚴謹的老師」</li>
+                    </ul>
+                    <p style="margin-top:10px; font-size:16px; color:#065f46;">&#x2192; AI 給出真實、有建設性的回饋</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== Slide 7: 5 招解決 AI 討好 ==================== -->
+    <div class="slide" data-slide="7">
+        <div class="card">
+            <h2>5 招解決 AI 討好</h2>
+
+            <p>以下 5 個 Prompt 技巧，讓 AI 從「說好話機器」變成「有建設性的評審」：</p>
+
+            <div class="feature-card">
+                <div class="fc-num">1</div>
+                <div class="fc-body">
+                    <h4>明確要求找缺點</h4>
+                    <p>Prompt：「<strong>請先指出這份作品的不足之處，如果要扣分，會在哪裡扣？</strong>」</p>
+                    <p style="font-size:16px; color:#666; margin-top:4px;">&#x2192; 強迫 AI 先從批評開始，避免只說好話</p>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="fc-num">2</div>
+                <div class="fc-body">
+                    <h4>模擬扣分</h4>
+                    <p>Prompt：「<strong>如果滿分 100 分，這份作品你會給幾分？請詳細說明每個扣分的理由。</strong>」</p>
+                    <p style="font-size:16px; color:#666; margin-top:4px;">&#x2192; 具體的分數逼 AI 做出取捨，不能每個都高分</p>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="fc-num">3</div>
+                <div class="fc-body">
+                    <h4>對照 Rubric 逐項評</h4>
+                    <p>Prompt：「<strong>根據以下 Rubric 的每個面向，逐項給分並說明理由。</strong>」</p>
+                    <p style="font-size:16px; color:#666; margin-top:4px;">&#x2192; 有明確標準，AI 就不能模糊帶過</p>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="fc-num">4</div>
+                <div class="fc-body">
+                    <h4>先批評再稱讚</h4>
+                    <p>Prompt：「<strong>先說需要改進的地方（至少 3 點），再說做得好的地方。</strong>」</p>
+                    <p style="font-size:16px; color:#666; margin-top:4px;">&#x2192; 順序很重要！先批評 = 確保批評不會被省略</p>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="fc-num">5</div>
+                <div class="fc-body">
+                    <h4>設定嚴格角色</h4>
+                    <p>Prompt：「<strong>你是一位嚴謹但溫暖的老師，你會指出問題但不會隨意給高分。</strong>」</p>
+                    <p style="font-size:16px; color:#666; margin-top:4px;">&#x2192; 角色設定讓 AI 有「嚴格的許可證」</p>
+                </div>
+            </div>
+
+            <div class="box info">
+                <strong>&#x1F4A1; 工具 ③ 的程式碼已經內建了這些技巧！</strong>你不需要每次手動輸入，程式碼裡的 Prompt 已經把 5 招都寫進去了。
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== Slide 8: 架構圖 ==================== -->
+    <div class="slide" data-slide="8">
+        <div class="card">
+            <h2>工具 &#x2462; 架構：NotebookLM + GAS + Gemini</h2>
+
+            <div class="flow-diagram">
+                <div class="flow-box">&#x1F4D3; NotebookLM<br><span style="font-size:15px; font-weight:400;">上傳課本、講義、Rubric、標準答案</span></div>
+                <div class="flow-arrow">&#x2B07;</div>
+                <div style="font-size:16px; color:#0d5f5c; font-weight:600; padding:4px 0;">提供知識庫基準</div>
+                <div class="flow-arrow">&#x2B07;</div>
+                <div class="flow-box alt">&#x1F4CA; Google Sheets<br><span style="font-size:15px; font-weight:400;">學生姓名 + 評量形式 + Rubric + 學生作品</span></div>
+                <div class="flow-arrow">&#x2B07;</div>
+                <div class="flow-box">&#x2699; GAS + Gemini API<br><span style="font-size:15px; font-weight:400;">自動讀取每列資料，呼叫 AI 逐一回饋</span></div>
+                <div class="flow-arrow">&#x2B07;</div>
+                <div class="flow-box" style="background:linear-gradient(135deg,#065f46,#10b981);">
+                    &#x2705; 產出：個人化回饋<br>
+                    <span style="font-size:15px; font-weight:400;">逐項評分 + 優點 + 缺點 + 改進建議 + 鼓勵語</span>
+                </div>
+            </div>
+
+            <div class="box info" style="margin-top:24px;">
+                <strong>&#x1F4CC; 說明：</strong>NotebookLM 是<strong>選配</strong>，沒有也能用。但有了它，AI 回饋的準確度會大幅提升 —— 因為 AI 會根據「你的教材」來評，而不是根據「網路上的通用知識」。
+            </div>
+
+            <div class="concept-grid cols-3" style="margin-top:20px;">
+                <div class="concept-card">
+                    <div class="icon">&#x1F4D6;</div>
+                    <h4>沒有 NotebookLM</h4>
+                    <p>AI 用通用知識評分，可能偏離你的教學重點</p>
+                </div>
+                <div class="concept-card" style="border-color:#10b981; background:#ecfdf5;">
+                    <div class="icon">&#x1F4D3;</div>
+                    <h4>有 NotebookLM</h4>
+                    <p>AI 根據你上傳的教材評分，精準對應你教的內容</p>
+                </div>
+                <div class="concept-card" style="border-color:#14b8a6; background:#f0fdfa;">
+                    <div class="icon">&#x1F3AF;</div>
+                    <h4>最佳實踐</h4>
+                    <p>把 NotebookLM 整理的重點摘要貼到 Rubric 欄</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== Slide 9: NotebookLM 設定 ==================== -->
+    <div class="slide" data-slide="9">
+        <div class="card">
+            <h2>（選做）NotebookLM 知識庫設定</h2>
+
+            <div class="box info" style="margin-bottom:20px;">
+                <strong>&#x1F4D3; NotebookLM 是什麼？</strong><br>
+                Google 推出的 AI 筆記工具。你上傳自己的教學資料後，AI <strong>只根據你的資料</strong>回答問題 —— 不會瞎掰、不會引用網路上的錯誤資訊。
+            </div>
+
+            <h3>設定步驟</h3>
+            <ol class="step-list">
+                <li>打開 <strong>notebooklm.google.com</strong> &#x2192; 用 Google 帳號登入</li>
+                <li>點「<strong>新增筆記本</strong>」&#x2192; 上傳你的教學資料：
+                    <ul style="list-style:disc; padding-left:24px; margin-top:6px; font-size:17px;">
+                        <li>課本 PDF / 講義</li>
+                        <li>Rubric 評分規準</li>
+                        <li>標準答案 / 範例作品</li>
+                        <li>教學簡報、補充資料</li>
+                    </ul>
+                </li>
+                <li><strong>測試：</strong>在對話框問「這個單元的核心概念是什麼？」確認 AI 有引用你的資料（會顯示來源標註）</li>
+                <li><strong>整理重點摘要：</strong>請 NotebookLM 幫你整理每個學習目標的重點，之後填入工具 &#x2462; 的 Rubric 欄位</li>
+            </ol>
+
+            <div class="two-col" style="margin-top:20px;">
+                <div>
+                    <img src="img/4-2_NotebookLM新增筆記本.png" alt="NotebookLM 新增筆記本" class="slide-img">
+                    <p style="text-align:center; font-size:15px; color:#666;">新增筆記本畫面</p>
+                </div>
+                <div>
+                    <img src="img/4-3_NotebookLM上傳後.png" alt="NotebookLM 上傳後" class="slide-img">
+                    <p style="text-align:center; font-size:15px; color:#666;">上傳資料後的畫面</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== Slide 10: Step 1 建立 Sheets ==================== -->
+    <div class="slide" data-slide="10">
+        <div class="card">
+            <h2>Step 1：建立 Google Sheets</h2>
+
+            <h3>操作步驟</h3>
+            <ol class="step-list">
+                <li>打開 Google Sheets &#x2192; 新建試算表</li>
+                <li>將試算表命名為「<strong>AI 學生回饋系統</strong>」</li>
+            </ol>
+
+            <h3 style="margin-top:24px;">欄位格式</h3>
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>欄位</th>
+                        <th>內容</th>
+                        <th>說明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>A 欄</strong></td>
+                        <td>學生姓名</td>
+                        <td>例如：王小明</td>
+                    </tr>
+                    <tr>
+                        <td><strong>B 欄</strong></td>
+                        <td>評量形式</td>
+                        <td>文字報告 / 視覺圖表 / Podcast</td>
+                    </tr>
+                    <tr>
+                        <td><strong>C 欄</strong></td>
+                        <td>Rubric（評分規準）</td>
+                        <td>從 Gemini / NotebookLM 產出的 Rubric 貼入</td>
+                    </tr>
+                    <tr>
+                        <td><strong>D 欄</strong></td>
+                        <td>學生作品內容</td>
+                        <td>學生的報告文字 / 圖表描述 / 逐字稿</td>
+                    </tr>
+                    <tr>
+                        <td><strong>E 欄</strong></td>
+                        <td>AI 回饋（自動產生）</td>
+                        <td>程式自動填入，不需手動輸入</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="box info">
+                <strong>&#x1F4CC; 提醒：</strong>第 1 列是標題列，從第 2 列開始填入學生資料。E 欄保持空白，程式會自動填入 AI 回饋。
+            </div>
+
+            <img src="img/4-4_回饋系統Sheets.png" alt="回饋系統 Sheets 格式" class="slide-img">
+        </div>
+    </div>
+
+    <!-- ==================== Slide 11: Step 2 貼上程式碼 ==================== -->
+    <div class="slide" data-slide="11">
+        <div class="card">
+            <h2>Step 2：設定 Apps Script + 貼程式碼</h2>
+
+            <div class="box info" style="margin-bottom:20px;">
+                <strong>&#x1F501; 跟工具 &#x2460;&#x2461; 一樣的流程，已經做過兩次了，應該很熟了！</strong>
+            </div>
+
+            <h3>操作步驟</h3>
+            <ol class="step-list">
+                <li>在 Google Sheets 上方選單：<strong>擴充功能 &#x2192; Apps Script</strong></li>
+                <li>左側齒輪 <strong>&#x2699; 專案設定</strong> &#x2192; 往下找到「<strong>指令碼屬性</strong>」&#x2192; 新增屬性：
+                    <div style="background:#1e293b; color:#e2e8f0; padding:12px 18px; border-radius:10px; margin-top:8px; font-family:monospace; font-size:16px;">
+                        屬性名稱：<span style="color:#14b8a6;">GEMINI_API_KEY</span><br>
+                        值：<span style="color:#fbbf24;">你的 Gemini API 金鑰</span>
+                    </div>
+                </li>
+                <li>回到編輯器 &#x2192; <strong>全選（Ctrl+A）&#x2192; 刪除</strong> &#x2192; 貼上<strong>工具 3 程式碼</strong> &#x2192; <strong>Ctrl+S</strong> 儲存</li>
+                <li>上方工具列點 <strong>&#x25B6; 執行</strong> &#x2192; 函式選「<strong>onOpen</strong>」&#x2192; 點執行 &#x2192; 完成 Google 授權流程</li>
+                <li>回到 Google Sheets &#x2192; <strong>F5 重新整理頁面</strong> &#x2192; 上方出現「<strong>&#x1F4AC; AI 回饋</strong>」自訂選單</li>
+            </ol>
+
+            <div class="box warning" style="margin-top:20px;">
+                <strong>&#x26A0; 常見問題：</strong>如果選單沒出現，試試以下方法：<br>
+                1. 重新整理頁面（F5）<br>
+                2. 關掉 Sheets 再重新打開<br>
+                3. 確認 onOpen 函式有執行成功（Apps Script 沒有紅色錯誤訊息）
+            </div>
+
+            <div class="box success">
+                <strong>&#x2705; 完成標準：</strong>Google Sheets 上方出現「&#x1F4AC; AI 回饋」選單，包含「&#x1F504; 產生個人化回饋」和「&#x1F4E7; 批次產生全部回饋」兩個選項。
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== Slide 12: Step 3 使用流程 ==================== -->
+    <div class="slide" data-slide="12">
+        <div class="card">
+            <h2>Step 3：使用流程</h2>
+
+            <h3>填入資料</h3>
+            <ol class="step-list">
+                <li><strong>A 欄</strong>填入學生姓名（例如：王小明、李小華...）</li>
+                <li><strong>B 欄</strong>填入該學生選的評量形式（文字報告 / 視覺圖表 / Podcast）</li>
+                <li><strong>C 欄</strong>填入 Rubric 評分規準
+                    <div style="font-size:17px; color:#555; margin-top:4px;">可從 Gemini 產出的 Rubric 貼入，或從 NotebookLM 整理的摘要貼入</div>
+                </li>
+                <li><strong>D 欄</strong>填入學生作品內容
+                    <div style="font-size:17px; color:#555; margin-top:4px;">文字報告直接貼文字；圖表可貼圖表描述文字；Podcast 可貼逐字稿</div>
+                </li>
+            </ol>
+
+            <h3 style="margin-top:24px;">產生回饋</h3>
+            <div class="concept-grid cols-2">
+                <div class="concept-card" style="border-color:#14b8a6;">
+                    <div class="icon">&#x1F504;</div>
+                    <h4>單筆產生</h4>
+                    <p>選取要產生回饋的列 &#x2192; 點「&#x1F4AC; AI 回饋」&#x2192;「&#x1F504; 產生個人化回饋」</p>
+                    <div style="background:#ccfbf1; padding:8px; border-radius:8px; margin-top:8px; font-size:15px;">適合逐一檢查品質</div>
+                </div>
+                <div class="concept-card" style="border-color:#10b981; background:#ecfdf5;">
+                    <div class="icon">&#x1F4E7;</div>
+                    <h4>批次產生</h4>
+                    <p>點「&#x1F4AC; AI 回饋」&#x2192;「&#x1F4E7; 批次產生全部回饋」一次全部跑</p>
+                    <div style="background:#d1fae5; padding:8px; border-radius:8px; margin-top:8px; font-size:15px;">適合全班一次處理</div>
+                </div>
+            </div>
+
+            <img src="img/4-5_AI回饋結果.png" alt="AI 回饋結果" class="slide-img" style="margin-top:20px;">
+        </div>
+    </div>
+
+    <!-- ==================== Slide 13: 批次完成展示 ==================== -->
+    <div class="slide" data-slide="13">
+        <div class="card">
+            <h2>回饋結果展示</h2>
+
+            <p>AI 產出的每份回饋包含 <strong>5 個部分</strong>，針對該學生的作品量身打造：</p>
+
+            <div style="margin:20px 0;">
+                <div class="feature-card" style="border-left:5px solid #3b82f6;">
+                    <div class="fc-num" style="background:#3b82f6;">1</div>
+                    <div class="fc-body">
+                        <h4>&#x1F4CA; 逐項評分</h4>
+                        <p>根據 Rubric 的每個面向給分，例如「概念理解 4/5、表達清晰度 3/5、實例應用 5/5」</p>
+                    </div>
+                </div>
+                <div class="feature-card" style="border-left:5px solid #10b981;">
+                    <div class="fc-num" style="background:#10b981;">2</div>
+                    <div class="fc-body">
+                        <h4>&#x2705; 做得好的地方（2-3 點）</h4>
+                        <p>具體指出哪些部分表現優秀，例如「正確運用 F=ma 分析了三個日常情境」</p>
+                    </div>
+                </div>
+                <div class="feature-card" style="border-left:5px solid #f59e0b;">
+                    <div class="fc-num" style="background:#f59e0b;">3</div>
+                    <div class="fc-body">
+                        <h4>&#x26A0; 需要改進的地方（2-3 點）</h4>
+                        <p>誠實指出不足，例如「第三段缺少單位標註，因果邏輯有跳躍」</p>
+                    </div>
+                </div>
+                <div class="feature-card" style="border-left:5px solid #8b5cf6;">
+                    <div class="fc-num" style="background:#8b5cf6;">4</div>
+                    <div class="fc-body">
+                        <h4>&#x1F4A1; 具體改進建議（2-3 點）</h4>
+                        <p>可操作的建議，例如「建議加入受力分析圖，第三段補上因果連接詞」</p>
+                    </div>
+                </div>
+                <div class="feature-card" style="border-left:5px solid #ec4899;">
+                    <div class="fc-num" style="background:#ec4899;">5</div>
+                    <div class="fc-body">
+                        <h4>&#x1F4AA; 鼓勵語</h4>
+                        <p>溫暖但不空泛的鼓勵，例如「你對日常情境的觀察力很敏銳，如果再加上數據佐證會更有說服力」</p>
+                    </div>
+                </div>
+            </div>
+
+            <img src="img/4-6_批次回饋完成.png" alt="批次回饋完成" class="slide-img">
+
+            <div class="box success">
+                <strong>&#x2705; 重點：</strong>每份回饋都是針對該學生的作品<strong>量身打造</strong>的，不是複製貼上！即使同一班 30 個學生，每個人收到的回饋都不一樣。
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== Slide 14: 回饋品質對照 ==================== -->
+    <div class="slide" data-slide="14">
+        <div class="card">
+            <h2>回饋品質對照</h2>
+
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th style="width:16%;">比較面向</th>
+                        <th style="width:42%; background:linear-gradient(135deg,#dc2626,#ef4444);">&#x274C; 無 Rubric + 一般問法</th>
+                        <th style="width:42%; background:linear-gradient(135deg,#065f46,#10b981);">&#x2705; 有 Rubric + 正確問法</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>評分</strong></td>
+                        <td>「很好，90 分」</td>
+                        <td>「概念理解 4/5、表達清晰度 3/5、實例應用 5/5、格式規範 4/5，總分 16/20」</td>
+                    </tr>
+                    <tr>
+                        <td><strong>優點</strong></td>
+                        <td>「寫得很好」</td>
+                        <td>「正確使用 F=ma 分析了腳踏車加速、電梯升降、投球三個實例，且每個實例都有數據佐證」</td>
+                    </tr>
+                    <tr>
+                        <td><strong>缺點</strong></td>
+                        <td>「可以再加油」</td>
+                        <td>「第三段缺少單位標註（應標明 N、kg、m/s²），第二段和第三段之間缺乏因果過渡」</td>
+                    </tr>
+                    <tr>
+                        <td><strong>建議</strong></td>
+                        <td>「繼續努力」</td>
+                        <td>「建議在第三段加入受力分析圖，並在段落間補上因果連接詞（例如：因此、由此可知）」</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="box warning" style="margin-top:20px;">
+                <strong>&#x26A0; 差異是天壤之別！</strong>左邊的回饋學生看了等於沒看，右邊的回饋學生可以明確知道「哪裡做得好」和「怎麼改進」。
+            </div>
+
+            <div style="background:linear-gradient(135deg,#f0fdfa,#d1fae5); padding:24px 30px; border-radius:16px; border:2px solid #14b8a6; margin-top:20px;">
+                <h3 style="margin-top:0;">&#x1F4AC; 對應 SDT「關係」需求</h3>
+                <p style="font-size:19px;">當學生收到<strong>具體、針對性</strong>的回饋時，他們會感受到：</p>
+                <p style="font-size:22px; font-weight:700; color:#0d5f5c; text-align:center; margin-top:10px;">「老師有認真看我的作品」&#x2192; 關係感提升 &#x2192; 學習動機提升</p>
+                <p style="font-size:17px; color:#555; margin-top:8px; text-align:center;">即使是 AI 產生的回饋，只要夠具體、夠精準，學生一樣能感受到被重視。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== Slide 15: 提示詞模板 ==================== -->
+    <!-- Slide: 提示詞模板 -->
+    <div class="slide" id="slide-prompt" data-slide="15">
+        <div class="card">
+            <h2>📋 提示詞模板：打造你自己的 AI 學生回饋系統</h2>
+            <p>複製以下提示詞，貼到 <strong>Gemini / ChatGPT / Claude</strong>，即可取得完整程式碼：</p>
+            <pre style="background:#1e293b;color:#e2e8f0;padding:25px;border-radius:12px;font-size:16px;line-height:1.7;white-space:pre-wrap;max-height:60vh;overflow-y:auto;"><code>請幫我寫一個 Google Apps Script（GAS），功能是「AI 學生回饋系統」。
+
+需求：
+1. 在 Google Sheets 建立選單「💬 AI 回饋」，含兩個功能：
+   - 產生個人化回饋（選取的那一列）
+   - 批次產生全部回饋
+2. Sheets 欄位：A=學生姓名、B=評量形式、C=Rubric 評分規準、D=學生作品、E=AI 回饋
+3. 呼叫 Gemini API（gemini-2.5-flash），Prompt 設計重點：
+   - 角色：「你是一位嚴謹但溫暖的老師，不會隨意給高分」
+   - 重要指示：「請誠實指出不足之處，如果有缺失就明確指出」
+   - 輸入：學生姓名、評量形式、Rubric、學生作品
+   - 輸出格式（5 個區塊）：
+     📊 逐項評分（根據 Rubric 每個面向給分）
+     ✅ 做得好的地方（2-3 點，要具體）
+     ⚠️ 需要改進的地方（2-3 點，要具體指出哪裡不好）
+     💡 具體改進建議（2-3 點，要可操作）
+     💪 鼓勵語（一句話）
+4. 批次功能要有 2 秒間隔避免 API 速率限制
+
+技術要求：
+- API Key 存在指令碼屬性 GEMINI_API_KEY
+- temperature: 0.4（讓回饋有點變化但不失準確）
+- 包含錯誤處理和進度提示</code></pre>
+            <div class="box info">
+                <strong>💡 提示：</strong>你可以修改 Prompt 中的「角色設定」來調整回饋風格。<br>
+                例如改成「你是一位幽默的老師」會讓回饋更輕鬆活潑。
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== Slide 16: 實作練習 ==================== -->
+    <div class="slide" data-slide="16">
+        <div class="card">
+            <h2>&#x1F3AF; 實作練習</h2>
+
+            <div class="box success" style="font-size:20px; padding:28px;">
+                <h3 style="color:#065f46; margin-top:0; margin-bottom:16px;">&#x1F3AF; 任務：批改一份學生作品</h3>
+
+                <h4 style="color:#065f46; margin-bottom:8px;">步驟：</h4>
+                <ol class="step-list" style="margin-bottom:20px;">
+                    <li>用 <strong>Gemini</strong> 先產出一份 Rubric（可參考 Slide 4 的 Prompt）</li>
+                    <li>在 Google Sheets 填入學生資料和作品內容（可用範例資料或自己班上的作品）</li>
+                    <li>用<strong>工具 &#x2462;</strong> 產生 AI 回饋</li>
+                </ol>
+
+                <h4 style="color:#065f46; margin-bottom:8px;">檢查回饋品質：</h4>
+                <ul style="list-style:disc; padding-left:24px; margin-bottom:16px;">
+                    <li>有沒有<strong>具體指出缺點</strong>？（不是只說「可以再加油」）</li>
+                    <li>建議是否<strong>可操作</strong>？（學生看了知道具體怎麼改）</li>
+                    <li>學生看了會有什麼感覺？（被重視 or 被敷衍？）</li>
+                </ul>
+            </div>
+
+            <div style="background:#eff6ff; border:2px solid #93c5fd; border-radius:16px; padding:24px; margin-top:20px;">
+                <h3 style="color:#1e40af; margin-top:0;">&#x1F680; 進階挑戰</h3>
+                <p style="font-size:19px; color:#1e40af;">修改程式碼中的 Prompt，調整回饋風格：</p>
+                <div class="two-col" style="margin-top:12px;">
+                    <div style="background:#fff; padding:16px; border-radius:12px; border:1px solid #bfdbfe;">
+                        <h4 style="color:#1e40af;">&#x1F9CA; 更嚴格版</h4>
+                        <p style="font-size:16px; color:#555;">在 Prompt 加入：「以學術標準嚴格評估，不要降低標準」</p>
+                    </div>
+                    <div style="background:#fff; padding:16px; border-radius:12px; border:1px solid #bfdbfe;">
+                        <h4 style="color:#1e40af;">&#x2600; 更溫暖版</h4>
+                        <p style="font-size:16px; color:#555;">在 Prompt 加入：「用溫暖鼓勵的語氣，強調成長空間」</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-grid cols-3" style="margin-top:24px;">
+                <div class="concept-card">
+                    <div class="icon">&#x23F0;</div>
+                    <h4>預計時間</h4>
+                    <p>20 分鐘</p>
+                </div>
+                <div class="concept-card">
+                    <div class="icon">&#x1F465;</div>
+                    <h4>建議方式</h4>
+                    <p>個人操作，小組互相檢查回饋品質</p>
+                </div>
+                <div class="concept-card">
+                    <div class="icon">&#x2753;</div>
+                    <h4>遇到問題？</h4>
+                    <p>舉手找講師，或參考教材 P.30</p>
+                </div>
+            </div>
+
+            <div style="text-align:center; margin-top:30px; padding-top:20px; border-top:2px solid rgba(0,0,0,0.1);">
+                <a href="Part5_分享與總結.html" style="display:inline-block; padding:16px 40px; background:linear-gradient(135deg, #c0392b, #e74c3c); color:#fff; text-decoration:none; border-radius:12px; font-size:20px; font-weight:700; box-shadow:0 4px 15px rgba(0,0,0,0.2); transition:transform 0.2s;">
+                    &#9654; 前往 Part 5：分享與總結
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div><!-- end slides-wrapper -->
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+(function() {
+    // --- State ---
+    let currentSlide = 1;
+    const totalSlides = 16;
+
+    // --- DOM refs ---
+    const slides     = document.querySelectorAll('.slide');
+    const prevBtn    = document.getElementById('prevBtn');
+    const nextBtn    = document.getElementById('nextBtn');
+    const dotsWrap   = document.getElementById('pageDots');
+    const counter    = document.getElementById('pageCounter');
+
+    // --- Build dots ---
+    for (let i = 1; i <= totalSlides; i++) {
+        const dot = document.createElement('button');
+        dot.className = 'dot' + (i === 1 ? ' active' : '');
+        dot.title = '第 ' + i + ' 頁';
+        dot.setAttribute('data-slide', i);
+        dot.addEventListener('click', function() { goTo(i); });
+        dotsWrap.appendChild(dot);
+    }
+
+    // --- Navigation ---
+    function goTo(n) {
+        if (n < 1 || n > totalSlides) return;
+        slides[currentSlide - 1].classList.remove('active');
+        currentSlide = n;
+        slides[currentSlide - 1].classList.add('active');
+        updateUI();
+    }
+
+    function nextSlide() { goTo(currentSlide + 1); }
+    function prevSlide() { goTo(currentSlide - 1); }
+
+    function updateUI() {
+        // counter
+        counter.textContent = currentSlide + ' / ' + totalSlides;
+        // dots
+        dotsWrap.querySelectorAll('.dot').forEach(function(d, i) {
+            d.classList.toggle('active', i + 1 === currentSlide);
+        });
+        // arrows
+        prevBtn.disabled = (currentSlide === 1);
+        nextBtn.disabled = (currentSlide === totalSlides);
+    }
+
+    // expose globally
+    window.nextSlide = nextSlide;
+    window.prevSlide = prevSlide;
+
+    // --- Keyboard ---
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') {
+            e.preventDefault();
+            nextSlide();
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+            e.preventDefault();
+            prevSlide();
+        } else if (e.key === 'Home') {
+            e.preventDefault();
+            goTo(1);
+        } else if (e.key === 'End') {
+            e.preventDefault();
+            goTo(totalSlides);
+        }
+    });
+
+    // --- Touch swipe ---
+    let touchStartX = 0;
+    let touchStartY = 0;
+    document.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+    document.addEventListener('touchend', function(e) {
+        const dx = e.changedTouches[0].screenX - touchStartX;
+        const dy = e.changedTouches[0].screenY - touchStartY;
+        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+            if (dx < 0) nextSlide();
+            else prevSlide();
+        }
+    }, { passive: true });
+
+    // --- Fullscreen ---
+    window.toggleFullscreen = function() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(function(){});
+        } else {
+            document.exitFullscreen().catch(function(){});
+        }
+    };
+
+    // --- Init ---
+    updateUI();
+})();
+</script>
+</body>
+</html>

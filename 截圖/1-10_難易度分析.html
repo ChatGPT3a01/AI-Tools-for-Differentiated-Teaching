@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff; width: 780px; }
+  .toolbar { background: #f0f4f0; padding: 4px 8px; border-bottom: 1px solid #c0c0c0; }
+  .toolbar .title { color: #188038; font-size: 18px; font-weight: 500; }
+  table { border-collapse: collapse; font-size: 13px; margin: 12px; }
+  th, td { border: 1px solid #e2e2e2; padding: 8px 14px; }
+  .section-title { font-size: 16px; font-weight: 600; color: #202124; padding: 16px 12px 8px; }
+  .header-green { background: #34a853; color: #fff; font-weight: 600; }
+  .header-yellow { background: #fbbc04; color: #202124; font-weight: 600; }
+  .easy { background: #e8f5e9; color: #1b5e20; }
+  .medium { background: #fff8e1; color: #f57f17; }
+  .hard { background: #fce8e6; color: #c62828; }
+  .sheet-tabs { background: #f0f0f0; padding: 4px 8px; display: flex; gap: 2px; border-top: 1px solid #c0c0c0; }
+  .tab { background: #fff; border: 1px solid #c0c0c0; border-bottom: none; padding: 6px 16px; font-size: 12px; border-radius: 4px 4px 0 0; }
+  .tab.active { border-bottom: 2px solid #34a853; font-weight: 500; color: #34a853; }
+  .bar-container { display: flex; height: 32px; border-radius: 6px; overflow: hidden; margin: 8px 12px; border: 1px solid #e0e0e0; }
+  .bar-easy { background: #34a853; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; }
+  .bar-medium { background: #fbbc04; color: #202124; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; }
+  .bar-hard { background: #ea4335; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; }
+</style>
+</head>
+<body>
+  <div class="toolbar"><span class="title">📊 段考AI審題助手</span></div>
+
+  <div class="section-title">各題難度分析</div>
+  <table>
+    <tr><th class="header-green">題號</th><th class="header-green">難度</th></tr>
+    <tr><td>第 1 題</td><td class="easy">簡單</td></tr>
+    <tr><td>第 2 題</td><td class="medium">中等</td></tr>
+    <tr><td>第 3 題</td><td class="easy">簡單</td></tr>
+    <tr><td>第 4 題</td><td class="easy">簡單</td></tr>
+    <tr><td>第 5 題</td><td class="hard">困難</td></tr>
+    <tr><td>第 6 題</td><td class="medium">中等</td></tr>
+    <tr><td>第 7 題</td><td class="medium">中等</td></tr>
+    <tr><td>第 8 題</td><td class="medium">中等</td></tr>
+    <tr><td>第 9 題</td><td class="medium">中等</td></tr>
+    <tr><td>第 10 題</td><td class="hard">困難</td></tr>
+    <tr><td>第 11 題</td><td class="medium">中等</td></tr>
+    <tr><td>第 12 題</td><td class="easy">簡單</td></tr>
+    <tr><td>第 13 題</td><td class="medium">中等</td></tr>
+    <tr><td>第 14 題</td><td class="medium">中等</td></tr>
+    <tr><td>第 15 題</td><td class="hard">困難</td></tr>
+  </table>
+
+  <div class="section-title">統計摘要</div>
+  <table>
+    <tr><th class="header-yellow">難度</th><th class="header-yellow">題數</th><th class="header-yellow">百分比</th></tr>
+    <tr><td class="easy">簡單</td><td>4 題</td><td>27%</td></tr>
+    <tr><td class="medium">中等</td><td>8 題</td><td>53%</td></tr>
+    <tr><td class="hard">困難</td><td>3 題</td><td>20%</td></tr>
+  </table>
+
+  <div style="padding: 8px 12px; font-size: 13px; color: #5f6368; margin-top: 4px;">難度分布視覺化：</div>
+  <div class="bar-container">
+    <div class="bar-easy" style="width: 27%;">簡單 27%</div>
+    <div class="bar-medium" style="width: 53%;">中等 53%</div>
+    <div class="bar-hard" style="width: 20%;">困難 20%</div>
+  </div>
+
+  <div class="sheet-tabs">
+    <div class="tab">雙向細目表</div>
+    <div class="tab active">難易度分析</div>
+    <div class="tab">檢核與建議</div>
+    <div class="tab">Sheet1</div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Google Sans', 'Segoe UI', Arial, sans-serif; background: #fff; width: 780px; }
+  .sheets-header { background: #0f9d58; padding: 10px 20px; display: flex; align-items: center; gap: 12px; }
+  .sheets-icon { width: 26px; height: 26px; background: #fff; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #0f9d58; font-size: 14px; font-weight: bold; }
+  .sheets-title { color: #fff; font-size: 16px; font-weight: 500; }
+  .toolbar { background: #f8f9fa; border-bottom: 1px solid #e0e0e0; padding: 6px 12px; display: flex; gap: 16px; font-size: 13px; color: #5f6368; }
+  .toolbar-item { padding: 4px 8px; cursor: pointer; }
+  .toolbar-item:hover { background: #e8eaed; border-radius: 4px; }
+  .content-area { display: flex; }
+  .sheet-left { width: 260px; border-right: 1px solid #e0e0e0; flex-shrink: 0; }
+  .col-header { display: flex; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; }
+  .col-header div { padding: 6px 8px; font-size: 11px; color: #5f6368; font-weight: 500; text-align: center; border-right: 1px solid #e0e0e0; }
+  .col-a { width: 40px; }
+  .col-b { width: 80px; }
+  .col-c { width: 140px; }
+  .row { display: flex; border-bottom: 1px solid #f1f3f4; }
+  .cell { padding: 8px 8px; font-size: 12px; color: #3c4043; border-right: 1px solid #f1f3f4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cell-num { width: 24px; background: #f8f9fa; color: #5f6368; font-size: 11px; text-align: center; padding: 8px 4px; border-right: 1px solid #e0e0e0; flex-shrink: 0; }
+  .cell-a { width: 80px; }
+  .cell-b { width: 80px; }
+  .cell-c { width: 76px; }
+  .selected-indicator { position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: #1a73e8; }
+  .feedback-panel { flex: 1; background: #fff; position: relative; border-left: 3px solid #1a73e8; }
+  .feedback-header { background: #e8f0fe; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #c6dafc; }
+  .feedback-header-title { font-size: 13px; color: #1a73e8; font-weight: 500; }
+  .feedback-cell-ref { font-size: 11px; color: #5f6368; background: #fff; padding: 2px 8px; border-radius: 4px; }
+  .feedback-content { padding: 16px 20px; font-size: 13px; color: #202124; line-height: 1.7; overflow-y: auto; max-height: 560px; }
+  .section-title { font-size: 15px; font-weight: 600; color: #202124; margin: 16px 0 10px; padding-bottom: 4px; border-bottom: 2px solid #e0e0e0; }
+  .section-title:first-child { margin-top: 0; }
+  table.rubric { width: 100%; border-collapse: collapse; margin: 8px 0 16px; font-size: 12px; }
+  table.rubric th { background: #f8f9fa; padding: 8px 10px; text-align: left; font-weight: 500; color: #5f6368; border: 1px solid #e0e0e0; }
+  table.rubric td { padding: 8px 10px; border: 1px solid #e0e0e0; color: #3c4043; }
+  .grade-high { color: #137333; font-weight: 600; }
+  .grade-mid { color: #e37400; font-weight: 600; }
+  .grade-low { color: #c5221f; font-weight: 600; }
+  .feedback-list { margin: 8px 0 16px; padding-left: 0; list-style: none; }
+  .feedback-list li { padding: 6px 0 6px 8px; border-left: 3px solid transparent; font-size: 13px; line-height: 1.6; }
+  .feedback-list li:nth-child(odd) { background: #fafafa; }
+  .good li { border-left-color: #34a853; }
+  .improve li { border-left-color: #ea4335; }
+  .suggest li { border-left-color: #4285f4; }
+  .encourage-box { background: #e6f4ea; border-radius: 8px; padding: 14px 16px; margin-top: 12px; font-size: 13px; color: #137333; line-height: 1.7; }
+  .row-highlight { background: #e8f0fe; }
+</style>
+</head>
+<body>
+  <div class="sheets-header">
+    <div class="sheets-icon">S</div>
+    <div class="sheets-title">AI 學生回饋系統 — 期末報告回饋</div>
+  </div>
+
+  <div class="toolbar">
+    <div class="toolbar-item">檔案</div>
+    <div class="toolbar-item">編輯</div>
+    <div class="toolbar-item">檢視</div>
+    <div class="toolbar-item" style="color: #0f9d58; font-weight: 500;">💬 AI 回饋</div>
+    <div class="toolbar-item">工具</div>
+    <div class="toolbar-item">說明</div>
+  </div>
+
+  <div class="content-area">
+    <!-- 左側 Sheets 部分欄位 -->
+    <div class="sheet-left">
+      <div class="col-header">
+        <div style="width:24px;"></div>
+        <div style="width:80px;">A 姓名</div>
+        <div style="width:80px;">B 形式</div>
+        <div style="width:76px;">C 繳交</div>
+      </div>
+
+      <div class="row">
+        <div class="cell-num">1</div>
+        <div class="cell cell-a" style="font-weight:500; color:#5f6368; font-size:11px;">姓名</div>
+        <div class="cell cell-b" style="font-weight:500; color:#5f6368; font-size:11px;">報告形式</div>
+        <div class="cell cell-c" style="font-weight:500; color:#5f6368; font-size:11px;">繳交狀態</div>
+      </div>
+
+      <div class="row row-highlight">
+        <div class="cell-num" style="background:#d2e3fc;">2</div>
+        <div class="cell cell-a" style="font-weight:600;">王小明</div>
+        <div class="cell cell-b">文字報告</div>
+        <div class="cell cell-c" style="color:#137333;">✅ 已繳</div>
+      </div>
+
+      <div class="row">
+        <div class="cell-num">3</div>
+        <div class="cell cell-a">李美華</div>
+        <div class="cell cell-b">簡報</div>
+        <div class="cell cell-c" style="color:#137333;">✅ 已繳</div>
+      </div>
+
+      <div class="row">
+        <div class="cell-num">4</div>
+        <div class="cell cell-a">張大偉</div>
+        <div class="cell cell-b">文字報告</div>
+        <div class="cell cell-c" style="color:#137333;">✅ 已繳</div>
+      </div>
+
+      <div class="row">
+        <div class="cell-num">5</div>
+        <div class="cell cell-a">陳怡君</div>
+        <div class="cell cell-b">Podcast</div>
+        <div class="cell cell-c" style="color:#137333;">✅ 已繳</div>
+      </div>
+
+      <div class="row">
+        <div class="cell-num">6</div>
+        <div class="cell cell-a">林志豪</div>
+        <div class="cell cell-b">文字報告</div>
+        <div class="cell cell-c" style="color:#e37400;">🕐 遲交</div>
+      </div>
+    </div>
+
+    <!-- 右側 E 欄展開：AI 回饋 -->
+    <div class="feedback-panel">
+      <div class="feedback-header">
+        <div class="feedback-header-title">📊 E2 — AI 個人化回饋（王小明）</div>
+        <div class="feedback-cell-ref">E2 展開檢視</div>
+      </div>
+
+      <div class="feedback-content">
+        <div class="section-title">📊 逐項評分</div>
+        <table class="rubric">
+          <thead>
+            <tr>
+              <th style="width:110px;">面向</th>
+              <th style="width:90px;">等級</th>
+              <th>說明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>內容正確性</td>
+              <td><span class="grade-mid">中（3分）</span></td>
+              <td>基本概念正確，但 F=ma 的推導過程有跳步</td>
+            </tr>
+            <tr>
+              <td>組織架構</td>
+              <td><span class="grade-high">優（5分）</span></td>
+              <td>段落分明，邏輯清楚</td>
+            </tr>
+            <tr>
+              <td>數據佐證</td>
+              <td><span class="grade-low">再加強（1分）</span></td>
+              <td>完全沒有引用課本數據或實驗結果</td>
+            </tr>
+            <tr>
+              <td>語言表達</td>
+              <td><span class="grade-mid">中（3分）</span></td>
+              <td>文句通順，但專有名詞偶有誤用</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="section-title">✅ 做得好的地方</div>
+        <ul class="feedback-list good">
+          <li>你用了購物車的例子來解釋 F=ma，這個比喻很生動</li>
+          <li>報告結構清楚，有引言、本文、結論</li>
+        </ul>
+
+        <div class="section-title">⚠️ 需要改進的地方</div>
+        <ul class="feedback-list improve">
+          <li>第二段的力學分析缺乏自由體圖佐證</li>
+          <li>混淆了「質量」和「重量」——質量是 kg，重量是 N</li>
+        </ul>
+
+        <div class="section-title">💡 具體改進建議</div>
+        <ul class="feedback-list suggest">
+          <li>畫出物體的自由體圖，標示所有作用力</li>
+          <li>加入課本 p.25 的實驗數據支持你的論點</li>
+        </ul>
+
+        <div class="section-title">💪 鼓勵語</div>
+        <div class="encourage-box">
+          你對牛頓定律的理解方向正確，把比喻換成數據佐證，這份報告會更有說服力。繼續加油！💪
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

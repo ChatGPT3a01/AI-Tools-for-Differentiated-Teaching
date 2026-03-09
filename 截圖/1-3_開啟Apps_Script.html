@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff; width: 780px; }
+  .toolbar { background: #f0f4f0; padding: 4px 8px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #c0c0c0; }
+  .toolbar .title { color: #188038; font-size: 18px; font-weight: 500; }
+  .menu-bar { background: #fff; padding: 2px 12px; display: flex; gap: 8px; font-size: 13px; color: #444; border-bottom: 1px solid #e0e0e0; position: relative; }
+  .menu-bar span { padding: 4px 8px; cursor: pointer; border-radius: 4px; }
+  .menu-bar span.active { background: #e8f0fe; color: #1a73e8; font-weight: 500; }
+  .dropdown { position: absolute; top: 28px; left: 445px; background: #fff; border: 1px solid #dadce0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,.15); width: 250px; z-index: 10; padding: 6px 0; }
+  .dropdown-item { padding: 8px 16px; font-size: 13px; color: #3c4043; display: flex; align-items: center; gap: 10px; }
+  .dropdown-item:hover { background: #f1f3f4; }
+  .dropdown-item.highlight { background: #e8f0fe; color: #1a73e8; font-weight: 500; }
+  .dropdown-divider { border-top: 1px solid #e0e0e0; margin: 4px 0; }
+  .sheet-area { background: #f8f9fa; min-height: 50px; padding: 20px; color: #999; font-size: 14px; }
+  .callout { position: absolute; top: 62px; left: 520px; background: #fce8e6; border: 2px solid #ea4335; border-radius: 8px; padding: 10px 16px; font-size: 14px; color: #c5221f; font-weight: 500; z-index: 20; white-space: nowrap; }
+  .sheet-tabs { background: #f0f0f0; padding: 4px 8px; display: flex; gap: 2px; border-top: 1px solid #c0c0c0; }
+  .tab { background: #fff; border: 1px solid #c0c0c0; border-bottom: none; padding: 6px 16px; font-size: 12px; border-radius: 4px 4px 0 0; }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <span class="title">📊 段考AI審題助手</span>
+  </div>
+  <div class="menu-bar">
+    <span>檔案</span><span>編輯</span><span>檢視</span><span>插入</span><span>格式</span><span>資料</span><span>工具</span><span class="active">擴充功能</span><span>說明</span>
+    <div class="dropdown">
+      <div class="dropdown-item">外掛程式</div>
+      <div class="dropdown-divider"></div>
+      <div class="dropdown-item highlight">
+        <span style="font-size:16px;">{ }</span> <b>Apps Script</b>
+      </div>
+    </div>
+  </div>
+  <div class="callout">👈 點這裡！「擴充功能」→「Apps Script」</div>
+  <div class="sheet-area">
+    （試算表內容區域）
+  </div>
+  <div class="sheet-tabs">
+    <div class="tab">Sheet1</div>
+  </div>
+</body>
+</html>

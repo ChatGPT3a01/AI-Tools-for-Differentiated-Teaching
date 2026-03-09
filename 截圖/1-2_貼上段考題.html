@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff; width: 780px; }
+  .toolbar { background: #f0f4f0; padding: 4px 8px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #c0c0c0; }
+  .toolbar .title { color: #188038; font-size: 18px; font-weight: 500; margin-right: 20px; }
+  .menu-bar { background: #fff; padding: 2px 12px; display: flex; gap: 8px; font-size: 13px; color: #444; border-bottom: 1px solid #e0e0e0; }
+  .menu-bar span { padding: 4px 8px; cursor: pointer; }
+  .sheet-grid { font-size: 13px; }
+  .sheet-grid table { border-collapse: collapse; width: 100%; }
+  .sheet-grid th, .sheet-grid td { border: 1px solid #e2e2e2; padding: 6px 10px; text-align: left; min-width: 60px; }
+  .sheet-grid th { background: #f8f9fa; color: #666; font-weight: 400; text-align: center; font-size: 12px; }
+  .col-header { background: #f8f9fa; color: #666; text-align: center; font-weight: 400; min-width: 50px; }
+  .row-num { background: #f8f9fa; color: #666; text-align: center; width: 40px; font-size: 12px; }
+  .cell-title { background: #e8f5e9; font-weight: bold; color: #1b5e20; }
+  .cell-q { color: #333; line-height: 1.5; font-size: 13px; }
+  .sheet-tabs { background: #f0f0f0; padding: 4px 8px; display: flex; gap: 2px; border-top: 1px solid #c0c0c0; }
+  .tab { background: #fff; border: 1px solid #c0c0c0; border-bottom: none; padding: 6px 16px; font-size: 12px; border-radius: 4px 4px 0 0; }
+  .tab.active { background: #fff; border-bottom: 2px solid #0f9d58; font-weight: 500; }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <span class="title">📊 段考AI審題助手</span>
+  </div>
+  <div class="menu-bar">
+    <span>檔案</span><span>編輯</span><span>檢視</span><span>插入</span><span>格式</span><span>資料</span><span>工具</span><span><b>擴充功能</b></span><span>說明</span>
+  </div>
+  <div class="sheet-grid">
+    <table>
+      <tr>
+        <th class="row-num"></th>
+        <th class="col-header" style="min-width:700px;">A</th>
+        <th class="col-header" style="min-width:100px;">B</th>
+      </tr>
+      <tr>
+        <td class="row-num">1</td>
+        <td class="cell-title">段考試題</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td class="row-num">2</td>
+        <td class="cell-q">1. 一質量 5 kg 的物體置於光滑水平面上，受一水平力 F = 20 N 作用，求此物體的加速度為多少？<br>(A) 2 m/s² (B) 4 m/s² (C) 5 m/s² (D) 10 m/s²</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td class="row-num">3</td>
+        <td class="cell-q">2. 某物體做等加速度運動，初速度為 2 m/s，加速度為 3 m/s²，求第 4 秒末的速度？<br>(A) 8 m/s (B) 10 m/s (C) 12 m/s (D) 14 m/s</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td class="row-num">4</td>
+        <td class="cell-q">3. 下列何者屬於牛頓第三運動定律的應用？<br>(A) 火箭升空 (B) 電梯加速上升 (C) 等速圓周運動 (D) 自由落體</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td class="row-num">5</td>
+        <td class="cell-q">4. 一個 2 kg 的物體從高度 10 m 處自由落下（忽略空氣阻力，g = 10 m/s²），著地前瞬間的動能為多少？<br>(A) 100 J (B) 200 J (C) 20 J (D) 50 J</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td class="row-num">6</td>
+        <td class="cell-q">5. 質量 m 的物體以初速 v₀ 沿斜面向上滑動，斜面傾角為 θ，動摩擦係數為 μ，求物體沿斜面向上運動時的加速度大小？<br>(A) g(sinθ + μcosθ) (B) g(sinθ - μcosθ) (C) gsinθ (D) μgcosθ</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td class="row-num">7</td>
+        <td class="cell-q">6. 功率的定義為何？若一台起重機以等速度 v 將質量 m 的物體向上提升，則起重機的輸出功率為？<br>(A) mgv (B) ½mv² (C) mgh (D) Fv²</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td class="row-num">8</td>
+        <td class="cell-q" style="color: #999;">7. ...</td>
+        <td></td>
+      </tr>
+    </table>
+  </div>
+  <div class="sheet-tabs">
+    <div class="tab active">Sheet1</div>
+  </div>
+</body>
+</html>

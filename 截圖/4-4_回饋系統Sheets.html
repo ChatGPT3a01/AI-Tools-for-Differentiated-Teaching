@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff; width: 780px; }
+  .toolbar { background: #f0f4f0; padding: 4px 8px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #c0c0c0; }
+  .toolbar .title { color: #188038; font-size: 18px; font-weight: 500; }
+  .menu-bar { background: #fff; padding: 2px 12px; display: flex; gap: 8px; font-size: 13px; color: #444; border-bottom: 1px solid #e0e0e0; }
+  .menu-bar span { padding: 4px 8px; border-radius: 4px; }
+  .menu-bar span.custom { background: #e8f0fe; color: #1a73e8; font-weight: 600; }
+  .sheet-grid { overflow-x: auto; }
+  .sheet-grid table { border-collapse: collapse; width: 100%; font-size: 12px; }
+  .sheet-grid th, .sheet-grid td { border: 1px solid #e2e2e2; padding: 7px 10px; text-align: left; vertical-align: top; }
+  .col-header { background: #f3f3f3; color: #5f6368; font-weight: 600; text-align: center; font-size: 11px; }
+  .header-row th { background: #4285f4; color: #fff; font-weight: 600; font-size: 12px; }
+  .row-num { background: #f8f9fa; color: #999; text-align: center; width: 24px; font-size: 11px; }
+  .name-cell { font-weight: 500; color: #202124; white-space: nowrap; }
+  .type-cell { white-space: nowrap; }
+  .type-text { background: #e8f0fe; color: #1a73e8; padding: 2px 6px; border-radius: 10px; font-size: 11px; }
+  .type-image { background: #fce8e6; color: #c5221f; padding: 2px 6px; border-radius: 10px; font-size: 11px; }
+  .type-podcast { background: #e6f4ea; color: #137333; padding: 2px 6px; border-radius: 10px; font-size: 11px; }
+  .truncated { color: #5f6368; font-size: 11px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .feedback-cell { font-size: 11px; color: #3c4043; max-width: 200px; line-height: 1.4; }
+  .feedback-cell .fb-title { font-weight: 600; color: #1a73e8; }
+  .feedback-cell .fb-score { color: #34a853; }
+  .empty-cell { color: #dadce0; font-style: italic; font-size: 11px; }
+  .sheet-tabs { background: #f0f0f0; padding: 4px 8px; display: flex; gap: 2px; border-top: 1px solid #c0c0c0; }
+  .tab { background: #fff; border: 1px solid #c0c0c0; border-bottom: none; padding: 6px 16px; font-size: 12px; border-radius: 4px 4px 0 0; cursor: default; }
+  .tab.active { border-bottom: 2px solid #4285f4; font-weight: 500; color: #1a73e8; }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <span class="title">💬 AI 學生回饋系統</span>
+  </div>
+  <div class="menu-bar">
+    <span>檔案</span><span>編輯</span><span>檢視</span><span>插入</span><span>格式</span><span>資料</span><span>工具</span><span>擴充功能</span><span>說明</span>
+    <span class="custom">💬 AI 回饋</span>
+  </div>
+  <div class="sheet-grid">
+    <table>
+      <tr>
+        <th class="row-num"></th>
+        <th class="col-header">A</th>
+        <th class="col-header">B</th>
+        <th class="col-header">C</th>
+        <th class="col-header">D</th>
+        <th class="col-header">E</th>
+      </tr>
+      <tr class="header-row">
+        <td class="row-num">1</td>
+        <th style="min-width:80px;">學生姓名</th>
+        <th style="min-width:80px;">評量形式</th>
+        <th style="min-width:150px;">Rubric</th>
+        <th style="min-width:160px;">學生作品內容</th>
+        <th style="min-width:200px;">AI回饋</th>
+      </tr>
+      <!-- Row 2: 王小明 -->
+      <tr>
+        <td class="row-num">2</td>
+        <td class="name-cell">王小明</td>
+        <td class="type-cell"><span class="type-text">文字報告</span></td>
+        <td class="truncated" title="內容正確性：優5/中3/待改1；邏輯組織：優5/中3/待改1；表達清晰度：優5/中3/待改1">內容正確性：優5/中3...</td>
+        <td class="truncated" title="牛頓第二定律描述了力、質量與加速度之間的關係。當一個物體受到淨力作用時，會產生加速度...">牛頓第二定律描述了...</td>
+        <td class="feedback-cell">
+          <span class="fb-title">### 逐項評分</span><br>
+          <span class="fb-score">內容正確性：中(3分)</span><br>
+          基本概念正確，但缺少F=ma公式的推導過程...
+        </td>
+      </tr>
+      <!-- Row 3: 李小華 -->
+      <tr>
+        <td class="row-num">3</td>
+        <td class="name-cell">李小華</td>
+        <td class="type-cell"><span class="type-image">概念圖</span></td>
+        <td class="truncated" title="概念完整性：優5/中3/待改1；連結正確性：優5/中3/待改1；視覺呈現：優5/中3/待改1">概念完整性：優5/中3...</td>
+        <td class="truncated" title="[概念圖描述] 中心主題：牛頓運動定律，分支包含第一定律（慣性）、第二定律（F=ma）、第三定律（作用力反作用力）...">[概念圖描述] 中心主題...</td>
+        <td class="feedback-cell">
+          <span class="fb-title">### 逐項評分</span><br>
+          <span class="fb-score">概念完整性：優(5分)</span><br>
+          三大定律分支完整，連結關係清楚...
+        </td>
+      </tr>
+      <!-- Row 4: 陳大文 -->
+      <tr>
+        <td class="row-num">4</td>
+        <td class="name-cell">陳大文</td>
+        <td class="type-cell"><span class="type-podcast">Podcast</span></td>
+        <td class="truncated" title="內容深度：優5/中3/待改1；口語表達：優5/中3/待改1；創意呈現：優5/中3/待改1">內容深度：優5/中3...</td>
+        <td class="truncated" title="[Podcast逐字稿] 大家好，歡迎收聽物理小教室！今天要跟大家聊聊牛頓第二定律...">[Podcast逐字稿] 大家好...</td>
+        <td class="feedback-cell">
+          <span class="fb-title">### 逐項評分</span><br>
+          <span class="fb-score">口語表達：優(5分)</span><br>
+          語調自然，以日常例子引入概念非常好...
+        </td>
+      </tr>
+      <!-- Row 5: 林小美 -->
+      <tr>
+        <td class="row-num">5</td>
+        <td class="name-cell">林小美</td>
+        <td class="type-cell"><span class="type-text">文字報告</span></td>
+        <td class="truncated">內容正確性：優5/中3...</td>
+        <td class="truncated">力的作用會使物體產生...</td>
+        <td class="empty-cell">（等待產生回饋）</td>
+      </tr>
+      <!-- Row 6: 張小強 -->
+      <tr>
+        <td class="row-num">6</td>
+        <td class="name-cell">張小強</td>
+        <td class="type-cell"><span class="type-image">概念圖</span></td>
+        <td class="truncated">概念完整性：優5/中3...</td>
+        <td class="truncated">[概念圖描述] 主題：力學...</td>
+        <td class="empty-cell">（等待產生回饋）</td>
+      </tr>
+    </table>
+  </div>
+  <div class="sheet-tabs">
+    <div class="tab active">Sheet1</div>
+  </div>
+</body>
+</html>

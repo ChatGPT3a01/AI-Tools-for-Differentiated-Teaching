@@ -1,0 +1,8 @@
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+transcribe/
+截圖/node_modules/
+截圖/package*.json
+截圖/html_to_png.js

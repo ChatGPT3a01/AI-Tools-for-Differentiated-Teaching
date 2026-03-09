@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; width: 780px; padding: 20px; }
+  .step-row { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .step-card { background: #fff; border: 1px solid #dadce0; border-radius: 12px; width: 420px; padding: 0; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+  .step-label { background: #4285f4; color: #fff; padding: 8px 16px; font-size: 14px; font-weight: 500; }
+  .step-label.orange { background: #f4b400; }
+  .step-label.red { background: #ea4335; }
+  .step-label.green { background: #34a853; }
+  .step-body { padding: 20px; }
+  .dialog-box { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .dialog-title { font-size: 16px; color: #202124; margin-bottom: 12px; }
+  .dialog-text { font-size: 13px; color: #5f6368; margin-bottom: 16px; line-height: 1.6; }
+  .dialog-btn { background: #1a73e8; color: #fff; border: none; border-radius: 4px; padding: 10px 24px; font-size: 14px; cursor: pointer; }
+  .dialog-btn.outline { background: #fff; color: #1a73e8; border: 1px solid #1a73e8; }
+  .highlight-link { color: #1a73e8; text-decoration: underline; cursor: pointer; font-size: 13px; }
+  .warning-box { background: #fff3e0; border: 1px solid #ff9800; border-radius: 8px; padding: 16px; margin-top: 12px; font-size: 13px; color: #e65100; }
+  .perm-item { padding: 6px 0; font-size: 13px; color: #3c4043; display: flex; align-items: center; gap: 8px; }
+  .arrow { font-size: 32px; color: #4285f4; text-align: center; padding: 10px 0; }
+  .step-num { display: inline-flex; width: 28px; height: 28px; background: #4285f4; color: #fff; border-radius: 50%; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; margin-right: 8px; }
+  .flow-container { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+</style>
+</head>
+<body>
+  <div style="text-align:center; margin-bottom: 16px; font-size: 18px; color: #202124; font-weight: 500;">Google 授權流程（照著點就好）</div>
+  <div class="step-row">
+    <!-- Step 1 -->
+    <div class="step-card">
+      <div class="step-label"><span class="step-num">1</span> 點「執行」後，出現授權提示</div>
+      <div class="step-body">
+        <div class="dialog-box">
+          <div class="dialog-title">需要授權</div>
+          <div class="dialog-text">這個專案需要你的授權才能存取你的資料。</div>
+          <button class="dialog-btn" style="font-weight:bold;">審查權限 👈 點這個</button>
+        </div>
+      </div>
+    </div>
+    <!-- Step 2 -->
+    <div class="step-card">
+      <div class="step-label orange"><span class="step-num" style="background:#f4b400;">2</span> 選擇你的 Google 帳號</div>
+      <div class="step-body">
+        <div class="dialog-box">
+          <div class="dialog-title">選擇帳戶</div>
+          <div style="padding: 12px; background: #f8f9fa; border-radius: 8px; margin: 8px 0; display: flex; align-items: center; gap: 12px; cursor: pointer; border: 2px solid #1a73e8;">
+            <div style="width:36px; height:36px; background:#4285f4; border-radius:50%; color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px;">T</div>
+            <div style="text-align:left;">
+              <div style="font-size:14px; color:#202124;">teacher@gmail.com</div>
+              <div style="font-size:12px; color:#5f6368;">老師的帳號</div>
+            </div>
+          </div>
+          <div style="font-size:12px; color:#5f6368;">👆 選你自己的帳號</div>
+        </div>
+      </div>
+    </div>
+    <!-- Step 3 -->
+    <div class="step-card">
+      <div class="step-label red"><span class="step-num" style="background:#ea4335;">3</span> 看到警告不要怕！點「進階」</div>
+      <div class="step-body">
+        <div class="dialog-box" style="text-align: left;">
+          <div class="dialog-title" style="text-align:center;">⚠️ Google 尚未驗證這個應用程式</div>
+          <div class="dialog-text">這個應用程式尚未經過 Google 驗證。請僅在你信任開發人員的情況下繼續操作。</div>
+          <div style="text-align: left;">
+            <span class="highlight-link">▼ 進階 👈 點這裡展開</span>
+          </div>
+          <div style="margin-top: 12px; padding: 12px; background: #f8f9fa; border-radius: 4px; font-size: 13px; color: #5f6368;">
+            前往「段考AI審題助手」（不安全）<br>
+            <span class="highlight-link" style="font-weight: bold;">👈 再點這個連結</span>
+          </div>
+        </div>
+        <div class="warning-box">
+          💡 <b>這個警告很正常！</b>因為程式是我們自己寫的，Google 不認識，但沒有安全問題。
+        </div>
+      </div>
+    </div>
+    <!-- Step 4 -->
+    <div class="step-card">
+      <div class="step-label green"><span class="step-num" style="background:#34a853;">4</span> 點「允許」完成授權</div>
+      <div class="step-body">
+        <div class="dialog-box" style="text-align: left;">
+          <div class="dialog-title" style="text-align:center;">「段考AI審題助手」要求存取以下權限</div>
+          <div class="perm-item">✅ 查看、編輯、建立及刪除你的 Google 試算表</div>
+          <div class="perm-item">✅ 連線至外部服務（呼叫 Gemini API 用）</div>
+          <div class="perm-item">✅ 在這個應用程式執行時顯示及執行第三方網頁內容</div>
+          <div style="text-align: center; margin-top: 16px;">
+            <button class="dialog-btn outline" style="margin-right: 8px;">取消</button>
+            <button class="dialog-btn" style="font-weight: bold; font-size: 16px;">允許 👈 點這個！</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

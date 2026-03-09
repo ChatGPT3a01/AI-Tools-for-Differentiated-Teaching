@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 5 — 分享與總結</title>
+    <style>
+        /* ===== Reset & Base ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; height: 100%;
+            overflow: hidden;
+            font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif;
+            font-size: 20px;
+            line-height: 1.8;
+            color: #2c3e50;
+            background: #0a0a0a;
+        }
+
+        /* ===== Top Navigation Bar ===== */
+        .top-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 56px;
+            background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1000;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+        }
+        .top-nav .nav-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .top-nav .nav-links {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .top-nav .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.15);
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .top-nav .nav-links a:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* ===== Slide Container ===== */
+        .slides-wrapper {
+            position: fixed;
+            top: 56px; left: 0; right: 0; bottom: 0;
+        }
+        .slide {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 50px 80px 80px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            transform: translateX(60px);
+            overflow-y: auto;
+        }
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+        .slide.exit-left {
+            opacity: 0;
+            transform: translateX(-60px);
+        }
+
+        /* ===== Slide Backgrounds ===== */
+        .slide { background: linear-gradient(160deg, #fef5f3 0%, #ffffff 40%, #fdecea 100%); }
+        .slide.cover-slide {
+            background: linear-gradient(135deg, #c0392b 0%, #e74c3c 50%, #ef4444 100%);
+            color: #fff;
+        }
+        .slide.ending-slide {
+            background: linear-gradient(135deg, #c0392b 0%, #d63031 40%, #e74c3c 70%, #ef4444 100%);
+            color: #fff;
+        }
+
+        /* ===== Slide Content ===== */
+        .slide-content {
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        /* ===== Typography ===== */
+        h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+        h2 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: #c0392b;
+            line-height: 1.3;
+        }
+        h3 {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            color: #e74c3c;
+        }
+        p, li {
+            font-size: 20px;
+            line-height: 1.8;
+        }
+
+        /* ===== Cover Slide ===== */
+        .cover-slide .part-label {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fca5a5;
+            text-shadow: 0 0 20px rgba(252,165,165,0.4);
+            letter-spacing: 4px;
+            margin-bottom: 16px;
+        }
+        .cover-slide h1 {
+            font-size: 52px;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            margin-bottom: 16px;
+        }
+        .cover-slide .subtitle {
+            font-size: 24px;
+            opacity: 0.92;
+            margin-bottom: 36px;
+            font-weight: 400;
+        }
+        .cover-slide .learning-points {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            padding: 24px 32px;
+            margin-bottom: 20px;
+            text-align: left;
+            max-width: 700px;
+        }
+        .cover-slide .learning-points li {
+            font-size: 20px;
+            margin-bottom: 6px;
+            list-style: none;
+            padding-left: 28px;
+            position: relative;
+        }
+        .cover-slide .learning-points li::before {
+            content: '\2713';
+            position: absolute;
+            left: 0;
+            color: #fca5a5;
+            font-weight: 700;
+        }
+        .cover-slide .tag {
+            display: inline-block;
+            background: rgba(255,255,255,0.22);
+            padding: 8px 24px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        /* ===== Sharing Cards ===== */
+        .sharing-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 24px 0;
+        }
+        .sharing-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 28px 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-left: 5px solid #ef4444;
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+        .sharing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+        .sharing-card .card-icon {
+            font-size: 44px;
+            margin-bottom: 12px;
+        }
+        .sharing-card h3 {
+            font-size: 22px;
+            color: #c0392b;
+            margin-bottom: 10px;
+        }
+        .sharing-card p {
+            font-size: 18px;
+            color: #555;
+        }
+
+        /* ===== SDT Visual ===== */
+        .sdt-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .sdt-column {
+            background: #fff;
+            border-radius: 18px;
+            padding: 24px 22px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        .sdt-column::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 5px;
+        }
+        .sdt-column.competence::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+        .sdt-column.autonomy::before { background: linear-gradient(90deg, #3b82f6, #6366f1); }
+        .sdt-column.relatedness::before { background: linear-gradient(90deg, #10b981, #14b8a6); }
+        .sdt-column .sdt-icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+        .sdt-column h3 {
+            font-size: 22px;
+            margin-bottom: 12px;
+        }
+        .sdt-column.competence h3 { color: #ef4444; }
+        .sdt-column.autonomy h3 { color: #3b82f6; }
+        .sdt-column.relatedness h3 { color: #10b981; }
+        .sdt-column ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sdt-column li {
+            font-size: 16px;
+            padding: 5px 0;
+            border-bottom: 1px solid #f3f4f6;
+            line-height: 1.6;
+        }
+        .sdt-column li:last-child { border-bottom: none; }
+        .sdt-feeling {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            text-align: center;
+        }
+        .sdt-column.competence .sdt-feeling {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+        .sdt-column.autonomy .sdt-feeling {
+            background: #eff6ff;
+            color: #3b82f6;
+        }
+        .sdt-column.relatedness .sdt-feeling {
+            background: #ecfdf5;
+            color: #10b981;
+        }
+
+        /* ===== Comparison Table ===== */
+        .compare-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            margin: 20px 0;
+            font-size: 19px;
+        }
+        .compare-table thead th {
+            padding: 16px 20px;
+            font-weight: 700;
+            font-size: 20px;
+            text-align: left;
+            color: #fff;
+        }
+        .compare-table thead th:first-child {
+            background: linear-gradient(135deg, #10b981, #34d399);
+        }
+        .compare-table thead th:last-child {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+        }
+        .compare-table tbody td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #fdecea;
+            vertical-align: top;
+        }
+        .compare-table tbody tr:nth-child(odd) { background: #fef5f3; }
+        .compare-table tbody tr:nth-child(even) { background: #fff; }
+        .compare-table tbody tr:hover { background: #fde8e4; }
+
+        /* ===== Security Cards ===== */
+        .security-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 24px 0;
+        }
+        .security-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 28px 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            text-align: center;
+            transition: transform 0.25s;
+        }
+        .security-card:hover {
+            transform: translateY(-4px);
+        }
+        .security-card.danger {
+            border-top: 5px solid #ef4444;
+        }
+        .security-card.safe {
+            border-top: 5px solid #10b981;
+        }
+        .security-card .card-icon {
+            font-size: 44px;
+            margin-bottom: 12px;
+        }
+        .security-card h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .security-card.danger h3 { color: #ef4444; }
+        .security-card.safe h3 { color: #10b981; }
+        .security-card p {
+            font-size: 17px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        /* ===== Styled Table ===== */
+        .styled-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            margin: 20px 0;
+            font-size: 19px;
+        }
+        .styled-table thead th {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            color: #fff;
+            padding: 16px 20px;
+            font-weight: 700;
+            font-size: 20px;
+            text-align: left;
+        }
+        .styled-table tbody td {
+            padding: 14px 20px;
+            border-bottom: 1px solid #fdecea;
+            vertical-align: top;
+        }
+        .styled-table tbody tr:nth-child(odd) { background: #fef5f3; }
+        .styled-table tbody tr:nth-child(even) { background: #fff; }
+        .styled-table tbody tr:hover { background: #fde8e4; }
+
+        /* ===== Prompt Table ===== */
+        .prompt-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            margin: 20px 0;
+            font-size: 17px;
+        }
+        .prompt-table thead th {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            color: #fff;
+            padding: 14px 16px;
+            font-weight: 700;
+            font-size: 18px;
+            text-align: left;
+        }
+        .prompt-table tbody td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #fdecea;
+            vertical-align: top;
+            line-height: 1.6;
+        }
+        .prompt-table tbody tr:nth-child(odd) { background: #fef5f3; }
+        .prompt-table tbody tr:nth-child(even) { background: #fff; }
+        .prompt-table tbody tr:hover { background: #fde8e4; }
+        .prompt-table .prompt-example {
+            font-family: 'Consolas', 'Courier New', monospace;
+            background: #fef2f2;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 15px;
+            color: #c0392b;
+            display: inline-block;
+        }
+
+        /* ===== FAQ ===== */
+        .faq-list {
+            margin: 20px 0;
+        }
+        .faq-item {
+            background: #fff;
+            border-radius: 14px;
+            margin-bottom: 14px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            overflow: hidden;
+            border-left: 5px solid #ef4444;
+            transition: box-shadow 0.25s;
+        }
+        .faq-item:hover {
+            box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+        }
+        .faq-question {
+            padding: 18px 24px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #c0392b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            user-select: none;
+            transition: background 0.2s;
+        }
+        .faq-question:hover {
+            background: #fef5f3;
+        }
+        .faq-question .faq-toggle {
+            font-size: 20px;
+            transition: transform 0.3s;
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            background: #fef2f2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ef4444;
+        }
+        .faq-item.open .faq-question .faq-toggle {
+            transform: rotate(45deg);
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+            padding: 0 24px;
+            font-size: 18px;
+            color: #555;
+            line-height: 1.8;
+            background: #fefefe;
+        }
+        .faq-item.open .faq-answer {
+            max-height: 300px;
+            padding: 0 24px 20px;
+        }
+
+        /* ===== Box Callouts ===== */
+        .box {
+            border-radius: 14px;
+            padding: 22px 28px;
+            margin: 20px 0;
+            font-size: 20px;
+            line-height: 1.8;
+        }
+        .box.info {
+            background: linear-gradient(135deg, #fef5f3, #fdecea);
+            border-left: 6px solid #ef4444;
+            color: #7f1d1d;
+        }
+        .box.warning {
+            background: linear-gradient(135deg, #fef9e7, #fdebd0);
+            border-left: 6px solid #f39c12;
+            color: #7d6608;
+        }
+        .box.success {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border-left: 6px solid #10b981;
+            color: #065f46;
+        }
+        .box.important {
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            border-left: 6px solid #c0392b;
+            color: #7f1d1d;
+        }
+
+        /* ===== Resource Table Links ===== */
+        .resource-link {
+            color: #c0392b;
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .resource-link:hover {
+            border-bottom-color: #ef4444;
+        }
+
+        /* ===== Ending Slide ===== */
+        .ending-slide .author-card {
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 40px 48px;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+        .ending-slide .author-name {
+            font-size: 38px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .ending-slide .author-title {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 24px;
+            line-height: 1.7;
+        }
+        .ending-slide .awards {
+            text-align: left;
+            margin: 0 auto 28px;
+            max-width: 550px;
+        }
+        .ending-slide .awards li {
+            font-size: 17px;
+            list-style: none;
+            padding: 5px 0;
+            padding-left: 28px;
+            position: relative;
+            opacity: 0.92;
+        }
+        .ending-slide .awards li::before {
+            content: '\1F3C6';
+            position: absolute;
+            left: 0;
+        }
+        .ending-slide .social-links {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+        .ending-slide .social-links a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 22px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.18);
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.2s, transform 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .ending-slide .social-links a:hover {
+            background: rgba(255,255,255,0.32);
+            transform: translateY(-2px);
+        }
+        .ending-slide .copyright {
+            font-size: 14px;
+            opacity: 0.65;
+            margin-top: 12px;
+            line-height: 1.6;
+        }
+
+        /* ===== Two Column Layout ===== */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+            margin: 16px 0;
+        }
+
+        /* ===== Arrow Navigation ===== */
+        .nav-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 56px;
+            height: 56px;
+            background: rgba(192,57,43,0.85);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            font-size: 28px;
+            cursor: pointer;
+            z-index: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+        }
+        .nav-arrow:hover {
+            background: rgba(231,76,60,1);
+            transform: translateY(-50%) scale(1.12);
+        }
+        .nav-arrow.left { left: 20px; }
+        .nav-arrow.right { right: 20px; }
+        .nav-arrow:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .nav-arrow:disabled:hover {
+            transform: translateY(-50%) scale(1);
+            background: rgba(192,57,43,0.85);
+        }
+
+        /* ===== Bottom Dots ===== */
+        .dots-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 900;
+            background: rgba(255,255,255,0.9);
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+        .dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #fca5a5;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .dot.active {
+            background: #c0392b;
+            transform: scale(1.3);
+            box-shadow: 0 0 8px rgba(192,57,43,0.4);
+        }
+        .dot:hover:not(.active) { background: #ef4444; }
+
+        /* ===== Slide Number ===== */
+        .slide-number {
+            position: fixed;
+            bottom: 22px;
+            right: 30px;
+            color: #888;
+            font-size: 14px;
+            z-index: 900;
+            background: rgba(255,255,255,0.85);
+            padding: 4px 14px;
+            border-radius: 12px;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 900px) {
+            .slide { padding: 30px 24px 70px; }
+            h1 { font-size: 34px; }
+            h2 { font-size: 28px; }
+            .cover-slide h1 { font-size: 36px; }
+            .sharing-cards { grid-template-columns: 1fr; }
+            .sdt-grid { grid-template-columns: 1fr; }
+            .security-cards { grid-template-columns: 1fr; }
+            .two-col { grid-template-columns: 1fr; }
+            .nav-arrow { width: 44px; height: 44px; font-size: 22px; }
+            .nav-arrow.left { left: 8px; }
+            .nav-arrow.right { right: 8px; }
+            .top-nav .nav-title { font-size: 14px; }
+            .prompt-table { font-size: 15px; }
+            .prompt-table thead th { font-size: 16px; padding: 12px; }
+            .prompt-table tbody td { padding: 10px 12px; }
+            .ending-slide .author-card { padding: 28px 24px; }
+            .ending-slide .author-name { font-size: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== Top Navigation Bar ===== -->
+<nav class="top-nav">
+    <span class="nav-title">Part 5 &#8212; &#20998;&#20139;&#33287;&#32317;&#32080;</span>
+    <div class="nav-links">
+        <a href="index.html">&#127968; &#22238;&#39318;&#38913;</a>
+        <a href="javascript:void(0)" onclick="toggleFullscreen()">&#128421;&#65039; &#20840;&#34722;&#24149;</a>
+        <a href="https://www.facebook.com/groups/2754139931432955" target="_blank">&#128216; FB</a>
+        <a href="https://www.youtube.com/@Liang-yt02" target="_blank">&#127909; YT</a>
+    </div>
+</nav>
+
+<!-- ===== Slides ===== -->
+<div class="slides-wrapper">
+
+    <!-- ===== Slide 1: Cover ===== -->
+    <div class="slide cover-slide active" id="slide-1">
+        <div class="slide-content" style="text-align:center;">
+            <div class="part-label">PART 5</div>
+            <h1>&#20998;&#20139;&#33287;&#32317;&#32080;</h1>
+            <p class="subtitle">&#22238;&#38991;&#20170;&#22825;&#23416;&#21040;&#30340;&#19968;&#20999;&#65292;&#24118;&#36208;&#21487;&#20197;&#39340;&#19978;&#29992;&#30340;&#24037;&#20855;</p>
+            <div class="learning-points">
+                <ul>
+                    <li>&#21508;&#32068;&#20998;&#20139;&#23526;&#20316;&#25104;&#26524;&#33287;&#24515;&#24471;</li>
+                    <li>SDT &#215; &#24046;&#30064;&#21270;&#25945;&#23416; &#215; AI &#24037;&#20855;&#22238;&#38991;</li>
+                    <li>Prompt &#36895;&#26597;&#34920;&#65306;&#24118;&#33879;&#36208;</li>
+                    <li>&#24120;&#35211;&#21839;&#38988; FAQ &#35299;&#31572;</li>
+                </ul>
+            </div>
+            <div class="tag">&#128260; &#22238;&#38991;&#33287;&#24310;&#20280;</div>
+        </div>
+    </div>
+
+    <!-- ===== Slide: 提示詞總整理（移至第二頁） ===== -->
+    <div class="slide" id="slide-prompt">
+        <div class="slide-content">
+            <h2>📋 提示詞總整理：一句話取得完整工具</h2>
+            <p>以下是三個工具的「一句話提示詞」，貼到任何 AI 都能用：</p>
+            <div class="concept-grid" style="display:grid;grid-template-columns: 1fr;gap:20px;margin:20px 0;">
+                <div style="background:#f8faff;border:2px solid #e3eafc;border-radius:16px;padding:24px;border-left:5px solid #1e3c72;">
+                    <h3 style="color:#1e3c72;">工具 ① 段考 AI 審題助手</h3>
+                    <pre style="background:#f8fafc;padding:15px;border-radius:8px;font-size:15px;line-height:1.6;white-space:pre-wrap;color:#334155;">請幫我寫一個 Google Apps Script，讀取 Google Sheets A 欄的段考題目，呼叫 Gemini API 分析，自動產出雙向細目表（單元×認知層次）、難易度分析（簡單/中等/困難統計）、檢核與建議，分別寫入三個工作表。要有自訂選單、JSON 格式回傳、temperature 0.2。</pre>
+                </div>
+                <div style="background:#f8faff;border:2px solid #e3eafc;border-radius:16px;padding:24px;border-left:5px solid #5b2d8e;">
+                    <h3 style="color:#5b2d8e;">工具 ② 動態評量產生器</h3>
+                    <pre style="background:#f8fafc;padding:15px;border-radius:8px;font-size:15px;line-height:1.6;white-space:pre-wrap;color:#334155;">請幫我寫一個 Google Apps Script，讀取 Sheets 的科目/單元/知識點，呼叫 Gemini API 為每個知識點產生一道應用題和三層漸進式提示（方向→公式→帶數字），然後自動建立含分支邏輯的 Google Form，計分邏輯：0提示=5分、1提示=4分、2提示=3分、3提示=1分。</pre>
+                </div>
+                <div style="background:#f8faff;border:2px solid #e3eafc;border-radius:16px;padding:24px;border-left:5px solid #0d5f5c;">
+                    <h3 style="color:#0d5f5c;">工具 ③ AI 學生回饋系統</h3>
+                    <pre style="background:#f8fafc;padding:15px;border-radius:8px;font-size:15px;line-height:1.6;white-space:pre-wrap;color:#334155;">請幫我寫一個 Google Apps Script，讀取 Sheets 的學生姓名、評量形式、Rubric、作品內容，呼叫 Gemini API 產生個人化回饋（逐項評分、優點、缺點、改進建議、鼓勵語）。Prompt 要強制 AI 誠實指出缺點，不能只說好話。支援單筆和批次產生。</pre>
+                </div>
+            </div>
+            <div class="box success">
+                <strong>🎯 重點：</strong>這些提示詞是「起點」，AI 產出後你可以繼續對話調整。<br>
+                例如：「請把 Prompt 改成適合國文科的版本」「請加入匯出 PDF 的功能」
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Slide 3: SDT &#22238;&#38991;&#22823;&#22294; ===== -->
+    <div class="slide" id="slide-3">
+        <div class="slide-content">
+            <h2>&#128300; &#22238;&#38991;&#65306;SDT &#215; &#24046;&#30064;&#21270;&#25945;&#23416; &#215; AI &#24037;&#20855;</h2>
+
+            <div class="sdt-grid">
+                <div class="sdt-column competence">
+                    <div class="sdt-icon">&#128170;</div>
+                    <h3>&#21213;&#20219;&#24863; Competence</h3>
+                    <ul>
+                        <li>&#128296; &#24037;&#20855;&#9312; <strong>&#27573;&#32771; AI &#23529;&#38988;&#21161;&#25163;</strong><br>&#8594; &#27298;&#26680;&#38627;&#24230;&#20998;&#24067;</li>
+                        <li>&#128296; &#24037;&#20855;&#9313; <strong>&#21205;&#24907;&#35413;&#37327;&#29986;&#29983;&#22120;</strong><br>&#8594; &#20998;&#23652;&#25552;&#31034;&#12289;&#36880;&#27493;&#24341;&#23566;</li>
+                        <li>&#128221; AI &#25913;&#25945;&#26448;<br>&#8594; &#38627;&#24230;&#35519;&#25972;&#12289;&#21475;&#35486;&#21270;</li>
+                    </ul>
+                    <div class="sdt-feeling">&#12300;&#25105;&#20570;&#24471;&#21040;&#65281;&#12301;</div>
+                </div>
+
+                <div class="sdt-column autonomy">
+                    <div class="sdt-icon">&#127919;</div>
+                    <h3>&#33258;&#20027;&#24615; Autonomy</h3>
+                    <ul>
+                        <li>&#127912; &#22810;&#20803;&#35413;&#37327; Rubric<br>&#8594; &#19977;&#31278;&#24418;&#24335;&#33258;&#36984;</li>
+                        <li>&#128161; &#36984;&#25799;&#31574;&#30053;<br>&#8594; &#21152;&#12300;&#26356;&#38627;&#12301;&#36984;&#38917;&#25552;&#21319;&#21205;&#27231;</li>
+                        <li>&#128187; &#24037;&#20855;&#36984;&#25799;<br>&#8594; &#23416;&#29983;&#36984;&#25110;&#32769;&#24107;&#36984;</li>
+                    </ul>
+                    <div class="sdt-feeling">&#12300;&#25105;&#21487;&#20197;&#36984;&#65281;&#12301;</div>
+                </div>
+
+                <div class="sdt-column relatedness">
+                    <div class="sdt-icon">&#128172;</div>
+                    <h3>&#38364;&#20418; Relatedness</h3>
+                    <ul>
+                        <li>&#128296; &#24037;&#20855;&#9314; <strong>AI &#23416;&#29983;&#22238;&#39243;&#31995;&#32113;</strong><br>&#8594; &#20491;&#20154;&#21270;&#22238;&#39243;</li>
+                        <li>&#128218; NotebookLM<br>&#8594; &#28310;&#30906;&#30693;&#35672;&#24235;</li>
+                        <li>&#128140; &#24107;&#29983;&#36899;&#32080;<br>&#8594; &#35731;&#23416;&#29983;&#24863;&#21463;&#34987;&#37325;&#35222;</li>
+                    </ul>
+                    <div class="sdt-feeling">&#12300;&#26377;&#20154;&#22312;&#20046;&#65281;&#12301;</div>
+                </div>
+            </div>
+
+            <div class="box success" style="text-align:center; font-size:22px;">
+                <strong>&#128161; &#26680;&#24515;&#27010;&#24565;&#65306;</strong>SDT &#19977;&#22823;&#38656;&#27714;&#28415;&#36275; &#8594; &#23416;&#29983;&#20839;&#22312;&#21205;&#27231;&#25552;&#21319; &#8594; &#23416;&#32722;&#25104;&#25928;&#25552;&#21319;
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Slide 4: AI &#19981;&#33021;&#21462;&#20195;&#30340;&#20107; ===== -->
+    <div class="slide" id="slide-4">
+        <div class="slide-content">
+            <h2>&#129302; AI &#19981;&#33021;&#21462;&#20195;&#30340;&#20107;</h2>
+
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th style="width:50%;">&#9989; AI &#21487;&#20197;&#20570;</th>
+                        <th style="width:50%;">&#10060; AI &#19981;&#33021;&#21462;&#20195;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>&#128640; &#24555;&#36895;&#29986;&#20986;&#38617;&#21521;&#32048;&#30446;&#34920;</td>
+                        <td>&#128105;&#8205;&#127979; &#32769;&#24107;&#23565;&#23416;&#29983;&#31243;&#24230;&#30340;&#21028;&#26039;</td>
+                    </tr>
+                    <tr>
+                        <td>&#128196; &#25209;&#37327;&#29986;&#20986;&#35413;&#37327;&#38988;&#30446;</td>
+                        <td>&#128270; &#38988;&#30446;&#24773;&#22659;&#30340;&#36969;&#20999;&#24615;&#23529;&#26680;</td>
+                    </tr>
+                    <tr>
+                        <td>&#128172; &#29986;&#20986;&#20491;&#20154;&#21270;&#22238;&#39243;</td>
+                        <td>&#129309; &#24107;&#29983;&#38754;&#23565;&#38754;&#30340;&#38364;&#25079;&#20114;&#21205;</td>
+                    </tr>
+                    <tr>
+                        <td>&#128202; &#20998;&#26512;&#38627;&#26131;&#24230;&#20998;&#24067;</td>
+                        <td>&#9889; &#25945;&#23416;&#29694;&#22580;&#30340;&#21363;&#26178;&#25033;&#35722;</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="box important" style="text-align:center; font-size:22px;">
+                <strong>&#128161; AI &#26159;&#12300;&#21161;&#25163;&#12301;&#19981;&#26159;&#12300;&#26367;&#20195;&#32773;&#12301;&#12290;</strong><br>
+                &#26368;&#32066;&#30340;&#25945;&#23416;&#21028;&#26039;&#65292;&#27704;&#36960;&#26159;&#32769;&#24107;&#30340;&#23560;&#26989;&#12290;
+            </div>
+
+            <div style="display:flex; gap:16px; justify-content:center; margin-top:20px; flex-wrap:wrap;">
+                <div style="background: linear-gradient(135deg, #c0392b, #e74c3c); color:#fff; padding:16px 28px; border-radius:14px; font-size:19px; font-weight:700; text-align:center; min-width:180px;">
+                    &#129302; AI &#29986;&#20986;<br>&#33609;&#31295;&#33287;&#20998;&#26512;
+                </div>
+                <div style="font-size:32px; color:#c0392b; font-weight:700; display:flex; align-items:center;">+</div>
+                <div style="background: linear-gradient(135deg, #10b981, #34d399); color:#fff; padding:16px 28px; border-radius:14px; font-size:19px; font-weight:700; text-align:center; min-width:180px;">
+                    &#128105;&#8205;&#127979; &#32769;&#24107;&#23560;&#26989;<br>&#23529;&#26680;&#33287;&#21028;&#26039;
+                </div>
+                <div style="font-size:32px; color:#c0392b; font-weight:700; display:flex; align-items:center;">=</div>
+                <div style="background: linear-gradient(135deg, #3b82f6, #6366f1); color:#fff; padding:16px 28px; border-radius:14px; font-size:19px; font-weight:700; text-align:center; min-width:180px;">
+                    &#11088; &#26368;&#20339;&#25945;&#23416;<br>&#21697;&#36074;&#33287;&#25928;&#29575;
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Slide 5: API &#37329;&#37568;&#23433;&#20840; ===== -->
+    <div class="slide" id="slide-5">
+        <div class="slide-content">
+            <h2>&#128274; API &#37329;&#37568;&#23433;&#20840;&#38920;&#30693;</h2>
+
+            <div class="security-cards">
+                <div class="security-card danger">
+                    <div class="card-icon">&#9888;&#65039;</div>
+                    <h3>&#21247;&#20998;&#20139;&#21547;&#37329;&#37568;&#30340;&#27284;&#26696;</h3>
+                    <p>&#19981;&#35201;&#25226; <code style="background:#fef2f2;padding:2px 6px;border-radius:4px;color:#c0392b;">.gs</code> &#27284;&#26696;&#30452;&#25509;&#20659;&#32102;&#21029;&#20154;&#65281;<br><br>&#37329;&#37568;&#22914;&#26524;&#23531;&#27515;&#22312;&#31243;&#24335;&#30908;&#35041;&#65292;&#20998;&#20139;&#27284;&#26696;&#31561;&#26044;&#20998;&#20139;&#37329;&#37568;&#12290;</p>
+                </div>
+                <div class="security-card safe">
+                    <div class="card-icon">&#9989;</div>
+                    <h3>&#29992;&#12300;&#25351;&#20196;&#30908;&#23660;&#24615;&#12301;&#23384;&#25918;</h3>
+                    <p>Apps Script &#20839;&#24314;&#23433;&#20840;&#20786;&#23384;&#65306;<br><br><code style="background:#ecfdf5;padding:2px 6px;border-radius:4px;color:#065f46;">PropertiesService<br>.getScriptProperties()</code><br><br>&#37329;&#37568;&#19981;&#26371;&#20986;&#29694;&#22312;&#31243;&#24335;&#30908;&#20013;&#12290;</p>
+                </div>
+                <div class="security-card safe">
+                    <div class="card-icon">&#9989;</div>
+                    <h3>&#23450;&#26399;&#27298;&#26597; API &#29992;&#37327;</h3>
+                    <p>Google AI Studio &#8594; API Keys<br>&#8594; &#26597;&#30475;&#29992;&#37327;&#33287;&#38989;&#24230;<br><br>&#30906;&#35469;&#26159;&#21542;&#26377;&#30064;&#24120;&#20351;&#29992;&#12290;</p>
+                </div>
+            </div>
+
+            <div class="box warning" style="font-size:20px;">
+                <strong>&#128161; &#22914;&#26524;&#37329;&#37568;&#22806;&#27945;&#24590;&#40636;&#36774;&#65311;</strong><br>
+                &#19981;&#29992;&#32202;&#24373;&#65281;&#21040; <a href="https://aistudio.google.com" target="_blank" style="color:#7d6608; text-decoration:underline; font-weight:700;">Google AI Studio</a> &#37325;&#26032;&#29986;&#29983;&#19968;&#32068;&#26032;&#37329;&#37568;&#65292;&#33290;&#30340;&#23601;&#26371;&#33258;&#21205;&#22833;&#25928;&#12290;
+            </div>
+
+            <div style="text-align:center; margin-top:16px;">
+                <div style="display:inline-block; background:linear-gradient(135deg,#fef2f2,#fee2e2); border:2px solid #ef4444; border-radius:14px; padding:16px 32px; font-size:20px;">
+                    <strong>&#128272; &#35352;&#20303;&#19968;&#21477;&#35441;&#65306;</strong>&#37329;&#37568;&#23601;&#20687;&#23478;&#35041;&#30340;&#37749;&#21273;&#65292;&#19981;&#35201;&#38568;&#20415;&#32102;&#21029;&#20154;&#12290;
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Slide 6: &#25104;&#26412;&#20272;&#31639; ===== -->
+    <div class="slide" id="slide-6">
+        <div class="slide-content">
+            <h2>&#128176; &#25104;&#26412;&#20272;&#31639;</h2>
+
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th style="width:25%;">&#27169;&#22411;</th>
+                        <th style="width:25%;">&#36027;&#29992;</th>
+                        <th style="width:50%;">&#19968;&#20491;&#29677;&#30340;&#29992;&#37327;&#20272;&#35336;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Gemini 2.5 Flash</strong></td>
+                        <td>&#20813;&#36027;&#38989;&#24230;&#20805;&#36275;</td>
+                        <td>&#27573;&#32771;&#23529;&#38988; + &#21205;&#24907;&#35413;&#37327; + &#22238;&#39243; &#8776; &#20813;&#36027;&#38989;&#24230;&#20839;</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="box success" style="font-size:22px; text-align:center;">
+                <strong>&#127881; &#22909;&#28040;&#24687;&#65281;</strong><br>
+                Gemini 2.5 Flash &#30340;&#20813;&#36027;&#38989;&#24230;&#30456;&#30070;&#20805;&#35029;&#65292;&#19968;&#33324;&#25945;&#23416;&#20351;&#29992;&#19981;&#22826;&#26371;&#36229;&#36942;&#12290;
+            </div>
+
+            <div class="two-col" style="margin-top:24px;">
+                <div style="background:#fff; border-radius:14px; padding:24px 28px; box-shadow:0 4px 16px rgba(0,0,0,0.06);">
+                    <h3 style="color:#10b981; margin-bottom:12px;">&#128200; &#20856;&#22411;&#20351;&#29992;&#22580;&#26223;&#20272;&#31639;</h3>
+                    <ul style="padding-left:20px;">
+                        <li style="font-size:18px; margin-bottom:6px;">&#27573;&#32771;&#23529;&#38988;&#65306;&#19968;&#27425;&#32004; 30&#8211;50 &#38988; &#8776; &#24190;&#21315;&#23383;</li>
+                        <li style="font-size:18px; margin-bottom:6px;">&#21205;&#24907;&#35413;&#37327;&#65306;&#19968;&#20221;&#35430;&#21367; 10 &#38988; &#8776; &#25976;&#21315;&#23383;</li>
+                        <li style="font-size:18px; margin-bottom:6px;">&#23416;&#29983;&#22238;&#39243;&#65306;&#19968;&#29677; 30 &#20154; &#8776; &#33836;&#23383;&#31561;&#32026;</li>
+                        <li style="font-size:18px;">&#20840;&#37096;&#21152;&#36215;&#20358;&#65292;&#36996;&#26159;&#22312;&#20813;&#36027;&#31684;&#22285;&#20839;</li>
+                    </ul>
+                </div>
+                <div style="background:#fff; border-radius:14px; padding:24px 28px; box-shadow:0 4px 16px rgba(0,0,0,0.06);">
+                    <h3 style="color:#ef4444; margin-bottom:12px;">&#128178; &#22914;&#26524;&#36229;&#36942;&#20813;&#36027;&#38989;&#24230;&#65311;</h3>
+                    <ul style="padding-left:20px;">
+                        <li style="font-size:18px; margin-bottom:6px;">&#36664;&#20837;&#65306;&#32004; $0.15 / &#30334;&#33836;&#23383;&#20803;</li>
+                        <li style="font-size:18px; margin-bottom:6px;">&#36664;&#20986;&#65306;&#32004; $0.60 / &#30334;&#33836;&#23383;&#20803;</li>
+                        <li style="font-size:18px; margin-bottom:6px;">&#19968;&#20491;&#23416;&#26399;&#29992;&#19979;&#20358;&#21487;&#33021;&#21482;&#35201;&#24190;&#22602;&#32654;&#37329;</li>
+                        <li style="font-size:18px;">&#36996;&#26159;&#27604;&#36023;&#19968;&#26479;&#21654;&#21857;&#20415;&#23452; &#9749;</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Slide 7: &#24310;&#20280;&#36039;&#28304; ===== -->
+    <div class="slide" id="slide-7">
+        <div class="slide-content">
+            <h2>&#128218; &#24310;&#20280;&#36039;&#28304;</h2>
+
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th style="width:22%;">&#36039;&#28304;</th>
+                        <th style="width:30%;">&#36899;&#32080;</th>
+                        <th style="width:48%;">&#35498;&#26126;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Google AI Studio</strong></td>
+                        <td><a href="https://aistudio.google.com" target="_blank" class="resource-link">aistudio.google.com</a></td>
+                        <td>&#21462;&#24471; API Key&#12289;&#28204;&#35430; Prompt&#12289;&#26597;&#30475;&#29992;&#37327;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>NotebookLM</strong></td>
+                        <td><a href="https://notebooklm.google.com" target="_blank" class="resource-link">notebooklm.google.com</a></td>
+                        <td>&#24314;&#31435;&#35506;&#31243;&#30693;&#35672;&#24235;&#65292;&#20316;&#28858;&#22238;&#39243;&#31995;&#32113;&#30340;&#36039;&#26009;&#20358;&#28304;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Apps Script</strong></td>
+                        <td><a href="https://script.google.com" target="_blank" class="resource-link">script.google.com</a></td>
+                        <td>GAS &#32232;&#36655;&#22120;&#65292;&#31649;&#29702;&#25152;&#26377; Google Apps Script &#23560;&#26696;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#22283;&#25945;&#32626;&#27573;&#32771;&#38988;&#24235;</strong></td>
+                        <td><a href="https://www.k12ea.gov.tw/Tw/SingleWindow/QuizList?filter=12445983-2A68-41E7-BC50-E7448925D%206BC&type=57" target="_blank" class="resource-link">國教署段考題庫</a></td>
+                        <td>&#19979;&#36617;&#27573;&#32771;&#38988;&#32244;&#32722;&#29992;&#65292;&#21487;&#37197;&#21512;&#23529;&#38988;&#21161;&#25163;&#20351;&#29992;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gemini</strong></td>
+                        <td><a href="https://gemini.google.com" target="_blank" class="resource-link">gemini.google.com</a></td>
+                        <td>&#30452;&#25509;&#33287; AI &#23565;&#35441;&#12289;&#25913;&#31777;&#22577;&#12289;&#28204;&#35430; Prompt</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="box info" style="font-size:19px;">
+                <strong>&#128161; &#23567;&#25552;&#37266;&#65306;</strong>&#20197;&#19978;&#36039;&#28304;&#37117;&#26159;&#20813;&#36027;&#30340;&#65281;&#21482;&#35201;&#26377; Google &#24115;&#34399;&#23601;&#33021;&#20351;&#29992;&#12290;<br>
+                &#24314;&#35696;&#25226;&#36889;&#19968;&#38913;&#25130;&#22294;&#25110;&#21152;&#26360;&#31844;&#65292;&#26041;&#20415;&#20197;&#24460;&#38568;&#26178;&#26597;&#38321;&#12290;
+            </div>
+
+            <div style="display:flex; gap:14px; justify-content:center; margin-top:16px; flex-wrap:wrap;">
+                <div style="background:linear-gradient(135deg,#c0392b,#e74c3c); color:#fff; padding:12px 24px; border-radius:12px; font-size:17px; font-weight:600;">
+                    &#128190; &#24314;&#35696;&#21152;&#26360;&#31844;
+                </div>
+                <div style="background:linear-gradient(135deg,#c0392b,#e74c3c); color:#fff; padding:12px 24px; border-radius:12px; font-size:17px; font-weight:600;">
+                    &#128247; &#25110;&#30452;&#25509;&#25130;&#22294;&#20445;&#23384;
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Slide 8: Prompt &#36895;&#26597;&#34920; ===== -->
+    <div class="slide" id="slide-8">
+        <div class="slide-content">
+            <h2>&#128221; Prompt &#35373;&#35336;&#36895;&#26597;&#34920;</h2>
+
+            <table class="prompt-table">
+                <thead>
+                    <tr>
+                        <th style="width:22%;">&#24773;&#22659;</th>
+                        <th style="width:28%;">Prompt &#25216;&#24039;</th>
+                        <th style="width:50%;">&#31684;&#20363;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>&#35201; AI &#20998;&#26512;&#32080;&#27083;&#21270;&#36039;&#26009;</td>
+                        <td>&#25351;&#23450; JSON &#36664;&#20986;&#26684;&#24335;</td>
+                        <td><span class="prompt-example">&#12300;&#35531;&#29992;&#20197;&#19979; JSON &#26684;&#24335;&#22238;&#20659;...&#12301;</span></td>
+                    </tr>
+                    <tr>
+                        <td>&#35201; AI &#25198;&#28436;&#29305;&#23450;&#35282;&#33394;</td>
+                        <td>&#35282;&#33394;&#35373;&#23450; + &#23560;&#26989;&#32004;&#26463;</td>
+                        <td><span class="prompt-example">&#12300;&#20320;&#26159;&#19968;&#20301;&#22196;&#35641;&#30340;&#39640;&#20013;&#29289;&#29702;&#32769;&#24107;&#12301;</span></td>
+                    </tr>
+                    <tr>
+                        <td>&#35201; AI &#35488;&#23526;&#25209;&#35413;</td>
+                        <td>&#26126;&#30906;&#35201;&#27714;&#25214;&#32570;&#40670;</td>
+                        <td><span class="prompt-example">&#12300;&#35531;&#20808;&#25351;&#20986;&#19981;&#36275;&#65292;&#22914;&#26524;&#35201;&#25187;&#20998;&#22312;&#21738;&#35041;&#25187;&#65311;&#12301;</span></td>
+                    </tr>
+                    <tr>
+                        <td>&#35201; AI &#20381;&#29031;&#27161;&#28310;&#35413;&#20998;</td>
+                        <td>&#25552;&#20379; Rubric + &#36880;&#38917;&#35201;&#27714;</td>
+                        <td><span class="prompt-example">&#12300;&#26681;&#25818;&#20197;&#19979; Rubric &#36880;&#38917;&#35413;&#20272;&#12301;</span></td>
+                    </tr>
+                    <tr>
+                        <td>&#35201; AI &#31777;&#21270;&#20839;&#23481;</td>
+                        <td>&#25351;&#23450;&#30446;&#27161;&#35712;&#32773; + &#23383;&#25976;&#38480;&#21046;</td>
+                        <td><span class="prompt-example">&#12300;&#25913;&#23531;&#28858;&#39640;&#19968;&#29983;&#33021;&#25026;&#30340;&#29256;&#26412;&#65292;&#27599;&#21477;&#19981;&#36229;&#36942; 20 &#23383;&#12301;</span></td>
+                    </tr>
+                    <tr>
+                        <td>&#35201; AI &#29986;&#20986;&#22810;&#23652;&#27425;&#20839;&#23481;</td>
+                        <td>&#26126;&#30906;&#25551;&#36848;&#23652;&#27425;&#24046;&#30064;</td>
+                        <td><span class="prompt-example">&#12300;&#25552;&#31034;1&#21482;&#32102;&#26041;&#21521;&#65292;&#25552;&#31034;2&#32102;&#20844;&#24335;&#65292;&#25552;&#31034;3&#24118;&#25976;&#23383;&#12301;</span></td>
+                    </tr>
+                    <tr>
+                        <td>&#38477;&#20302; AI &#30340;&#38568;&#27231;&#24615;</td>
+                        <td>&#35373;&#23450;&#20302; temperature</td>
+                        <td><span class="prompt-example">temperature: 0.2&#65288;&#20998;&#26512;&#29992;&#65289;</span></td>
+                    </tr>
+                    <tr>
+                        <td>&#22686;&#21152; AI &#30340;&#21109;&#24847;</td>
+                        <td>&#35373;&#23450;&#39640; temperature</td>
+                        <td><span class="prompt-example">temperature: 0.7&#65288;&#25913;&#23531;&#29992;&#65289;</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="text-align:center; margin-top:12px;">
+                <div style="display:inline-block; background:linear-gradient(135deg,#fef2f2,#fee2e2); border:2px solid #ef4444; border-radius:14px; padding:14px 28px; font-size:19px;">
+                    <strong>&#128203; &#24314;&#35696;&#25226;&#36889;&#24373;&#34920;&#25130;&#22294;&#20445;&#23384;&#65281;</strong>&#20197;&#24460;&#23531; Prompt &#26178;&#38568;&#26178;&#21443;&#32771;&#12290;
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Slide 9: FAQ ===== -->
+    <div class="slide" id="slide-9">
+        <div class="slide-content">
+            <h2>&#10067; &#24120;&#35211;&#21839;&#38988; FAQ</h2>
+
+            <div class="faq-list">
+                <div class="faq-item open">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span class="faq-toggle">+</span>
+                        <span>Q1&#65306;API &#37329;&#37568;&#35201;&#20184;&#36027;&#21966;&#65311;</span>
+                    </div>
+                    <div class="faq-answer">
+                        Gemini 2.5 Flash &#26377;&#20813;&#36027;&#38989;&#24230;&#65292;&#19968;&#33324;&#25945;&#23416;&#20351;&#29992;&#32124;&#32124;&#26377;&#39192;&#12290;&#36229;&#36942;&#20063;&#24456;&#20415;&#23452;&#65288;&#32004;&#27599;&#30334;&#33836;&#23383;&#20803; $0.15 &#32654;&#20803;&#65289;&#12290;
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span class="faq-toggle">+</span>
+                        <span>Q2&#65306;&#23416;&#29983;&#36039;&#26009;&#20002;&#32102; AI &#23433;&#20840;&#21966;&#65311;</span>
+                    </div>
+                    <div class="faq-answer">
+                        Google &#23448;&#26041;&#32882;&#26126; API &#20659;&#36865;&#30340;&#36039;&#26009;&#19981;&#26371;&#29992;&#26044;&#35347;&#32244;&#27169;&#22411;&#12290;&#24314;&#35696;&#65306;&#19981;&#35201;&#20659;&#36523;&#20998;&#35388;&#34399;&#31561;&#25935;&#24863;&#20491;&#36039;&#65292;&#22995;&#21517;&#21487;&#29992;&#24231;&#34399;&#20195;&#26367;&#12290;
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span class="faq-toggle">+</span>
+                        <span>Q3&#65306;AI &#29986;&#20986;&#30340;&#38617;&#21521;&#32048;&#30446;&#34920;&#28310;&#30906;&#21966;&#65311;</span>
+                    </div>
+                    <div class="faq-answer">
+                        &#22823;&#26041;&#21521;&#26159;&#28310;&#30906;&#30340;&#65292;&#20294;&#24314;&#35696;&#32769;&#24107;&#20173;&#38656;&#20154;&#24037;&#23529;&#26680;&#12290;AI &#30340;&#20559;&#24046;&#27491;&#22909;&#21487;&#20197;&#20316;&#28858;&#21453;&#24605;&#20986;&#38988;&#30340;&#20999;&#20837;&#40670;&#12290;
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span class="faq-toggle">+</span>
+                        <span>Q4&#65306;&#21205;&#24907;&#35413;&#37327;&#21487;&#20197;&#29992;&#22312;&#21738;&#20123;&#31185;&#30446;&#65311;</span>
+                    </div>
+                    <div class="faq-answer">
+                        &#26377;&#35336;&#31639;&#25110;&#26126;&#30906;&#35299;&#38988;&#27493;&#39519;&#30340;&#31185;&#30446;&#26368;&#36969;&#21512;&#65288;&#25976;&#23416;&#12289;&#29289;&#29702;&#12289;&#21270;&#23416;&#65289;&#12290;&#25991;&#31185;&#20063;&#21487;&#20197;&#29992;&#65292;&#21482;&#26159;&#25552;&#31034;&#30340;&#35373;&#35336;&#26041;&#24335;&#19981;&#21516;&#12290;
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span class="faq-toggle">+</span>
+                        <span>Q5&#65306;&#25105;&#19981;&#26371;&#23531;&#31243;&#24335;&#65292;&#21487;&#20197;&#29992;&#21966;&#65311;</span>
+                    </div>
+                    <div class="faq-answer">
+                        &#21487;&#20197;&#65281;&#21482;&#38656;&#35201;&#65306;&#26371;&#29992; Google Sheets&#12289;&#26371;&#38283; Apps Script&#65288;&#23601;&#26159;&#40670;&#19968;&#20491;&#36984;&#21934;&#65289;&#12289;&#26371;&#35079;&#35069;&#36028;&#19978;&#12289;&#26371;&#30003;&#35531; API &#37329;&#37568;&#65288;&#26377;&#27493;&#39519;&#25945;&#20320;&#65289;&#12290;
+                    </div>
+                </div>
+            </div>
+
+            <div class="box info" style="font-size:18px; text-align:center;">
+                &#128172; &#36996;&#26377;&#20854;&#20182;&#21839;&#38988;&#65311;&#27489;&#36814;&#21152;&#20837; <a href="https://www.facebook.com/groups/2754139931432955" target="_blank" style="color:#7f1d1d; font-weight:700; text-decoration:underline;">Facebook &#31038;&#22296;</a> &#32380;&#32396;&#35342;&#35542;&#65281;
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Slide 11: &#32080;&#23614; ===== -->
+    <div class="slide ending-slide" id="slide-11">
+        <div class="slide-content" style="display:flex; justify-content:center; align-items:center;">
+            <div class="author-card">
+                <h1 style="font-size:42px; margin-bottom:8px; text-shadow:0 3px 10px rgba(0,0,0,0.2);">&#24863;&#35613;&#21443;&#33287;&#65281;</h1>
+                <div class="author-name">&#26366;&#24950;&#33391; &#20027;&#20219;&#65288;&#38463;&#20142;&#32769;&#24107;&#65289;</div>
+                <div class="author-title">
+                    &#26032;&#33288;&#31185;&#25216;&#25512;&#24291;&#20013;&#24515;&#20027;&#20219; &#65295; &#25945;&#32946;&#37096;&#23416;&#31185;&#20013;&#24515;&#30740;&#31350;&#25945;&#24107;
+                </div>
+
+                <div class="awards">
+                    <li>2025 SETEAM&#25945;&#23416;&#23560;&#26989;&#35611;&#24107;&#35469;&#35388;</li>
+                    <li>2024 &#25945;&#32946;&#37096;&#20154;&#24037;&#26234;&#24935;&#35611;&#24107;&#35469;&#35388;</li>
+                    <li>2022&#8211;2023 &#25351;&#23566;&#23416;&#29983;XR&#23560;&#38988;&#31478;&#36093;&#29305;&#20778;</li>
+                    <li>2019 &#30334;&#22823;&#36039;&#35338;&#20154;&#25165;&#29518;</li>
+                    <li>2018&#8211;2019 &#35242;&#23376;&#22825;&#19979;&#21109;&#26032;100&#25945;&#24107;</li>
+                    <li>2018 &#33274;&#21271;&#24066;&#29305;&#27530;&#20778;&#33391;&#25945;&#24107;</li>
+                </div>
+
+                <div class="social-links">
+                    <a href="https://www.youtube.com/@Liang-yt02" target="_blank">
+                        &#127909; YouTube &#38971;&#36947;
+                    </a>
+                    <a href="https://www.facebook.com/groups/2754139931432955" target="_blank">
+                        &#128216; Facebook &#31038;&#22296;
+                    </a>
+                    <a href="mailto:3a01chatgpt@gmail.com">
+                        &#128231; 3a01chatgpt@gmail.com
+                    </a>
+                </div>
+
+                <div class="copyright">
+                    &copy; 2026 &#38463;&#20142;&#32769;&#24107; &#29256;&#27402;&#25152;&#26377;<br>
+                    &#26412;&#25945;&#26448;&#20677;&#20379;&#30740;&#32722;&#23416;&#21729;&#23416;&#32722;&#20351;&#29992;
+                </div>
+
+                <div style="text-align:center; margin-top:30px; padding-top:20px; border-top:2px solid rgba(255,255,255,0.2);">
+                    <a href="index.html" style="display:inline-block; padding:16px 40px; background:linear-gradient(135deg, #667eea, #764ba2); color:#fff; text-decoration:none; border-radius:12px; font-size:20px; font-weight:700; box-shadow:0 4px 15px rgba(0,0,0,0.2); transition:transform 0.2s;">
+                        &#127968; 回到研習首頁
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div><!-- end slides-wrapper -->
+
+<!-- ===== Navigation Arrows ===== -->
+<button class="nav-arrow left" onclick="prevSlide()" id="btn-prev" aria-label="&#19978;&#19968;&#38913;">&#10094;</button>
+<button class="nav-arrow right" onclick="nextSlide()" id="btn-next" aria-label="&#19979;&#19968;&#38913;">&#10095;</button>
+
+<!-- ===== Bottom Dots ===== -->
+<div class="dots-nav" id="dots-nav"></div>
+
+<!-- ===== Slide Number ===== -->
+<div class="slide-number" id="slide-number"></div>
+
+<script>
+    // ===== Slide Engine =====
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+
+    // Build dots
+    const dotsNav = document.getElementById('dots-nav');
+    for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement('button');
+        dot.classList.add('dot');
+        if (i === 0) dot.classList.add('active');
+        dot.setAttribute('aria-label', '\u524D\u5F80\u7B2C ' + (i + 1) + ' \u9801');
+        dot.addEventListener('click', () => goToSlide(i));
+        dotsNav.appendChild(dot);
+    }
+
+    function updateSlide() {
+        slides.forEach((s, i) => {
+            s.classList.remove('active', 'exit-left');
+            if (i < currentSlide) s.classList.add('exit-left');
+        });
+        slides[currentSlide].classList.add('active');
+
+        // Update dots
+        document.querySelectorAll('.dot').forEach((d, i) => {
+            d.classList.toggle('active', i === currentSlide);
+        });
+
+        // Update arrows
+        document.getElementById('btn-prev').disabled = (currentSlide === 0);
+        document.getElementById('btn-next').disabled = (currentSlide === totalSlides - 1);
+
+        // Update slide number
+        document.getElementById('slide-number').textContent = (currentSlide + 1) + ' / ' + totalSlides;
+
+        // Scroll to top if content overflows
+        slides[currentSlide].scrollTop = 0;
+    }
+
+    function nextSlide() {
+        if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); }
+    }
+
+    function prevSlide() {
+        if (currentSlide > 0) { currentSlide--; updateSlide(); }
+    }
+
+    function goToSlide(n) {
+        currentSlide = n;
+        updateSlide();
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+            e.preventDefault();
+            nextSlide();
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            prevSlide();
+        } else if (e.key === 'Home') {
+            e.preventDefault();
+            goToSlide(0);
+        } else if (e.key === 'End') {
+            e.preventDefault();
+            goToSlide(totalSlides - 1);
+        }
+    });
+
+    // Touch / Swipe support
+    let touchStartX = 0;
+    let touchEndX = 0;
+    document.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        const diff = touchStartX - touchEndX;
+        if (Math.abs(diff) > 60) {
+            if (diff > 0) nextSlide();
+            else prevSlide();
+        }
+    }, { passive: true });
+
+    // Fullscreen toggle
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+            document.exitFullscreen();
+        }
+    }
+
+    // FAQ toggle
+    function toggleFaq(el) {
+        const item = el.parentElement;
+        const wasOpen = item.classList.contains('open');
+        // Close all
+        document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('open'));
+        // Toggle this one
+        if (!wasOpen) item.classList.add('open');
+    }
+
+    // Initialize
+    updateSlide();
+</script>
+
+</body>
+</html>

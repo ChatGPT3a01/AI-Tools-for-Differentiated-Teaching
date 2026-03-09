@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Google Sans', 'Segoe UI', Arial, sans-serif; background: #fff; width: 780px; position: relative; }
+  .sheets-header { background: #0f9d58; padding: 10px 20px; display: flex; align-items: center; gap: 12px; }
+  .sheets-icon { width: 26px; height: 26px; background: #fff; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #0f9d58; font-size: 14px; font-weight: bold; }
+  .sheets-title { color: #fff; font-size: 16px; font-weight: 500; }
+  .toolbar { background: #f8f9fa; border-bottom: 1px solid #e0e0e0; padding: 6px 12px; display: flex; gap: 16px; font-size: 13px; color: #5f6368; }
+  .toolbar-item { padding: 4px 8px; cursor: pointer; }
+  .toolbar-item:hover { background: #e8eaed; border-radius: 4px; }
+  .toolbar-highlight { color: #0f9d58; font-weight: 500; background: #e6f4ea; border-radius: 4px; padding: 4px 10px; }
+  .formula-bar { background: #fff; border-bottom: 1px solid #e0e0e0; padding: 6px 12px; font-size: 12px; color: #5f6368; display: flex; align-items: center; gap: 8px; }
+  .formula-cell { background: #e8f0fe; padding: 2px 8px; border-radius: 3px; font-size: 11px; color: #1a73e8; font-weight: 500; }
+  .sheet-table { width: 100%; border-collapse: collapse; }
+  .sheet-table th { background: #f8f9fa; padding: 7px 10px; font-size: 11px; color: #5f6368; font-weight: 500; text-align: left; border: 1px solid #e0e0e0; }
+  .sheet-table td { padding: 8px 10px; font-size: 12px; color: #3c4043; border: 1px solid #e8eaed; vertical-align: top; }
+  .sheet-table tr:hover { background: #f8f9fa; }
+  .col-num { width: 30px; background: #f8f9fa; color: #5f6368; text-align: center; font-size: 11px; }
+  .col-a { width: 80px; }
+  .col-b { width: 80px; }
+  .col-c { width: 70px; }
+  .col-d { width: 130px; }
+  .col-e { min-width: 420px; }
+  .status-done { color: #137333; }
+  .status-late { color: #e37400; }
+  .feedback-done { color: #137333; font-size: 11px; line-height: 1.5; }
+  .feedback-empty { color: #dadce0; font-size: 12px; }
+
+  /* 彈出對話框 */
+  .overlay { position: fixed; top: 0; left: 0; width: 780px; height: 100%; background: rgba(0,0,0,0.25); z-index: 100; display: flex; align-items: flex-start; justify-content: center; padding-top: 120px; }
+  .dialog { background: #fff; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.24); width: 420px; overflow: hidden; }
+  .dialog-header { padding: 24px 24px 16px; }
+  .dialog-icon { width: 48px; height: 48px; border-radius: 50%; background: #e6f4ea; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 16px; }
+  .dialog-title { font-size: 18px; font-weight: 500; color: #202124; margin-bottom: 8px; }
+  .dialog-body { font-size: 14px; color: #5f6368; line-height: 1.6; padding: 0 24px 8px; }
+  .dialog-stats { display: flex; gap: 16px; margin: 12px 0; }
+  .dialog-stat { background: #f8f9fa; border-radius: 8px; padding: 10px 16px; flex: 1; text-align: center; }
+  .dialog-stat-num { font-size: 24px; font-weight: 600; color: #137333; }
+  .dialog-stat-label { font-size: 11px; color: #5f6368; margin-top: 2px; }
+  .dialog-footer { padding: 16px 24px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #e0e0e0; }
+  .dialog-btn { padding: 8px 24px; border-radius: 20px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; }
+  .dialog-btn-primary { background: #0f9d58; color: #fff; }
+  .dialog-btn-secondary { background: #fff; color: #5f6368; border: 1px solid #dadce0; }
+
+  .sheet-tabs { display: flex; background: #f8f9fa; border-top: 1px solid #e0e0e0; padding: 0 12px; }
+  .sheet-tab { padding: 8px 20px; font-size: 12px; color: #5f6368; cursor: pointer; border-bottom: 2px solid transparent; }
+  .sheet-tab.active { color: #0f9d58; border-bottom-color: #0f9d58; font-weight: 500; background: #fff; }
+</style>
+</head>
+<body>
+  <div class="sheets-header">
+    <div class="sheets-icon">S</div>
+    <div class="sheets-title">AI 學生回饋系統 — 期末報告回饋</div>
+  </div>
+
+  <div class="toolbar">
+    <div class="toolbar-item">檔案</div>
+    <div class="toolbar-item">編輯</div>
+    <div class="toolbar-item">檢視</div>
+    <div class="toolbar-highlight">💬 AI 回饋</div>
+    <div class="toolbar-item">工具</div>
+    <div class="toolbar-item">擴充功能</div>
+    <div class="toolbar-item">說明</div>
+  </div>
+
+  <div class="formula-bar">
+    <div class="formula-cell">E2</div>
+    <span style="color:#3c4043;">✅ 逐項評分：內容正確性 中/組織架構 優/數據佐證 再加強/語言表達 中 ｜做得好：購物車比喻...</span>
+  </div>
+
+  <table class="sheet-table">
+    <thead>
+      <tr>
+        <th class="col-num"></th>
+        <th class="col-a">A 姓名</th>
+        <th class="col-b">B 形式</th>
+        <th class="col-c">C 繳交</th>
+        <th class="col-d">D 報告連結</th>
+        <th class="col-e">E AI 個人化回饋</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="col-num">2</td>
+        <td style="font-weight:500;">王小明</td>
+        <td>文字報告</td>
+        <td class="status-done">✅ 已繳</td>
+        <td style="color:#1a73e8; font-size:11px;">📎 report_王小明.pdf</td>
+        <td class="feedback-done">✅ 逐項評分：內容正確性 中／組織架構 優／數據佐證 再加強／語言表達 中 ｜做得好：購物車比喻生動、結構清楚 ｜改進：缺自由體圖...</td>
+      </tr>
+      <tr>
+        <td class="col-num">3</td>
+        <td style="font-weight:500;">李美華</td>
+        <td>簡報</td>
+        <td class="status-done">✅ 已繳</td>
+        <td style="color:#1a73e8; font-size:11px;">📎 slides_李美華.pptx</td>
+        <td class="feedback-done">✅ 逐項評分：內容正確性 優／組織架構 優／數據佐證 中／語言表達 優 ｜做得好：圖表清晰、數據引用完整 ｜改進：摩擦力部分可深入...</td>
+      </tr>
+      <tr>
+        <td class="col-num">4</td>
+        <td style="font-weight:500;">張大偉</td>
+        <td>文字報告</td>
+        <td class="status-done">✅ 已繳</td>
+        <td style="color:#1a73e8; font-size:11px;">📎 report_張大偉.pdf</td>
+        <td class="feedback-done">✅ 逐項評分：內容正確性 再加強／組織架構 中／數據佐證 再加強／語言表達 中 ｜做得好：嘗試用生活例子 ｜改進：概念有誤需重新理解...</td>
+      </tr>
+      <tr>
+        <td class="col-num">5</td>
+        <td style="font-weight:500;">陳怡君</td>
+        <td>Podcast</td>
+        <td class="status-done">✅ 已繳</td>
+        <td style="color:#1a73e8; font-size:11px;">📎 podcast_陳怡君.mp3</td>
+        <td class="feedback-done">✅ 逐項評分：內容正確性 優／組織架構 中／數據佐證 中／語言表達 優 ｜做得好：口語表達流暢、能舉實例 ｜改進：缺乏書面佐證資料...</td>
+      </tr>
+      <tr>
+        <td class="col-num">6</td>
+        <td style="font-weight:500;">林志豪</td>
+        <td>文字報告</td>
+        <td class="status-late">🕐 遲交</td>
+        <td style="color:#1a73e8; font-size:11px;">📎 report_林志豪.pdf</td>
+        <td class="feedback-empty">—</td>
+      </tr>
+      <tr>
+        <td class="col-num">7</td>
+        <td style="font-weight:500;">黃雅琪</td>
+        <td>簡報</td>
+        <td class="status-done">✅ 已繳</td>
+        <td style="color:#1a73e8; font-size:11px;">📎 slides_黃雅琪.pptx</td>
+        <td class="feedback-empty">—</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="sheet-tabs">
+    <div class="sheet-tab active">學生報告</div>
+    <div class="sheet-tab">Rubric 設定</div>
+    <div class="sheet-tab">系統設定</div>
+  </div>
+
+  <!-- 彈出對話框 -->
+  <div class="overlay">
+    <div class="dialog">
+      <div class="dialog-header">
+        <div class="dialog-icon">✅</div>
+        <div class="dialog-title">批次回饋完成！</div>
+      </div>
+      <div class="dialog-body">
+        <div class="dialog-stats">
+          <div class="dialog-stat">
+            <div class="dialog-stat-num">4</div>
+            <div class="dialog-stat-label">已產生回饋</div>
+          </div>
+          <div class="dialog-stat">
+            <div class="dialog-stat-num">2</div>
+            <div class="dialog-stat-label">尚未處理</div>
+          </div>
+          <div class="dialog-stat">
+            <div class="dialog-stat-num" style="color:#1a73e8;">~45s</div>
+            <div class="dialog-stat-label">平均處理時間</div>
+          </div>
+        </div>
+        <div style="font-size:13px; color:#5f6368; margin-top:8px;">
+          共產生 <b>4</b> 份個人化回饋。每份回饋包含逐項評分、優點、改進建議與鼓勵語。
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <div class="dialog-btn dialog-btn-secondary">檢視回饋</div>
+        <div class="dialog-btn dialog-btn-primary">確定</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
