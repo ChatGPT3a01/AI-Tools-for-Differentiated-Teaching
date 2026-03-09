@@ -13,26 +13,49 @@
 
 **所有工具都是「複製貼上就能用」，不需要寫程式基礎。**
 
+<br>
+
+### 👉 [📺 點我開啟研習簡報（線上版）](https://chatgpt3a01.github.io/AI-Tools-for-Differentiated-Teaching/簡報/index.html) 👈
+
+<br>
+
+[![開啟簡報](https://img.shields.io/badge/🎬_開啟研習簡報-點我開始-ff6b35?style=for-the-badge&labelColor=1e3c72)](https://chatgpt3a01.github.io/AI-Tools-for-Differentiated-Teaching/簡報/index.html)
+[![下載教材](https://img.shields.io/badge/📄_教材_PDF-下載-27ae60?style=for-the-badge&labelColor=0d6938)](教材/研習教材_AI工具協助差異化教學.pdf)
+
 </div>
 
 ---
 
-## 📂 快速下載
+## 📺 研習簡報（線上瀏覽）
 
 <div align="center">
 
-| 📖 研習簡報 | 📄 教材 PDF | 💻 程式碼 |
-|:---:|:---:|:---:|
-| [▶ 開啟簡報（index.html）](簡報/index.html) | [📥 下載教材 PDF](教材/研習教材_AI工具協助差異化教學.pdf) | [📥 工具① 段考AI審題助手](GAS程式碼/工具1_段考AI審題助手.js) |
-| [Part 1 動機理論 + 審題助手](簡報/Part1_動機理論與段考AI審題助手.html) | | [📥 工具② 動態評量產生器](GAS程式碼/工具2_動態評量產生器.js) |
-| [Part 2 教材差異化](簡報/Part2_教材差異化AI改簡報.html) | | [📥 工具③ AI學生回饋系統](GAS程式碼/工具3_AI學生回饋系統.js) |
-| [Part 3 動態評量產生器](簡報/Part3_動態評量產生器.html) | | |
-| [Part 4 多元評量 + 回饋系統](簡報/Part4_多元評量與AI學生回饋系統.html) | | |
-| [Part 5 分享與總結](簡報/Part5_分享與總結.html) | | |
+> 💡 點擊下方連結，直接在瀏覽器中開啟簡報，不需要下載！
+
+| Part | 主題 | 線上開啟 |
+|:---:|------|:---:|
+| 🏠 | **統整頁（從這裡開始）** | [**▶ 開啟簡報首頁**](https://chatgpt3a01.github.io/AI-Tools-for-Differentiated-Teaching/簡報/index.html) |
+| 1 | 動機理論基礎 + 段考 AI 審題助手 | [開啟 Part 1](https://chatgpt3a01.github.io/AI-Tools-for-Differentiated-Teaching/簡報/Part1_動機理論與段考AI審題助手.html) |
+| 2 | 教材差異化：AI 改廠商簡報 | [開啟 Part 2](https://chatgpt3a01.github.io/AI-Tools-for-Differentiated-Teaching/簡報/Part2_教材差異化AI改簡報.html) |
+| 3 | 動態評量產生器 | [開啟 Part 3](https://chatgpt3a01.github.io/AI-Tools-for-Differentiated-Teaching/簡報/Part3_動態評量產生器.html) |
+| 4 | 多元評量 Rubric + AI 學生回饋系統 | [開啟 Part 4](https://chatgpt3a01.github.io/AI-Tools-for-Differentiated-Teaching/簡報/Part4_多元評量與AI學生回饋系統.html) |
+| 5 | 分享與總結 | [開啟 Part 5](https://chatgpt3a01.github.io/AI-Tools-for-Differentiated-Teaching/簡報/Part5_分享與總結.html) |
 
 </div>
 
-> 💡 **使用方式**：下載整個 Repo（`Code` → `Download ZIP`），解壓後用瀏覽器開啟 `簡報/index.html` 即可。
+---
+
+## 💻 程式碼下載
+
+<div align="center">
+
+| 工具 | 下載 |
+|------|:---:|
+| ① 段考 AI 審題助手 | [📥 下載 .js](GAS程式碼/工具1_段考AI審題助手.js) |
+| ② 動態評量產生器 | [📥 下載 .js](GAS程式碼/工具2_動態評量產生器.js) |
+| ③ AI 學生回饋系統 | [📥 下載 .js](GAS程式碼/工具3_AI學生回饋系統.js) |
+
+</div>
 
 ---
 
@@ -103,20 +126,6 @@ output/
     ├── 3-1_知識點輸入.png ~ 3-5
     └── 4-1_三種Rubric.png ~ 4-6
 ```
-
----
-
-## 🎓 研習簡報
-
-以瀏覽器開啟 `簡報/index.html` 即可瀏覽完整研習簡報。
-
-| Part | 主題 | 對應需求 |
-|:---:|------|:---:|
-| 1 | 動機理論基礎 + 段考 AI 審題助手 | 勝任感 |
-| 2 | 教材差異化：AI 改廠商簡報 | 勝任感 |
-| 3 | 動態評量產生器 | 勝任感（補強） |
-| 4 | 多元評量 Rubric + AI 學生回饋系統 | 自主性 + 關係 |
-| 5 | 分享與總結 | — |
 
 ---
 
