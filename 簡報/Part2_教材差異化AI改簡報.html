@@ -553,14 +553,18 @@
                 <div>
                     <p style="margin-bottom:12px;">把專業術語變成學生聽得懂的白話文，降低認知門檻。</p>
                     <h3>&#128221; Prompt 範例</h3>
-                    <div class="code-block">你是高中物理教師，請將以下內容改寫為高一生能理解的版本：
+                    <div class="code-block"><span class="keyword">請將以下教學內容改寫為適合高中一年級學生的程度。</span>
 
-<span class="keyword">要求：</span>
-<span class="string">1. 專業術語用括號附上白話解釋</span>
-<span class="string">2. 每句不超過 20 字</span>
-<span class="string">3. 加上一個日常生活例子</span>
+<span class="string">改寫要求：</span>
+1. 將專業術語替換為日常用語，第一次出現時在括號中保留原術語
+2. 句子長度不超過 20 字
+3. 每個概念搭配一個生活中的例子
+4. 語氣親切，像老師在課堂上對學生說話
 
-<span class="comment">【貼上你的簡報內容】</span></div>
+<span class="comment">原始內容：</span>
+<span class="comment">【在這裡貼上你的教材內容】</span>
+
+<span class="comment">請改寫：</span></div>
 
                     <div style="display:flex; gap:16px; margin-top:14px;">
                         <div class="compare-box before" style="flex:1;">
@@ -589,13 +593,16 @@
                 <div>
                     <p style="margin-bottom:12px;">一張塞太多的簡報，拆成三張「一頁一重點」，降低學生的認知負荷。</p>
                     <h3>&#128221; Prompt 範例</h3>
-                    <div class="code-block">請將以下內容拆成 3 張簡報，每張包含：
+                    <div class="code-block"><span class="keyword">以下是一張簡報的內容，資訊量太大。
+請幫我拆成 3 張簡報，每張只講一個核心概念，適合高中生逐步理解。</span>
 
-<span class="keyword">1.</span> <span class="string">標題（10 字以內）</span>
-<span class="keyword">2.</span> <span class="string">重點（3 個要點，每點 15 字以內）</span>
-<span class="keyword">3.</span> <span class="string">講者備註（口語化，50 字以內）</span>
+<span class="string">每張簡報請提供：</span>
+- 標題（10 字以內）
+- 重點（3 個要點，每點不超過 15 字）
+- 講者備註（老師上課可以說的話，50 字以內）
 
-<span class="comment">【貼上你的簡報內容】</span></div>
+<span class="comment">原始簡報內容：</span>
+<span class="comment">【在這裡貼上你的簡報內容】</span></div>
 
                     <div class="box info" style="margin-top:16px;">
                         <strong>&#128161; 為什麼要拆？</strong><br>
@@ -619,14 +626,17 @@
                 <div>
                     <p style="margin-bottom:12px;">把課本裡的「甲地、乙地」換成學生每天走過的地方，讓學習有感連結。</p>
                     <h3>&#128221; Prompt 範例</h3>
-                    <div class="code-block">請改寫以下物理題目，融入在地元素：
+                    <div class="code-block"><span class="keyword">請將以下教材的舉例，替換為與我們學校學生生活相關的情境。</span>
 
-<span class="keyword">地點用：</span><span class="string">象山步道、松山車站、信義商圈</span>
-<span class="keyword">活動用：</span><span class="string">搭捷運、體育課、園遊會</span>
+<span class="string">考慮以下在地元素：</span>
+- 學校附近：象山步道、松山車站、信義商圈
+- 學生日常：搭捷運上學、體育課、園遊會
+- 時事或流行文化
 
-<span class="comment">保留相同的物理概念和計算</span>
+<span class="comment">原始內容：</span>
+<span class="comment">【在這裡貼上你的教材內容】</span>
 
-<span class="comment">【貼上你的題目或教材內容】</span></div>
+<span class="comment">請改寫為在地化版本，保留相同的學科概念和計算：</span></div>
 
                     <div style="display:flex; gap:16px; margin-top:14px;">
                         <div class="compare-box before" style="flex:1;">
@@ -745,30 +755,43 @@
             <p>複製以下提示詞，貼到 <strong>Gemini / ChatGPT / Claude</strong>，直接改你的教材：</p>
 
             <h3 style="color:#0d6938;margin-top:25px;">策略一：調整難度</h3>
-            <pre style="background:#1e293b;color:#e2e8f0;padding:20px;border-radius:12px;font-size:15px;line-height:1.7;white-space:pre-wrap;"><code>你是高中物理教師，請將以下內容改寫為高一生能理解的版本：
+            <pre style="background:#1e293b;color:#e2e8f0;padding:20px;border-radius:12px;font-size:15px;line-height:1.7;white-space:pre-wrap;"><code>請將以下教學內容改寫為適合高中一年級學生的程度。
 
-要求：
-1. 專業術語用括號附上白話解釋
-2. 每句不超過 20 字
-3. 加上一個日常生活例子
+改寫要求：
+1. 將專業術語替換為日常用語，第一次出現時在括號中保留原術語
+2. 句子長度不超過 20 字
+3. 每個概念搭配一個生活中的例子
+4. 語氣親切，像老師在課堂上對學生說話
 
-【在這裡貼上你的教材內容】</code></pre>
+原始內容：
+【在這裡貼上你的教材內容】
+
+請改寫：</code></pre>
 
             <h3 style="color:#0d6938;margin-top:25px;">策略二：一張拆三張</h3>
-            <pre style="background:#1e293b;color:#e2e8f0;padding:20px;border-radius:12px;font-size:15px;line-height:1.7;white-space:pre-wrap;"><code>請將以下內容拆成 3 張簡報，每張包含：
-1. 標題（10 字以內）
-2. 重點（3 個要點，每點 15 字以內）
-3. 講者備註（口語化，50 字以內）
+            <pre style="background:#1e293b;color:#e2e8f0;padding:20px;border-radius:12px;font-size:15px;line-height:1.7;white-space:pre-wrap;"><code>以下是一張簡報的內容，資訊量太大。
+請幫我拆成 3 張簡報，每張只講一個核心概念，適合高中生逐步理解。
 
-【在這裡貼上你的教材內容】</code></pre>
+每張簡報請提供：
+- 標題（10 字以內）
+- 重點（3 個要點，每點不超過 15 字）
+- 講者備註（老師上課可以說的話，50 字以內）
+
+原始簡報內容：
+【在這裡貼上你的簡報內容】</code></pre>
 
             <h3 style="color:#0d6938;margin-top:25px;">策略三：融入在地情境</h3>
-            <pre style="background:#1e293b;color:#e2e8f0;padding:20px;border-radius:12px;font-size:15px;line-height:1.7;white-space:pre-wrap;"><code>請改寫以下題目，融入在地元素：
-- 地點用：（你學校附近的地標）
-- 活動用：（學生日常活動）
-保留相同的學科概念和計算
+            <pre style="background:#1e293b;color:#e2e8f0;padding:20px;border-radius:12px;font-size:15px;line-height:1.7;white-space:pre-wrap;"><code>請將以下教材的舉例，替換為與我們學校學生生活相關的情境。
 
-【在這裡貼上你的教材內容】</code></pre>
+考慮以下在地元素：
+- 學校附近：（填入你學校附近的地標）
+- 學生日常：（填入學生常做的活動）
+- 時事或流行文化
+
+原始內容：
+【在這裡貼上你的教材內容】
+
+請改寫為在地化版本，保留相同的學科概念和計算：</code></pre>
         </div>
     </div>
 
