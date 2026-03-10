@@ -703,6 +703,10 @@
             .ending-slide .author-card { padding: 28px 24px; }
             .ending-slide .author-name { font-size: 30px; }
         }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
     </style>
 </head>
 <body>
@@ -1172,8 +1176,11 @@
                     &#26412;&#25945;&#26448;&#20677;&#20379;&#30740;&#32722;&#23416;&#21729;&#23416;&#32722;&#20351;&#29992;
                 </div>
 
-                <div style="text-align:center; margin-top:30px; padding-top:20px; border-top:2px solid rgba(255,255,255,0.2);">
-                    <a href="index.html" style="display:inline-block; padding:16px 40px; background:linear-gradient(135deg, #667eea, #764ba2); color:#fff; text-decoration:none; border-radius:12px; font-size:20px; font-weight:700; box-shadow:0 4px 15px rgba(0,0,0,0.2); transition:transform 0.2s;">
+                <div style="text-align:center; margin-top:30px; padding-top:20px; border-top:2px solid rgba(255,255,255,0.2); display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
+                    <a href="certification.html" style="display:inline-block; padding:16px 40px; background:linear-gradient(135deg, #f59e0b, #f97316); color:#fff; text-decoration:none; border-radius:12px; font-size:20px; font-weight:700; box-shadow:0 4px 15px rgba(245,158,11,0.4); transition:transform 0.2s; animation: pulse 2s infinite;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+                        &#9997;&#65039; 前往認證測驗
+                    </a>
+                    <a href="index.html" style="display:inline-block; padding:16px 40px; background:linear-gradient(135deg, #667eea, #764ba2); color:#fff; text-decoration:none; border-radius:12px; font-size:20px; font-weight:700; box-shadow:0 4px 15px rgba(0,0,0,0.2); transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
                         &#127968; 回到研習首頁
                     </a>
                 </div>
