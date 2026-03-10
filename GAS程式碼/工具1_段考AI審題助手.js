@@ -209,21 +209,36 @@ function outputResults(analysis) {
 
   const table = analysis['雙向細目表'];
   if (table) {
-    const headers = ['單元 \\ 認知層次', ...table['認知層次']];
+    // 固定 6 個認知層次，避免 AI 漏掉某些層次導致欄位不一致
+    const fixedLevels = ['記憶', '理解', '應用', '分析', '評鑑', '創造'];
+    const headers = ['單元 \\ 認知層次', ...fixedLevels];
     sheetTable.getRange(1, 1, 1, headers.length).setValues([headers])
-      .setBackground('#4285F4').setFontColor('white').setFontWeight('bold');
+      .setBackground('#4285F4').setFontColor('white').setFontWeight('bold')
+      .setHorizontalAlignment('center');
+
+    // A 欄（單元名稱）設定足夠寬度，避免遮住 B 欄標題
+    sheetTable.setColumnWidth(1, 160);
+    // B~G 欄（認知層次）設定統一寬度
+    for (let c = 2; c <= headers.length; c++) {
+      sheetTable.setColumnWidth(c, 80);
+    }
 
     const units = table['單元列表'] || [];
     units.forEach((unit, i) => {
       const row = [unit];
-      (table['認知層次'] || []).forEach(level => {
+      fixedLevels.forEach(level => {
         const nums = table['對應題號']?.[unit]?.[level] || [];
         row.push(nums.length > 0 ? nums.join(', ') : '—');
       });
       sheetTable.getRange(i + 2, 1, 1, row.length).setValues([row]);
     });
 
-    sheetTable.autoResizeColumns(1, headers.length);
+    // 單元名稱欄靠左，認知層次欄置中
+    const dataRows = units.length;
+    if (dataRows > 0) {
+      sheetTable.getRange(2, 1, dataRows, 1).setHorizontalAlignment('left');
+      sheetTable.getRange(2, 2, dataRows, fixedLevels.length).setHorizontalAlignment('center');
+    }
   }
 
   // --- 工作表：難易度分析 ---

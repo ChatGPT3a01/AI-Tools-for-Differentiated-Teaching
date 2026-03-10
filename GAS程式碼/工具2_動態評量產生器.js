@@ -215,6 +215,13 @@ function createForm() {
   );
   form.setIsQuiz(false); // 用自訂計分邏輯
 
+  // ===== 學生資訊欄位（表單最前面）=====
+  form.addTextItem().setTitle('班級').setRequired(true)
+    .setHelpText('例如：301、高一甲');
+  form.addTextItem().setTitle('座號').setRequired(true)
+    .setHelpText('例如：5、05');
+  form.addTextItem().setTitle('姓名').setRequired(true);
+
   const data = sheet.getRange(2, 1, lastRow - 1, 9).getValues();
   const numQuestions = data.length;
 
@@ -337,22 +344,223 @@ function createForm() {
   urlSheet.getRange(1, 2).setValue(formUrl);
   urlSheet.getRange(2, 1).setValue('編輯連結：').setFontWeight('bold');
   urlSheet.getRange(2, 2).setValue(editUrl);
+  urlSheet.getRange(3, 1).setValue('題目數量：').setFontWeight('bold');
+  urlSheet.getRange(3, 2).setValue(numQuestions);
   urlSheet.autoResizeColumns(1, 2);
 
   ui.alert(`✅ Google Form 已建立！\n\n學生連結：${formUrl}\n\n（連結也已記錄在「表單連結」工作表）`);
 }
 
-// ---------- 計算成績（說明版）----------
+// ---------- 計算成績（全自動計分）----------
 function calculateScores() {
   const ui = SpreadsheetApp.getUi();
-  ui.alert('📊 計分功能說明：\n\n' +
-    '請在 Google Form 收到回覆後：\n' +
-    '1. 開啟表單回覆的 Google Sheets\n' +
-    '2. 根據學生使用提示的情況計分：\n' +
-    '   • 不用提示答對 = 5 分\n' +
-    '   • 用 1 個提示答對 = 4 分\n' +
-    '   • 用 2 個提示答對 = 3 分\n' +
-    '   • 用 3 個提示答對 = 1 分\n' +
-    '   • 全部提示後仍答錯 = 0 分\n\n' +
-    '（未來版本將支援全自動計分）');
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  // 1. 讀取表單資訊
+  const urlSheet = ss.getSheetByName('表單連結');
+  if (!urlSheet) {
+    ui.alert('❌ 找不到「表單連結」工作表，請先建立 Google Form。');
+    return;
+  }
+
+  const editUrl = urlSheet.getRange(2, 2).getValue();
+  const numQuestions = urlSheet.getRange(3, 2).getValue();
+
+  if (!editUrl || !numQuestions) {
+    ui.alert('❌ 表單連結資訊不完整，請重新建立 Google Form。');
+    return;
+  }
+
+  // 2. 開啟表單並取得回覆
+  let form;
+  try {
+    form = FormApp.openByUrl(editUrl);
+  } catch (e) {
+    ui.alert('❌ 無法開啟表單，請確認表單連結是否正確。\n\n錯誤：' + e.message);
+    return;
+  }
+
+  const responses = form.getResponses();
+  if (responses.length === 0) {
+    ui.alert('⚠️ 目前還沒有學生回覆，請等學生作答後再計算成績。');
+    return;
+  }
+
+  // 3. 取得所有 MultipleChoiceItem（用來判斷提示使用情況）
+  const allItems = form.getItems();
+  const mcItems = [];
+  allItems.forEach(function(item) {
+    if (item.getType() === FormApp.ItemType.MULTIPLE_CHOICE) {
+      mcItems.push(item.getId());
+    }
+  });
+
+  // 前 0 個是學生資訊欄位（TextItem），MultipleChoiceItem 從題目開始
+  // 每道題有 3 個 MultipleChoiceItem（needHint, needHint2, needHint3）
+
+  // 4. 計算每位學生成績
+  const studentResults = [];
+
+  responses.forEach(function(response) {
+    const itemResponses = response.getItemResponses();
+
+    // 取得學生資訊（前三個回答：班級、座號、姓名）
+    var className = '', seatNo = '', studentName = '';
+    var mcAnswers = [];
+
+    itemResponses.forEach(function(ir) {
+      var itemType = ir.getItem().getType();
+      var title = ir.getItem().getTitle();
+      var answer = ir.getResponse();
+
+      if (title === '班級') {
+        className = answer;
+      } else if (title === '座號') {
+        seatNo = answer;
+      } else if (title === '姓名') {
+        studentName = answer;
+      } else if (itemType === FormApp.ItemType.MULTIPLE_CHOICE) {
+        mcAnswers.push(answer);
+      }
+    });
+
+    // 每 3 個 MC 回答 = 1 道題（needHint, needHint2, needHint3）
+    var scores = [];
+    var hints = [];
+
+    for (var q = 0; q < numQuestions; q++) {
+      var baseIdx = q * 3;
+      var ans1 = mcAnswers[baseIdx];      // 「需要提示嗎？」
+      var ans2 = mcAnswers[baseIdx + 1];  // 「還需要更多提示嗎？」
+      var ans3 = mcAnswers[baseIdx + 2];  // 「還需要最後一個提示嗎？」
+
+      var score, hintCount;
+
+      if (!ans1 || ans1.indexOf('不需要') >= 0) {
+        // 第1層就選「不需要」→ 0 個提示 → 5 分
+        score = 5;
+        hintCount = 0;
+      } else if (!ans2 || ans2.indexOf('不需要') >= 0) {
+        // 第2層選「不需要」→ 1 個提示 → 4 分
+        score = 4;
+        hintCount = 1;
+      } else if (!ans3 || ans3.indexOf('不需要') >= 0) {
+        // 第3層選「不需要」→ 2 個提示 → 3 分
+        score = 3;
+        hintCount = 2;
+      } else {
+        // 全部都要提示 → 3 個提示 → 1 分
+        score = 1;
+        hintCount = 3;
+      }
+
+      scores.push(score);
+      hints.push(hintCount);
+    }
+
+    var totalScore = scores.reduce(function(a, b) { return a + b; }, 0);
+    var maxScore = numQuestions * 5;
+    var percentage = Math.round(totalScore / maxScore * 100);
+
+    // 能力指標判定
+    var indicator;
+    if (percentage >= 90) {
+      indicator = '⭐ 精熟';
+    } else if (percentage >= 70) {
+      indicator = '📗 接近精熟';
+    } else if (percentage >= 40) {
+      indicator = '📙 發展中';
+    } else {
+      indicator = '📕 需補強';
+    }
+
+    var row = [className, seatNo, studentName];
+    for (var i = 0; i < numQuestions; i++) {
+      row.push(scores[i]);
+      row.push(hints[i] + ' 個提示');
+    }
+    row.push(totalScore, maxScore, percentage + '%', indicator);
+
+    studentResults.push({ row: row, scores: scores, percentage: percentage });
+  });
+
+  // 5. 建立成績報表工作表
+  var reportSheet = ss.getSheetByName('成績報表');
+  if (reportSheet) reportSheet.clear();
+  else reportSheet = ss.insertSheet('成績報表');
+
+  // 表頭
+  var headers = ['班級', '座號', '姓名'];
+  for (var q = 1; q <= numQuestions; q++) {
+    headers.push('Q' + q + '得分');
+    headers.push('Q' + q + '提示');
+  }
+  headers.push('總分', '滿分', '百分比', '能力指標');
+
+  reportSheet.getRange(1, 1, 1, headers.length).setValues([headers])
+    .setBackground('#4285F4').setFontColor('white').setFontWeight('bold');
+
+  // 寫入學生資料
+  if (studentResults.length > 0) {
+    var allRows = studentResults.map(function(s) { return s.row; });
+    reportSheet.getRange(2, 1, allRows.length, headers.length).setValues(allRows);
+
+    // 得分欄位上色（依分數）
+    var scoreColorMap = { 5: '#34A853', 4: '#A8DAB5', 3: '#FBBC04', 1: '#F4A261' };
+
+    for (var r = 0; r < studentResults.length; r++) {
+      var rowNum = r + 2;
+      for (var q = 0; q < numQuestions; q++) {
+        var colNum = 4 + q * 2; // Q得分欄位（第4欄開始，每題佔2欄）
+        var score = studentResults[r].scores[q];
+        var color = scoreColorMap[score] || '#FFFFFF';
+        reportSheet.getRange(rowNum, colNum).setBackground(color);
+        if (score === 5) {
+          reportSheet.getRange(rowNum, colNum).setFontColor('white');
+        }
+      }
+    }
+
+    // 全班平均列
+    var avgRow = ['', '', '📊 全班平均'];
+    var totalSumAll = 0;
+    var maxScoreAll = numQuestions * 5;
+
+    for (var q = 0; q < numQuestions; q++) {
+      var qSum = 0;
+      for (var r = 0; r < studentResults.length; r++) {
+        qSum += studentResults[r].scores[q];
+      }
+      var qAvg = Math.round(qSum / studentResults.length * 10) / 10;
+      totalSumAll += qSum;
+      avgRow.push(qAvg);
+      avgRow.push('');
+    }
+
+    var totalAvg = Math.round(totalSumAll / studentResults.length * 10) / 10;
+    var avgPercentage = Math.round(totalAvg / maxScoreAll * 100);
+
+    var avgIndicator;
+    if (avgPercentage >= 90) {
+      avgIndicator = '⭐ 精熟';
+    } else if (avgPercentage >= 70) {
+      avgIndicator = '📗 接近精熟';
+    } else if (avgPercentage >= 40) {
+      avgIndicator = '📙 發展中';
+    } else {
+      avgIndicator = '📕 需補強';
+    }
+
+    avgRow.push(totalAvg, maxScoreAll, avgPercentage + '%', avgIndicator);
+
+    var avgRowNum = studentResults.length + 2;
+    reportSheet.getRange(avgRowNum, 1, 1, headers.length).setValues([avgRow])
+      .setBackground('#E8EAED').setFontWeight('bold');
+  }
+
+  reportSheet.autoResizeColumns(1, headers.length);
+
+  ui.alert('✅ 成績報表已產生！\n\n' +
+    '共 ' + studentResults.length + ' 位學生，' + numQuestions + ' 道題目\n' +
+    '請查看「成績報表」工作表。');
 }
