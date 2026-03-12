@@ -585,6 +585,166 @@
             border-radius: 10px;
         }
 
+
+        /* ===== Motivation Spectrum ===== */
+        .motivation-spectrum {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin: 16px 0;
+            flex-wrap: wrap;
+        }
+        .spectrum-item {
+            padding: 10px 14px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 100px;
+        }
+        .spectrum-item.external {
+            background: rgba(231,76,60,0.1);
+            border: 2px solid #e74c3c;
+        }
+        .spectrum-item.transition {
+            background: rgba(243,156,18,0.1);
+            border: 2px solid #f39c12;
+        }
+        .spectrum-item.internal {
+            background: rgba(46,204,113,0.1);
+            border: 2px solid #27ae60;
+        }
+        .spectrum-item.best {
+            background: rgba(46,204,113,0.2);
+            border: 3px solid #27ae60;
+            font-weight: 700;
+        }
+        .spectrum-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+        }
+        .spectrum-desc {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+        .spectrum-arrow {
+            font-size: 20px;
+            color: #999;
+            margin: 0 4px;
+        }
+
+        /* ===== AI x SDT Cards ===== */
+        .ai-sdt-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 20px 0;
+        }
+        .ai-sdt-card {
+            background: #f8faff;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .ai-sdt-header {
+            color: white;
+            padding: 12px 16px;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .ai-sdt-icon { font-size: 24px; }
+        .ai-sdt-body {
+            padding: 16px;
+        }
+        .ai-sdt-body ul {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0;
+        }
+        .ai-sdt-body li {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #444;
+        }
+        .ai-sdt-example {
+            background: rgba(79,172,254,0.08);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #2a5298;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        /* ===== SDT Teaching Flow ===== */
+        .sdt-flow {
+            margin: 20px 0;
+        }
+        .sdt-flow-step {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .sdt-flow-number {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+        .sdt-flow-content {
+            flex: 1;
+            background: #f8faff;
+            border-radius: 12px;
+            padding: 16px 20px;
+            border: 1px solid #e3eafc;
+        }
+        .sdt-flow-content h3 {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        .sdt-flow-content p {
+            font-size: 16px;
+            color: #555;
+            margin: 6px 0;
+        }
+        .sdt-flow-tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+        .competence-tag { background: #2a5298; }
+        .autonomy-tag { background: #27ae60; }
+        .relatedness-tag { background: #8e44ad; }
+        .sdt-flow-example {
+            background: rgba(79,172,254,0.06);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #666;
+            margin-top: 8px;
+        }
+        .sdt-flow-arrow {
+            text-align: center;
+            font-size: 24px;
+            color: #4facfe;
+            margin: 4px 0;
+            padding-left: 14px;
+        }
+
         /* ===== Responsive ===== */
         @media (max-width: 900px) {
             .slide { padding: 20px 50px; }
@@ -597,6 +757,9 @@
             .flow-diagram { flex-direction: column; }
             .flow-arrow { transform: rotate(90deg); }
             .concept-grid { grid-template-columns: 1fr; }
+            .ai-sdt-grid { grid-template-columns: 1fr; }
+            .motivation-spectrum { flex-direction: column; }
+            .spectrum-arrow { transform: rotate(90deg); }
             .nav-arrow { width: 42px; height: 42px; font-size: 18px; }
         }
         @media (max-width: 600px) {
@@ -631,7 +794,7 @@
 <div class="page-indicators" id="pageIndicators"></div>
 
 <!-- ===== Page Number ===== -->
-<div class="page-number" id="pageNumber">1 / 21</div>
+<div class="page-number" id="pageNumber">1 / 24</div>
 
 <!-- ===== Slides ===== -->
 <div class="slides-wrapper">
@@ -743,8 +906,157 @@
         </div>
     </div>
 
-    <!-- ==================== Slide 4: 畫畫實驗 ==================== -->
+
+    <!-- ==================== Slide 4: SDT 理論背景與動機光譜 ==================== -->
     <div class="slide" id="slide-4">
+        <div class="card">
+            <div class="slide-tag">理論深入</div>
+            <h2>SDT 的學術背景與動機光譜</h2>
+            <p class="subtitle">Edward L. Deci &#38; Richard M. Ryan&#65288;1985&#65289;&#8212;&#8212; 自我決定理論的開創者</p>
+
+            <div class="box info">
+                <strong>&#128218; 核心主張：</strong>真正有效的學習動機來自<strong>內在動機</strong>，而非外在壓力。<br>
+                當三大心理需求被滿足時，學生會更專注、更持久、更有創造力。<br>
+                <span style="font-size: 16px; color: #666;">&#128214; Deci &#38; Ryan (2000). Self-Determination Theory and the Facilitation of Intrinsic Motivation.</span>
+            </div>
+
+            <h3 style="margin-top: 24px;">&#128260; 動機光譜：從外在到內在的六個階段</h3>
+            <div class="motivation-spectrum">
+                <div class="spectrum-item external">
+                    <div class="spectrum-label">無動機</div>
+                    <div class="spectrum-desc">完全不想學</div>
+                </div>
+                <div class="spectrum-arrow">&#8594;</div>
+                <div class="spectrum-item external">
+                    <div class="spectrum-label">外在調節</div>
+                    <div class="spectrum-desc">為了獎懲才做</div>
+                </div>
+                <div class="spectrum-arrow">&#8594;</div>
+                <div class="spectrum-item transition">
+                    <div class="spectrum-label">內攝調節</div>
+                    <div class="spectrum-desc">避免罪惡感</div>
+                </div>
+                <div class="spectrum-arrow">&#8594;</div>
+                <div class="spectrum-item transition">
+                    <div class="spectrum-label">認同調節</div>
+                    <div class="spectrum-desc">認為有價值</div>
+                </div>
+                <div class="spectrum-arrow">&#8594;</div>
+                <div class="spectrum-item internal">
+                    <div class="spectrum-label">整合調節</div>
+                    <div class="spectrum-desc">融入自我認同</div>
+                </div>
+                <div class="spectrum-arrow">&#8594;</div>
+                <div class="spectrum-item internal best">
+                    <div class="spectrum-label">&#127775; 內在動機</div>
+                    <div class="spectrum-desc">因為想學！</div>
+                </div>
+            </div>
+
+            <div class="compare-grid" style="margin-top: 20px;">
+                <div class="compare-col col-b" style="text-align: left; padding: 20px 24px;">
+                    <h3 style="color: #e74c3c; text-align: center;">&#10060; 外在動機的表現</h3>
+                    <ul style="padding-left: 20px; font-size: 18px; line-height: 2;">
+                        <li>為了考試而讀書</li>
+                        <li>為了分數而寫作業</li>
+                        <li>為了不被罵而學習</li>
+                    </ul>
+                    <p style="text-align: center; font-size: 16px; color: #999; margin-top: 8px;">&#8594; 拿掉外力就停了</p>
+                </div>
+                <div class="compare-col col-a" style="text-align: left; padding: 20px 24px;">
+                    <h3 style="color: #27ae60; text-align: center;">&#9989; 內在動機的表現</h3>
+                    <ul style="padding-left: 20px; font-size: 18px; line-height: 2;">
+                        <li>因為想學而主動探索</li>
+                        <li>因為有興趣而深入投入</li>
+                        <li>因為有成就感而持續挑戰</li>
+                    </ul>
+                    <p style="text-align: center; font-size: 16px; color: #999; margin-top: 8px;">&#8594; 自動自發、持久</p>
+                </div>
+            </div>
+
+            <div class="key-insight">
+                &#128161; SDT 的教學目標：透過滿足<strong>勝任感、自主性、關係感</strong>三大需求，<br>
+                將學生從「外在動機」逐步推向「內在動機」
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==================== Slide 5: AI × SDT 結合模型 ==================== -->
+    <div class="slide" id="slide-5">
+        <div class="card">
+            <div class="slide-tag">核心架構</div>
+            <h2>AI 如何支援 SDT 三大需求？</h2>
+            <p class="subtitle">AI 回饋 &#215; AI 選擇 &#215; AI 互動 ＝ 學習動機全面提升</p>
+
+            <div class="ai-sdt-grid">
+                <div class="ai-sdt-card" style="border-left: 5px solid #2a5298;">
+                    <div class="ai-sdt-header" style="background: linear-gradient(135deg, #1e3c72, #2a5298);">
+                        <span class="ai-sdt-icon">&#128170;</span>
+                        <span>AI &#215; 勝任感</span>
+                    </div>
+                    <div class="ai-sdt-body">
+                        <p style="font-weight: 700; color: #1e3c72; margin-bottom: 8px;">AI 即時回饋，讓學生知道「我做得到」</p>
+                        <ul>
+                            <li>&#9654; AI 批改作業 &#8594; 即時知道對錯</li>
+                            <li>&#9654; AI 分析錯誤 &#8594; 精準找到弱點</li>
+                            <li>&#9654; AI 提供提示 &#8594; 引導而非直接給答案</li>
+                            <li>&#9654; AI 分層難度 &#8594; 每人都有成功經驗</li>
+                        </ul>
+                        <div class="ai-sdt-example">
+                            &#128172; 學生心聲：「原來我可以做到！」
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ai-sdt-card" style="border-left: 5px solid #27ae60;">
+                    <div class="ai-sdt-header" style="background: linear-gradient(135deg, #0d6938, #27ae60);">
+                        <span class="ai-sdt-icon">&#127919;</span>
+                        <span>AI &#215; 自主性</span>
+                    </div>
+                    <div class="ai-sdt-body">
+                        <p style="font-weight: 700; color: #0d6938; margin-bottom: 8px;">AI 讓學生自主探索，掌握學習主導權</p>
+                        <ul>
+                            <li>&#9654; 自己向 AI 提問 &#8594; 主動學習</li>
+                            <li>&#9654; AI 生成多層題目 &#8594; 自選難度</li>
+                            <li>&#9654; 自己設計題目 &#8594; 探索式學習</li>
+                            <li>&#9654; 多元評量形式 &#8594; 選擇擅長方式</li>
+                        </ul>
+                        <div class="ai-sdt-example">
+                            &#128172; 學生心聲：「這是我自己選的！」
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ai-sdt-card" style="border-left: 5px solid #8e44ad;">
+                    <div class="ai-sdt-header" style="background: linear-gradient(135deg, #5b2d8e, #8e44ad);">
+                        <span class="ai-sdt-icon">&#128172;</span>
+                        <span>AI &#215; 關係感</span>
+                    </div>
+                    <div class="ai-sdt-body">
+                        <p style="font-weight: 700; color: #5b2d8e; margin-bottom: 8px;">AI 個人化互動，讓學生感受「有人在乎」</p>
+                        <ul>
+                            <li>&#9654; AI 個人化評語 &#8594; 每人獨特回饋</li>
+                            <li>&#9654; AI 協作討論 &#8594; 促進同儕交流</li>
+                            <li>&#9654; 成果分享平台 &#8594; 建立學習社群</li>
+                            <li>&#9654; 教師 AI 輔助 &#8594; 更多時間關注學生</li>
+                        </ul>
+                        <div class="ai-sdt-example">
+                            &#128172; 學生心聲：「老師有認真看我的作品！」
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box success" style="text-align: center; font-size: 20px;">
+                <strong>&#128300; 研究支持：</strong>Deci &#38; Ryan (2000) 研究顯示，當三大需求被滿足時，<br>
+                學生的<strong>學習投入度、持久度、創造力</strong>都顯著提升。
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== Slide 6: 畫畫實驗 ==================== -->
+    <div class="slide" id="slide-6">
         <div class="card">
             <div class="slide-tag">經典研究</div>
             <h2>內部動機 vs 外部動機：畫畫實驗</h2>
@@ -780,8 +1092,8 @@
         </div>
     </div>
 
-    <!-- ==================== Slide 5: 動機四象限 ==================== -->
-    <div class="slide" id="slide-5">
+    <!-- ==================== Slide 7: 動機四象限 ==================== -->
+    <div class="slide" id="slide-7">
         <div class="card">
             <div class="slide-tag">理論延伸</div>
             <h2>動機的四個象限</h2>
@@ -826,8 +1138,8 @@
         </div>
     </div>
 
-    <!-- ==================== Slide 6: 滷肉飯策略 ==================== -->
-    <div class="slide" id="slide-6">
+    <!-- ==================== Slide 8: 滷肉飯策略 ==================== -->
+    <div class="slide" id="slide-8">
         <div class="card">
             <div class="slide-tag">&#127919; 自主性策略</div>
             <h2>選擇增加動機：滷肉飯 + 炸豆腐策略</h2>
@@ -864,8 +1176,8 @@
         </div>
     </div>
 
-    <!-- ==================== Slide 7: 三大需求對照表 ==================== -->
-    <div class="slide" id="slide-7">
+    <!-- ==================== Slide 9: 三大需求對照表 ==================== -->
+    <div class="slide" id="slide-9">
         <div class="card">
             <div class="slide-tag">總覽</div>
             <h2>三大需求 &#215; 差異化教學 &#215; AI 工具</h2>
@@ -917,8 +1229,75 @@
         </div>
     </div>
 
-    <!-- ==================== Slide 8: 工具(1) 問題情境 ==================== -->
-    <div class="slide" id="slide-8">
+
+    <!-- ==================== Slide 10: SDT 教學設計流程 ==================== -->
+    <div class="slide" id="slide-10">
+        <div class="card">
+            <div class="slide-tag">教學設計</div>
+            <h2>SDT &#215; AI 教學設計四步驟</h2>
+            <p class="subtitle">從理論到實踐：一堂課的 AI 差異化教學流程</p>
+
+            <div class="sdt-flow">
+                <div class="sdt-flow-step">
+                    <div class="sdt-flow-number">1</div>
+                    <div class="sdt-flow-content">
+                        <h3>&#127919; 建立學習挑戰</h3>
+                        <span class="sdt-flow-tag competence-tag">勝任感</span>
+                        <p>教師設計適切難度的問題，學生先嘗試獨立解題</p>
+                        <div class="sdt-flow-example">例：排列組合應用題、統計分析問題、數學建模任務</div>
+                    </div>
+                </div>
+
+                <div class="sdt-flow-arrow">&#8595;</div>
+
+                <div class="sdt-flow-step">
+                    <div class="sdt-flow-number">2</div>
+                    <div class="sdt-flow-content">
+                        <h3>&#129302; AI 分析回饋</h3>
+                        <span class="sdt-flow-tag competence-tag">勝任感</span>
+                        <p>學生使用 AI 工具分析自己的解題過程，獲得即時回饋與改進方向</p>
+                        <div class="sdt-flow-example">Prompt：「請分析我的解題步驟，指出錯誤並提供提示，不要直接給答案」</div>
+                    </div>
+                </div>
+
+                <div class="sdt-flow-arrow">&#8595;</div>
+
+                <div class="sdt-flow-step">
+                    <div class="sdt-flow-number">3</div>
+                    <div class="sdt-flow-content">
+                        <h3>&#128269; 學生自主探索</h3>
+                        <span class="sdt-flow-tag autonomy-tag">自主性</span>
+                        <p>學生可以改變題目、設計變形題，用 AI 生成不同難度的練習</p>
+                        <div class="sdt-flow-example">Prompt：「請生成 5 題難度逐漸提高的排列組合問題，並附上解題提示」</div>
+                    </div>
+                </div>
+
+                <div class="sdt-flow-arrow">&#8595;</div>
+
+                <div class="sdt-flow-step">
+                    <div class="sdt-flow-number">4</div>
+                    <div class="sdt-flow-content">
+                        <h3>&#128101; 分享與討論</h3>
+                        <span class="sdt-flow-tag relatedness-tag">關係感</span>
+                        <p>小組分享解法、比較不同 AI 的回應，教師引導深度討論</p>
+                        <div class="sdt-flow-example">活動：AI 解法比較、小組 AI 討論、AI 輔助學習報告</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="key-insight">
+                &#128161; 四步驟完整對應 SDT 三大需求：<br>
+                Step 1-2 建立<strong>勝任感</strong> &#8594; Step 3 培養<strong>自主性</strong> &#8594; Step 4 促進<strong>關係感</strong>
+            </div>
+
+            <div class="box info" style="margin-top: 12px; font-size: 17px;">
+                <strong>&#128218; 適用情境：</strong>數學課程、STEAM 教育、AI 素養課程、自主學習課程、專題研究課程
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== Slide 11: 工具(1) 問題情境 ==================== -->
+    <div class="slide" id="slide-11">
         <div class="card">
             <div class="slide-tag">&#128736;&#65039; 工具 &#9312;</div>
             <h2>工具 &#9312; 段考 AI 審題助手</h2>
@@ -944,8 +1323,8 @@
         </div>
     </div>
 
-    <!-- ==================== Slide 9: 技術架構 ==================== -->
-    <div class="slide" id="slide-9">
+    <!-- ==================== Slide 12: 技術架構 ==================== -->
+    <div class="slide" id="slide-12">
         <div class="card">
             <div class="slide-tag">&#128736;&#65039; 技術說明</div>
             <h2>技術架構</h2>
@@ -996,8 +1375,8 @@
         </div>
     </div>
 
-    <!-- ==================== Slide 10: Step 1 ==================== -->
-    <div class="slide" id="slide-10">
+    <!-- ==================== Slide 13: Step 1 ==================== -->
+    <div class="slide" id="slide-13">
         <div class="card">
             <div class="slide-tag">&#128736;&#65039; 實作步驟</div>
             <h2>Step 1：建立 Google Sheets</h2>
@@ -1014,8 +1393,8 @@
         </div>
     </div>
 
-    <!-- ==================== Slide 11: Step 2 ==================== -->
-    <div class="slide" id="slide-11">
+    <!-- ==================== Slide 14: Step 2 ==================== -->
+    <div class="slide" id="slide-14">
         <div class="card">
             <div class="slide-tag">&#128736;&#65039; 實作步驟</div>
             <h2>Step 2：開啟 Apps Script 編輯器</h2>
@@ -1030,8 +1409,8 @@
         </div>
     </div>
 
-    <!-- ==================== Slide 12: Step 3 ==================== -->
-    <div class="slide" id="slide-12">
+    <!-- ==================== Slide 15: Step 3 ==================== -->
+    <div class="slide" id="slide-15">
         <div class="card">
             <div class="slide-tag">&#128736;&#65039; 實作步驟</div>
             <h2>Step 3：設定 Gemini API 金鑰</h2>
@@ -1057,8 +1436,8 @@
         </div>
     </div>
 
-    <!-- ==================== Slide 13: Step 4 ==================== -->
-    <div class="slide" id="slide-13">
+    <!-- ==================== Slide 16: Step 4 ==================== -->
+    <div class="slide" id="slide-16">
         <div class="card">
             <div class="slide-tag">&#128736;&#65039; 實作步驟</div>
             <h2>Step 4：貼上程式碼</h2>
@@ -1074,8 +1453,8 @@
         </div>
     </div>
 
-    <!-- ==================== Slide 14: Step 5 ==================== -->
-    <div class="slide" id="slide-14">
+    <!-- ==================== Slide 17: Step 5 ==================== -->
+    <div class="slide" id="slide-17">
         <div class="card">
             <div class="slide-tag">&#128736;&#65039; 實作步驟</div>
             <h2>Step 5：儲存並授權</h2>
@@ -1095,8 +1474,8 @@
         </div>
     </div>
 
-    <!-- ==================== Slide 15: Step 6 ==================== -->
-    <div class="slide" id="slide-15">
+    <!-- ==================== Slide 18: Step 6 ==================== -->
+    <div class="slide" id="slide-18">
         <div class="card">
             <div class="slide-tag">&#128736;&#65039; 實作步驟</div>
             <h2>Step 6：使用工具</h2>
@@ -1116,8 +1495,8 @@
         </div>
     </div>
 
-    <!-- ==================== Slide 16: 結果 1 ==================== -->
-    <div class="slide" id="slide-16">
+    <!-- ==================== Slide 19: 結果 1 ==================== -->
+    <div class="slide" id="slide-19">
         <div class="card">
             <div class="slide-tag">&#128202; 分析結果</div>
             <h2>分析結果 &#9312;：雙向細目表</h2>
@@ -1145,8 +1524,8 @@
         </div>
     </div>
 
-    <!-- ==================== Slide 17: 結果 2 ==================== -->
-    <div class="slide" id="slide-17">
+    <!-- ==================== Slide 20: 結果 2 ==================== -->
+    <div class="slide" id="slide-20">
         <div class="card">
             <div class="slide-tag">&#128200; 分析結果</div>
             <h2>分析結果 &#9313;：難易度分析</h2>
@@ -1179,8 +1558,8 @@
         </div>
     </div>
 
-    <!-- ==================== Slide 18: 結果 3 ==================== -->
-    <div class="slide" id="slide-18">
+    <!-- ==================== Slide 21: 結果 3 ==================== -->
+    <div class="slide" id="slide-21">
         <div class="card">
             <div class="slide-tag">&#9989; 分析結果</div>
             <h2>分析結果 &#9314;：檢核與建議</h2>
@@ -1211,8 +1590,8 @@
         </div>
     </div>
 
-    <!-- ==================== Slide 19: Prompt 設計要點 ==================== -->
-    <div class="slide" id="slide-19">
+    <!-- ==================== Slide 22: Prompt 設計要點 ==================== -->
+    <div class="slide" id="slide-22">
         <div class="card">
             <div class="slide-tag">&#9997;&#65039; Prompt 技巧</div>
             <h2>Prompt 設計要點</h2>
@@ -1252,9 +1631,9 @@
         </div>
     </div>
 
-    <!-- ==================== Slide 20: 提示詞模板 ==================== -->
+    <!-- ==================== Slide 23: 提示詞模板 ==================== -->
     <!-- Slide: 提示詞模板 -->
-    <div class="slide" id="slide-20">
+    <div class="slide" id="slide-23">
         <div class="card">
             <h2>📋 提示詞模板：打造你自己的段考 AI 審題助手</h2>
             <p>複製以下提示詞，貼到 <strong>Gemini / ChatGPT / Claude</strong>，即可取得完整的 Google Apps Script 程式碼：</p>
@@ -1285,8 +1664,8 @@
         </div>
     </div>
 
-    <!-- ==================== Slide 21: 實作練習 ==================== -->
-    <div class="slide" id="slide-21">
+    <!-- ==================== Slide 24: 實作練習 ==================== -->
+    <div class="slide" id="slide-24">
         <div class="card">
             <div class="slide-tag">&#127919; 動手做</div>
             <h2>實作練習</h2>
@@ -1335,7 +1714,7 @@
 
 <script>
     // ===== Slide Navigation =====
-    const totalSlides = 21;
+    const totalSlides = 24;
     let currentSlide = 1;
 
     // Build page indicators
