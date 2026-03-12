@@ -138,7 +138,7 @@ output/
 | 技術 | 用途 |
 |------|------|
 | Google Apps Script (GAS) | 三個工具的後端邏輯 |
-| Gemini API (gemini-2.5-flash) | AI 分析、產題、回饋 |
+| Gemini API (gemini-3-flash-preview) | AI 分析、產題、回饋 |
 | Google Sheets | 工具的操作介面 |
 | Google Forms | 動態評量的學生作答介面 |
 | NotebookLM | 課程知識庫（選配） |

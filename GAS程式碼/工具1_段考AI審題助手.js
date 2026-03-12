@@ -108,7 +108,7 @@ function callGemini(examText) {
     return null;
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
 
   const prompt = `你是一位專業的高中教育評量專家。請分析以下段考試題，並產出：
 
