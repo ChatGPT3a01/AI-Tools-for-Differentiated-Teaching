@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>工具 1 ｜ AI 審題助手</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="app-header">
+      <span class="crumb"><a href="../landing.html" style="color:white;">← 回入口</a></span>
+      <h1>📝 AI 審題助手</h1>
+      <p>貼題目 → 一鍵產出雙向細目表 + 難易度</p>
+    </div>
+
+    <!-- 🎯 工具說明卡 -->
+    <div class="card" style="background: linear-gradient(135deg, #fff5ee, #ffffff); border-left: 6px solid var(--accent);">
+      <h2>🎯 這個工具能做什麼？</h2>
+      <p style="margin-bottom: 12px;">把你出的段考題目貼進來，AI 會幫你做「段考體檢」。</p>
+      <ul style="margin-left: 24px; line-height: 1.9; margin-bottom: 12px;">
+        <li><strong>雙向細目表</strong>：每題對應到哪個概念與單元</li>
+        <li><strong>Bloom 認知層次</strong>：記憶 / 理解 / 應用 / 分析 / 評鑑 / 創造</li>
+        <li><strong>難易度判定</strong>：易、中、難，並說明判斷理由</li>
+        <li><strong>命題建議</strong>：好題目好在哪？有缺陷的可優化處</li>
+      </ul>
+      <div class="alert alert-info" style="margin: 0;">
+        💡 <strong>適合誰用</strong>：要出段考卷的老師、要做命題檢核的教研老師。<br>
+        🎬 <strong>使用流程</strong>：先看下方「Prompt 對比」→ 再選一題學測題（或自己貼）→ 按「開始分析」。
+      </div>
+    </div>
+
+    <!-- 兩階段體驗區 -->
+    <div class="card">
+      <h2>🧪 動手實驗：Prompt 好壞，AI 回應差多少？</h2>
+      <p style="color: var(--muted); font-size: 14px; margin-bottom: 12px;">
+        同一題、不同 prompt，AI 的回答品質會天差地別。下面兩個按鈕分別跑「爛 prompt」與「好 prompt」，你<strong>親自按下去</strong>對比看看。
+      </p>
+
+      <!-- 示範題（可編輯）-->
+      <div style="margin: 10px 0;">
+        <label style="font-size: 13px; color: var(--bg-1); font-weight: 600;">
+          📝 示範題目（可改成你想試的題目，兩邊都跑這題）：
+        </label>
+        <textarea id="experiment-input"
+          style="width: 100%; padding: 10px 12px; margin-top: 6px; border: 2px solid var(--border);
+                 border-radius: 10px; font-size: 13px; font-family: inherit; line-height: 1.7;
+                 min-height: 80px; resize: vertical;">一物體質量 2 kg，受 10 N 力作用 3 秒，求其末速度為多少？(取初速為 0)
+(A) 10 m/s  (B) 15 m/s  (C) 20 m/s  (D) 30 m/s</textarea>
+        <div style="margin-top: 4px; font-size: 11px; color: var(--muted);">
+          💡 可以貼自己出的題目、學測題、段考題 — 兩個按鈕都會跑這裡的題目
+        </div>
+      </div>
+
+      <!-- 兩欄對比 -->
+      <div class="prompt-compare">
+        <div class="prompt-bad">
+          <h4>❌ 爛 prompt</h4>
+          <code style="font-size: 12px;">「幫我分析這題」</code>
+          <button class="sample-btn" style="background: #fdf2f2; color: #c0392b; border: 1px solid #c0392b; margin-top: 10px; width: 100%;"
+                  id="try-bad-btn" onclick="tryBadPrompt()">▶ 用爛 prompt 跑跑看</button>
+          <div id="bad-result" style="margin-top: 10px; font-size: 12px; max-height: 240px; overflow-y: auto;"></div>
+        </div>
+        <div class="prompt-good">
+          <h4>✅ 好 prompt（本工具內建）</h4>
+          <code style="font-size: 12px;">「依台北市段考雙向細目表標準：1️⃣內容向度 2️⃣Bloom 認知層次 3️⃣難易度 4️⃣命題建議，輸出結構化 JSON」</code>
+          <button class="sample-btn" style="background: #f0f9f4; color: #155724; border: 1px solid #155724; margin-top: 10px; width: 100%;"
+                  id="try-good-btn" onclick="tryGoodPrompt()">▶ 用好 prompt 跑跑看</button>
+          <div id="good-result" style="margin-top: 10px; font-size: 12px; max-height: 240px; overflow-y: auto;"></div>
+        </div>
+      </div>
+
+      <div class="alert alert-info" style="margin-top: 14px;">
+        💡 <strong>感受到差別了嗎？</strong>爛 prompt：AI 直接幫你算答案、不分析。好 prompt：AI 給出向度、層次、難易度、命題建議的結構化結果。<br>
+        <strong>這個工具已經把好 prompt 內建好了</strong>——你只要貼題目，下面操作區直接用就行。
+      </div>
+    </div>
+
+    <!-- 操作區 -->
+    <div class="card">
+      <h2>📥 輸入：段考題目</h2>
+      <label for="input">把要分析的題目貼進來（可一次貼多題，記得編號）</label>
+      <textarea id="input" placeholder="例如：
+1. 一物體質量 2 kg，受 10 N 力作用 3 秒，求其末速度為多少？(取初速為 0)
+   (A) 10 m/s  (B) 15 m/s  (C) 20 m/s  (D) 30 m/s
+
+2. 下列關於彈性碰撞的敘述，何者正確？
+   (A) 動能與動量皆守恆
+   (B) 只有動量守恆
+   (C) 只有動能守恆
+   (D) 都不守恆"></textarea>
+
+      <div style="margin-top: 12px;">
+        <div style="font-size: 13px; color: var(--muted); margin-bottom: 6px;">⚡ 快速試試（選擇科目 → 點題目載入）</div>
+        <div id="subject-tabs"
+             style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;"></div>
+        <div id="question-list"
+             style="display: flex; flex-direction: column; gap: 6px;"></div>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <button id="go" onclick="analyze()">🔍 開始分析</button>
+        <button class="btn-ghost" onclick="document.getElementById('input').value=''">清空</button>
+      </div>
+      <div id="status" class="alert hidden"></div>
+    </div>
+
+    <!-- 結果區 -->
+    <div class="card hidden" id="result-card">
+      <h2>📊 AI 分析結果</h2>
+      <div id="summary"></div>
+      <div id="items"></div>
+      <div style="margin-top: 16px;">
+        <button class="btn-ghost" onclick="copyResult()">📋 複製為文字</button>
+        <button class="btn-accent" onclick="downloadCSV()">📥 下載 CSV</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      阿亮老師 × AI 差異化教學｜工具 1 / 3
+    </div>
+  </div>
+
+  <script src="../assets/config.js"></script>
+  <script>
+    // 分科題庫（物理為 115 學測真題；其他科先標示題源/PDF 連結）
+    const SUBJECTS_DATA = {
+      chinese:   { name: "📖 國文",   questions: [], note: "題庫整理中｜請至大考中心官網查詢學測國文 PDF" },
+      english:   { name: "🔤 英文",   questions: [], note: "題庫整理中｜請至大考中心官網查詢學測英文 PDF" },
+      math: {
+        name: "🔢 數學",
+        questions: [
+          {
+            year: "115 學測 數學 A 第 1 題",
+            text: `財神廟舉辦抽發財金活動：參加者抽兩次籤，每次抽籤出現「吉」、「祥」的機率皆為 1/3。如果兩次都抽得「吉」，獲得獎金 180 元；如果兩次都抽得「祥」，獲得獎金 90 元；其餘情況則無獎金。試問參加者可獲獎金的期望值為何？
+(1) 20 元   (2) 30 元   (3) 45 元   (4) 60 元   (5) 90 元`
+          },
+          {
+            year: "115 學測 數學 A 第 3 題",
+            text: `設 f(x) = a^x，其中 a 為正實數。已知 c₁, c₂, c₃ 是公差為 10/3 的等差數列，且 f(c₁), f(c₂), f(c₃) 是公比為 4 的等比數列。則等比數列 f(10), f(8), f(6) 的公比為何？
+(1) 2^(-6/5)   (2) 2^(-3/5)   (3) 2^(3/5)   (4) 2^(6/5)   (5) 2^(5/3)`
+          },
+          {
+            year: "115 學測 數學 A 第 6 題",
+            text: `坐標平面上有 A(2,-2), B(-1,2) 兩點，試問直線 y = -6 上有多少個點 C 使得 △ABC 為等腰三角形？
+(1) 1   (2) 2   (3) 3   (4) 4   (5) 5`
+          },
+          {
+            year: "115 學測 數學 A 第 7 題（多選）",
+            text: `坐標平面上同時滿足不等式組 { 2x − y − 3 > 0, x + 2y + 1 < 0 } 的點 P(x, y) 可能位在下列哪些選項？
+(1) 第一象限
+(2) 第二象限
+(3) 第三象限
+(4) 第四象限
+(5) x 軸`
+          },
+          {
+            year: "115 學測 數學 A 第 9 題（多選）",
+            text: `T 分數為評量成績的一種方式，計算方式如下：設全班平均成績為 μ 且標準差為 σ。若某生原始成績為 S，則他該科之 T 分數為 T = 50 + 10((S − μ) / σ)。已知某班期末數學和英文兩科的平均成績皆為 60，數學成績的標準差為 12，英文成績的標準差為 8。試選出正確的選項。
+(1) 若甲生英文原始成績為 52，則其 T 分數為 40
+(2) 各生數學的 T 分數不會超過其原始成績
+(3) 若乙生兩科原始成績平均比丙生高，則乙生兩科 T 分數平均比丙生高
+(4) 若該班級兩科及格標準均為 T 分數 ≥ 40，則數學及格的原始成績比英文及格的原始成績低
+(5) 該班原始成績數學對英文的迴歸直線斜率與該班 T 分數數學對英文的迴歸直線斜率相同`
+          }
+        ]
+      },
+      physics: {
+        name: "⚛️ 物理",
+        questions: [
+          {
+            year: "115 學測 自然 第 10 題",
+            text: `有一部質量為 1000 公斤的汽車由靜止開始，在水平路面朝正東方直線加速到速度為 10 公尺/秒。接著它保持等速度前進，一段時間後因失去動力而減速至停止。若汽車的速度隨時間的變化如圖 4 所示（0–5 秒加速；5–10 秒等速 10 m/s；10–20 秒減速至 0），則下列敘述何者正確？
+(A) 汽車的加速度量值在減速階段為加速階段的 2 倍
+(B) 減速過程阻力對汽車所作的功為 −5×10⁶ 焦耳
+(C) 汽車的位移在減速階段為加速階段的 2 倍
+(D) 汽車在加速階段的位移為 50 公尺
+(E) 整個過程中汽車的位移為 200 公尺`
+          },
+          {
+            year: "115 學測 自然 第 11 題",
+            text: `一塔式起重機將一個重物自地面甲點從靜止鉛直上拉，歷經乙、丙兩點後，停止於丁點。其中甲、乙之間保持加速運動，乙、丙之間為等速度運動，丙、丁之間保持減速運動。假設重物的位移、速度、加速度與所受合力分別為 D、v、a 與 F，則下列敘述哪些正確？（應選 2 項）
+(A) 甲至乙、丙至丁兩段路程，F 的方向皆向上
+(B) 甲至乙、丙至丁兩段路程，F 的方向皆向下
+(C) 丙至丁段路程之中 D 與 F 的方向相同
+(D) 丙至丁段路程之中 v 與 F 的方向相反
+(E) 丙至丁段路程之中 a 與 F 的方向相同`
+          },
+          {
+            year: "115 學測 自然 第 12 題",
+            text: `（延續第 11 題：塔式起重機將重物從甲靜止上拉，經乙、丙到丁停止；甲→乙加速、乙→丙等速、丙→丁減速）
+假設 ΔU 甲乙、ΔU 乙丙、ΔU 丙丁分別代表重物在三段路程的重力位能變化量；ΔK 甲乙、ΔK 乙丙、ΔK 丙丁分別代表三段路程的動能變化量。下列關係哪些正確？（應選 2 項）
+(A) ΔU 甲乙 + ΔK 甲乙 = 0
+(B) ΔK 甲乙 + ΔK 丙丁 = 0
+(C) ΔU 乙丙 + ΔK 乙丙 = 0
+(D) ΔK 甲乙 + ΔK 乙丙 + ΔK 丙丁 > 0
+(E) ΔU 甲乙 + ΔU 乙丙 + ΔU 丙丁 > 0`
+          },
+          {
+            year: "115 學測 自然 第 14 題",
+            text: `一個氦原子的原子核內有兩個質子與兩個中子，而原子核外則有兩個電子環繞。若氦原子裡兩質子間的靜電力量值為甲，兩中子間的重力量值為乙，一個質子與一個電子間的靜電力量值為丙，兩質子間的強力量值為丁，則這四個量值間的大小關係為下列何者？
+(A) 甲 = 丁 > 丙 > 乙
+(B) 丁 > 甲 = 乙 > 丙
+(C) 甲 > 丙 > 乙
+(D) 甲 = 丙 > 乙
+(E) 甲 > 乙 > 丙 > 丁`
+          },
+          {
+            year: "115 學測 自然 第 15 題",
+            text: `電場為單位正電荷在空間中任一位置所受的靜電力，電場內常以電場驅動帶電粒子，進行運算、控制與調節等工作。設 N 為牛頓、C 為庫侖、V 為伏特、A 為安培，則下列何者為電場的 SI 單位？
+(A) C/N
+(B) N/C
+(C) V/A
+(D) A/V
+(E) N²/C`
+          }
+        ]
+      },
+      chemistry: {
+        name: "🧪 化學",
+        questions: [
+          {
+            year: "115 學測 自然 第 22 題",
+            text: `常溫、常壓下，P₄O₆ 與 P₄O₁₀ 皆為固體，可從 P₄ 固體與氧氣反應而得。在標準狀態下，1 莫耳 P₄ 分別與足量氧氣反應，各自生成 P₄O₆ 與 P₄O₁₀，且依序放出 1640 kJ 與 3000 kJ 的熱量。今有 12.4 克的 P₄ 與氧氣反應後得到 5.5 克 P₄O₆ 與 21.3 克 P₄O₁₀，其未平衡的熱化學反應式為 P₄(s) + O₂(g) → P₄O₆(s) + P₄O₁₀(s)，ΔH = Q，則 Q 值為何？(原子量：O=16.0, P=31.0)
+(A) -4640 kJ
+(B) 464 kJ
+(C) -266 kJ
+(D) 250 kJ
+(E) -232 kJ`
+          },
+          {
+            year: "115 學測 自然 第 25 題（題組）",
+            text: `（題組情境：小芬修習「探究與實作」後，從香蕉果皮與果肉中萃取鉀鹽，依序執行 5 個步驟：1. 整理資料 → 2. 燃燒並收集礦物質 → 3. 加水攪拌 → 4. 加 NH₄ClO₄ 沉澱 → 5. 加熱、量測沉澱物變化）
+在上述步驟中，包括下列哪些實驗方法？(應選 2 項)
+(A) 濾紙層析法
+(B) 蒸餾法
+(C) 過濾法
+(D) 沉澱法
+(E) 萃取法`
+          },
+          {
+            year: "115 學測 自然 第 27 題（題組）",
+            text: `（延續第 25 題情境：步驟 5 — 將乾燥沉澱物移入 600 ℃ 烘箱加熱、重量減少 46.2%，反應物質量比原先少 46.2%。莫耳質量：NaClO₄=122.5、KClO₄=138.5、NaCl=58.5、KCl=74.5）
+在步驟 5 中的反應，下列相關敘述，哪些正確？(應選 3 項)
+(A) 此反應可能產生氧氣而導致步驟 5 中的重量減少
+(B) 此反應中 Cl 被還原
+(C) 此反應產生 KClO
+(D) 此反應中，1 莫耳的反應物分解產生 1 莫耳的氧氣
+(E) 平衡反應式的最小整數係數和為 4`
+          }
+        ]
+      },
+      biology: {
+        name: "🧬 生物",
+        questions: [
+          {
+            year: "115 學測 自然 第 29 題",
+            text: `將正常光照下生長的豆苗移入黑暗處，若仍然存活且未發生凋萎現象，則豆苗生理變化的敘述，何者最合理？
+(A) 呼吸作用停止，細胞中葡萄糖分解產生丙酮酸
+(B) 呼吸作用逐漸下降，細胞中的乳酸因而累積
+(C) 呼吸作用受到抑制，細胞中的酒精因而累積
+(D) 光反應停止，細胞內醣類因能量需求減少而累積
+(E) 固碳反應停止，細胞為維持適當機能而分解醣類`
+          },
+          {
+            year: "115 學測 自然 第 30 題",
+            text: `研究生物體的細部結構，有賴顯微鏡製作技術的發展。十九世紀前後的科學家們，用逐步改良的顯微鏡觀察生物體的內部結構後，歸納出細胞學說。有關細胞學說的形成，下列歷史性敘述何者正確？
+(A) 虎克觀察軟木塞發現細胞膜，是形成細胞學說的主要基礎
+(B) 雷文霍克改良顯微鏡，將細胞細部結構整理發表為《微物圖誌》
+(C) 布朗在細胞學說大體上被確立後，進一步發現動物細胞內的細胞核
+(D) 許來登觀察動物組織後，推論動物體由細胞及其產物所構成
+(E) 魏修研究細胞的生長後，認為所有的細胞由既存的細胞所產生`
+          },
+          {
+            year: "115 學測 自然 第 33 題",
+            text: `在粗萃取奇異果 DNA 的實驗中，以果汁機打碎果實，依序加入清潔劑、食鹽水和新鮮鳳梨汁，分別攪拌之。接著，以過濾法去除雜質，加酒精於濾液中。最後，濾液和酒精的交界處會出現含 DNA 的棉絮狀物質。若對此棉絮狀物質做後續處理，則理論上何者正確？
+(A) 經染色後會緊密纏繞成棍棒狀，呈現類似細胞內的染色體樣態
+(B) 經水解處理後會產生核苷酸
+(C) 加入胺基酸並水浴於 35 ℃ 會產生蛋白質
+(D) 置於生理食鹽水中會產生 RNA
+(E) 與草莓萃取的 DNA 混合會形成完全互補之雙股 DNA`
+          }
+        ]
+      },
+      earth: {
+        name: "🌏 地科",
+        questions: [
+          {
+            year: "115 學測 自然 第 1 題",
+            text: `陽光從太陽發射傳遞至地球大約需時 500 秒，又已知月球與地球的平均距離約為 0.0025 天文單位，試問登陸月球的太空船將資訊透過無線電訊號傳達地球大約需時多少秒？
+(A) 0.001
+(B) 0.1
+(C) 1
+(D) 10
+(E) 100`
+          },
+          {
+            year: "115 學測 自然 第 2 題",
+            text: `從宇宙形成至今不斷有天體陸續生成，科學家可以藉由不同的方法來判斷天體的年齡。以下有關不同天體的敘述何者錯誤？
+(A) 所有的恆星都是在宇宙形成後才出現
+(B) 銀河系存在的時間比太陽系存在的時間長
+(C) 距離地球五百萬光年的星系，其年齡是五百萬年
+(D) 太陽系中的行星和衛星比太陽年輕
+(E) 同一星系內的不同星團，其年齡不盡相同`
+          },
+          {
+            year: "115 學測 自然 第 3 題",
+            text: `天文觀測從一開始的可見光逐漸走向多波段觀測，下列有關於天文觀測的描述何者正確？
+(A) 大氣窗是指某些地區讓各種波長的電磁波都可以通過地球大氣層
+(B) 若想要觀測宇宙中低溫的星雲，最適合使用 γ 射線進行觀測
+(C) 天文學家都透過觀測到的顏色來估恆星與行星表面溫度
+(D) 紅外線望遠鏡放在太空中的原因之一，是為了避免溫室氣體的吸收
+(E) 大氣中的臭氧會吸收紫外線，其主要分布在中氣層內`
+          },
+          {
+            year: "115 學測 自然 第 5 題",
+            text: `威爾斯（J.W. Wells）在 1963 年提出生物時鐘理論。根據珊瑚的年成長值與日成長值推斷出泥盆紀（419-358 百萬年前）時，地球一年有 402 天；而石炭紀（358-298 百萬年前）早期一年則有 393 天。科學家推論此現象主要是由過去到現在地球自轉速率變化而造成，公轉速率則無太大改變。下列敘述何者錯誤？
+(A) 四億年（400 百萬年）前，地球每一天約 22 小時
+(B) 六億年（600 百萬年）前，地球的一天約 20.7 小時
+(C) 從六億年前至今，平均每經過 10 萬年，地球一年的天數約減少一天
+(D) 由古至今，地球自轉速率有增快的趨勢
+(E) 千年後，地球一年的天數與現在相同`
+          },
+          {
+            year: "115 學測 自然 第 6 題",
+            text: `颱風抵達前、正通過以及通過後，當地的風場、氣壓及降雨都會呈現變化。若有一颱風以直線路徑往正西前進，於 8 月 18 日下午 2 點從花蓮登陸，於 8 月 19 日清晨 5 點從臺中離開。下列狀況何者最不可能？
+(A) 隨颱風眼逐漸接近，花蓮當地氣壓通常會邊上升後持續下降
+(B) 花蓮當地在颱風到達前風向會偏北風；通過後則偏南風
+(C) 臺灣西南部在 8 月 19 日後須嚴防豪大雨發生
+(D) 颱風中心通過臺中時，臺東地區可能出現焚風現象
+(E) 8 月 17 日到 8 月 19 日期間，太平洋副熱帶高壓強度較強且位置偏西`
+          }
+        ]
+      }
+    };
+
+    let currentSubject = "physics";
+
+    function renderTabs() {
+      const tabs = document.getElementById("subject-tabs");
+      tabs.innerHTML = Object.entries(SUBJECTS_DATA).map(([key, sub]) => {
+        const active = key === currentSubject;
+        return `<button class="sample-btn" onclick="selectSubject('${key}')" style="${active ? 'background:var(--bg-1);color:white;border-color:var(--bg-1);' : ''}">${sub.name}</button>`;
+      }).join("");
+    }
+
+    function renderQuestions() {
+      const list = document.getElementById("question-list");
+      const sub = SUBJECTS_DATA[currentSubject];
+      if (sub.questions.length === 0) {
+        list.innerHTML = `<div class="alert alert-warn" style="margin:0;">📌 ${sub.note}</div>`;
+        return;
+      }
+      list.innerHTML = sub.questions.map((q, i) => `
+        <button class="sample-btn" onclick="loadQuestion('${currentSubject}', ${i})"
+                style="text-align:left; padding:8px 12px; font-size:12px; line-height:1.5;">
+          <span style="color:var(--accent); font-weight:700;">${q.year}</span>
+          <span style="color:var(--muted); margin-left:8px;">${q.text.split('\n')[0].slice(0, 40)}…</span>
+        </button>
+      `).join("");
+    }
+
+    function selectSubject(key) {
+      currentSubject = key;
+      renderTabs();
+      renderQuestions();
+    }
+
+    function loadQuestion(subject, idx) {
+      const q = SUBJECTS_DATA[subject].questions[idx];
+      if (q) document.getElementById("input").value = q.text;
+    }
+
+    renderTabs();
+    renderQuestions();
+
+    // ============ 🧪 Prompt 對比實驗 ============
+    function getExperimentInput() {
+      const v = (document.getElementById("experiment-input").value || "").trim();
+      return v;
+    }
+
+    function escHtml(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    }
+
+    async function tryBadPrompt() {
+      const btn = document.getElementById("try-bad-btn");
+      const out = document.getElementById("bad-result");
+      const input = getExperimentInput();
+      if (!input) {
+        out.innerHTML = '<div class="alert alert-warn" style="margin:0; font-size:12px;">⚠️ 請先在上方填入題目</div>';
+        return;
+      }
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>AI 用爛 prompt 回應中...';
+      out.innerHTML = '<div class="alert alert-info" style="margin:0; font-size:12px;">⏳ 等 10–20 秒...</div>';
+      try {
+        const url = window.WORKER_BASE.replace(/\/$/, "") + "/api/demo-bad";
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ input: input })
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || "HTTP " + resp.status);
+        out.innerHTML = `<div style="padding:10px; background:white; border-radius:8px; border:1px solid #f5b3b3;">
+          <div style="font-size:11px; color:var(--err); font-weight:700; margin-bottom:6px;">📢 AI 回應（鬆散、直接解題、沒做命題分析）：</div>
+          <pre style="white-space:pre-wrap; font-family:inherit; font-size:12px; line-height:1.6; margin:0;">${escHtml(data.raw_text || "")}</pre>
+        </div>`;
+      } catch (e) {
+        out.innerHTML = `<div class="alert alert-err" style="margin:0; font-size:12px;">❌ ${escHtml(e.message)}</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = "▶ 用爛 prompt 跑跑看";
+      }
+    }
+
+    async function tryGoodPrompt() {
+      const btn = document.getElementById("try-good-btn");
+      const out = document.getElementById("good-result");
+      const input = getExperimentInput();
+      if (!input) {
+        out.innerHTML = '<div class="alert alert-warn" style="margin:0; font-size:12px;">⚠️ 請先在上方填入題目</div>';
+        return;
+      }
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>AI 用好 prompt 回應中...';
+      out.innerHTML = '<div class="alert alert-info" style="margin:0; font-size:12px;">⏳ 等 10–20 秒...</div>';
+      try {
+        const data = await window.callAPI("/api/shen-ti", input);
+        const items = data.items || [];
+        const sum = data.summary || {};
+        let rows = items.map(it => `
+          <tr><td>${escHtml(it.number)}</td><td>${escHtml(it.content_dimension || "")}</td>
+          <td><span class="tag tag-blue">${escHtml(it.cognitive_dimension || "")}</span></td>
+          <td><span class="tag ${it.difficulty === '易' ? 'tag-easy' : it.difficulty === '中' ? 'tag-mid' : 'tag-hard'}">${escHtml(it.difficulty || "")}</span></td></tr>`).join("");
+        out.innerHTML = `<div style="padding:10px; background:white; border-radius:8px; border:1px solid #a8e6c9;">
+          <div style="font-size:11px; color:var(--ok); font-weight:700; margin-bottom:6px;">📊 AI 回應（結構化、有向度、有層次）：</div>
+          <table style="font-size:12px; width:100%;"><thead><tr><th>#</th><th>內容向度</th><th>認知</th><th>難易</th></tr></thead><tbody>${rows}</tbody></table>
+          <div style="font-size:11px; color:var(--muted); margin-top:6px;">📈 ${escHtml(sum.overall_comment || "")}</div>
+        </div>`;
+      } catch (e) {
+        out.innerHTML = `<div class="alert alert-err" style="margin:0; font-size:12px;">❌ ${escHtml(e.message)}</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = "▶ 用好 prompt 跑跑看";
+      }
+    }
+
+    let lastResult = null;
+
+    async function analyze() {
+      const input = document.getElementById("input").value.trim();
+      const status = document.getElementById("status");
+      const goBtn = document.getElementById("go");
+      const resultCard = document.getElementById("result-card");
+
+      if (!input) {
+        status.className = "alert alert-warn";
+        status.textContent = "請先貼上題目";
+        status.classList.remove("hidden");
+        return;
+      }
+
+      goBtn.disabled = true;
+      goBtn.innerHTML = '<span class="spinner"></span>AI 分析中...';
+      status.className = "alert alert-info";
+      status.textContent = "正在呼叫 AI，約需 10-20 秒...";
+      status.classList.remove("hidden");
+      resultCard.classList.add("hidden");
+
+      try {
+        const data = await window.callAPI("/api/shen-ti", input);
+        lastResult = data;
+        renderResult(data);
+        status.classList.add("hidden");
+        resultCard.classList.remove("hidden");
+        resultCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      } catch (err) {
+        status.className = "alert alert-err";
+        status.textContent = "❌ 分析失敗：" + err.message;
+      } finally {
+        goBtn.disabled = false;
+        goBtn.innerHTML = "🔍 開始分析";
+      }
+    }
+
+    function tagClass(d) {
+      if (d === "易") return "tag tag-easy";
+      if (d === "中") return "tag tag-mid";
+      if (d === "難") return "tag tag-hard";
+      return "tag tag-blue";
+    }
+
+    function renderResult(data) {
+      const sumEl = document.getElementById("summary");
+      const itemsEl = document.getElementById("items");
+
+      if (data._parse_error) {
+        sumEl.innerHTML = `<div class="alert alert-warn">AI 回傳格式異常，以下是原始輸出：</div><pre style="white-space:pre-wrap;font-size:13px;">${escapeHtml(data._raw || "")}</pre>`;
+        itemsEl.innerHTML = "";
+        return;
+      }
+
+      const s = data.summary || {};
+      const items = data.items || [];
+
+      sumEl.innerHTML = `
+        <div class="alert alert-ok">
+          <strong>📈 整體分析：</strong>${escapeHtml(s.overall_comment || "—")}<br>
+          <span style="font-size: 13px;">
+            共 ${s.total || items.length} 題 ·
+            難度分布：${renderDist(s.by_difficulty)} ·
+            認知層次：${renderDist(s.by_cognitive)}
+          </span>
+        </div>
+      `;
+
+      let html = `<table>
+        <thead><tr><th>題號</th><th>題幹</th><th>內容向度</th><th>認知層次</th><th>難易度</th><th>命題建議</th></tr></thead>
+        <tbody>`;
+      for (const it of items) {
+        html += `<tr>
+          <td><strong>${escapeHtml(it.number)}</strong></td>
+          <td>${escapeHtml(it.stem || "")}</td>
+          <td>${escapeHtml(it.content_dimension || "")}</td>
+          <td><span class="tag tag-blue">${escapeHtml(it.cognitive_dimension || "")}</span></td>
+          <td><span class="${tagClass(it.difficulty)}">${escapeHtml(it.difficulty || "")}</span><br><span style="font-size:12px;color:var(--muted);">${escapeHtml(it.difficulty_reason || "")}</span></td>
+          <td style="font-size:13px;">${escapeHtml(it.suggestion || "")}</td>
+        </tr>`;
+      }
+      html += `</tbody></table>`;
+      itemsEl.innerHTML = html;
+    }
+
+    function renderDist(obj) {
+      if (!obj) return "—";
+      return Object.entries(obj).map(([k, v]) => `${k} ${v}`).join("、");
+    }
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    }
+
+    function copyResult() {
+      if (!lastResult) return;
+      const text = JSON.stringify(lastResult, null, 2);
+      navigator.clipboard.writeText(text).then(() => alert("已複製到剪貼簿"));
+    }
+
+    function downloadCSV() {
+      if (!lastResult || !lastResult.items) return;
+      const header = ["題號", "題幹", "內容向度", "認知層次", "難易度", "難易理由", "命題建議"];
+      const rows = lastResult.items.map(it => [
+        it.number, it.stem, it.content_dimension, it.cognitive_dimension,
+        it.difficulty, it.difficulty_reason, it.suggestion
+      ]);
+      const csv = "﻿" + [header, ...rows]
+        .map(r => r.map(c => `"${String(c == null ? "" : c).replace(/"/g, '""')}"`).join(","))
+        .join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `審題分析_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+    }
+  </script>
+</body>
+</html>

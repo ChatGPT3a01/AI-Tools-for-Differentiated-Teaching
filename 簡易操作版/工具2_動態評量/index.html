@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>工具 2 ｜ 動態評量產生器</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="app-header">
+      <span class="crumb"><a href="../landing.html" style="color:white;">← 回入口</a></span>
+      <h1>🎯 動態評量產生器</h1>
+      <p>同一題 × 三層提示｜針對不同程度學生差異化教學</p>
+    </div>
+
+    <!-- 🎯 工具說明卡 -->
+    <div class="card" style="background: linear-gradient(135deg, #fff5ee, #ffffff); border-left: 6px solid var(--accent);">
+      <h2>🎯 這個工具能做什麼？</h2>
+      <p style="margin-bottom: 12px;">針對「同一題」自動生成三層鷹架提示，讓不同程度的學生都能進步：</p>
+      <ul style="margin-left: 24px; line-height: 1.9; margin-bottom: 12px;">
+        <li><span class="tag tag-easy">高程度</span>只給最小提示，引導他自己想清楚</li>
+        <li><span class="tag tag-mid">中程度</span>點出關鍵概念連結，但不直接給答案</li>
+        <li><span class="tag tag-hard">低程度</span>把問題拆步驟、給範例對照</li>
+      </ul>
+      <div class="alert alert-info" style="margin: 0;">
+        💡 <strong>適合誰用</strong>：要做差異化教學、想設計分層學習單、想用「鷹架式」評量的老師。<br>
+        🎬 <strong>使用流程</strong>：選一科真學測題（或自己貼題目）→ 按「產生分層提示」→ 拿到三層提示卡，可列印給學生對應使用。
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>💡 什麼是「動態評量」？</h2>
+      <p style="margin-bottom: 10px;">
+        傳統評量問「會不會」，動態評量問「<strong>給多少提示後就會</strong>」。
+        同一題，把<strong>三層鷹架</strong>準備好：
+      </p>
+      <ul style="margin-left: 20px; line-height: 2;">
+        <li><span class="tag tag-easy">高程度</span>只需最小提示，讓他自己回想公式</li>
+        <li><span class="tag tag-mid">中程度</span>點出關鍵概念連結，但不給答案</li>
+        <li><span class="tag tag-hard">低程度</span>把問題拆步驟、給範例對照</li>
+      </ul>
+      <div class="alert alert-info">
+        💡 <strong>用法</strong>：把題目貼進去，AI 自動為這題寫好三層提示——直接拿去印成「提示卡」，課堂上學生卡關時對應發放。
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📥 輸入：題目或概念</h2>
+      <label for="input">貼題目（可多題）、或寫「我想針對 XX 概念設計動態評量」</label>
+      <textarea id="input" placeholder="範例 1（直接貼題目）：
+1. 一物體質量 2 kg，受 10 N 力作用 3 秒，求其末速度為多少？
+
+範例 2（概念導向）：
+我教高一物理「自由落體」，學生常卡在「為什麼初速度為 0 但加速度不為 0」。請針對這個 misconception 設計三層提示。"></textarea>
+
+      <div style="margin-top: 12px;">
+        <div style="font-size: 13px; color: var(--muted); margin-bottom: 6px;">⚡ 快速試試（選擇科目 → 點題目載入）</div>
+        <div id="subject-tabs"
+             style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;"></div>
+        <div id="question-list"
+             style="display: flex; flex-direction: column; gap: 6px;"></div>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <button id="go" onclick="generate()">🎯 產生分層提示</button>
+        <button class="btn-ghost" onclick="document.getElementById('input').value=''">清空</button>
+      </div>
+      <div id="status" class="alert hidden"></div>
+    </div>
+
+    <div class="card hidden" id="result-card">
+      <h2>🪜 三層鷹架提示</h2>
+      <div id="items"></div>
+
+      <!-- ✏️ 答題互動區（看完提示後充當學生試答）-->
+      <div style="margin-top: 24px; padding: 20px; background: linear-gradient(135deg, #fff5ee, #ffffff); border-radius: 14px; border-left: 6px solid var(--accent);">
+        <h3 style="color: var(--bg-1); margin-bottom: 6px;">✏️ 換你作答（充當學生體驗看看）</h3>
+        <p style="color: var(--muted); font-size: 13px; margin-bottom: 12px;">
+          看完上方三層提示，把你的答案寫下來。AI 會<strong>即時批改 + 給回饋 + 解釋為什麼</strong>，
+          答錯還會給「下一步可以怎麼想」的引導，不直接給答案。
+        </p>
+        <textarea id="answer-input"
+                  placeholder="例如：(B) 15 m/s&#10;或：我覺得是 B，因為 F=ma → a=5、v=at=15"
+                  style="width: 100%; padding: 12px; border: 2px solid var(--border);
+                         border-radius: 10px; font-size: 14px; font-family: inherit;
+                         min-height: 70px; resize: vertical; box-sizing: border-box;"></textarea>
+        <button id="grade-btn" onclick="submitAnswer()"
+                style="margin-top: 10px; background: var(--accent);">
+          📤 送出答案，AI 即時批改
+        </button>
+        <div id="grade-result" style="margin-top: 14px;"></div>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <button class="btn-ghost" onclick="copyResult()">📋 複製為文字</button>
+        <button class="btn-accent" onclick="printCards()">🖨️ 列印為提示卡</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      阿亮老師 × AI 差異化教學｜工具 2 / 3
+    </div>
+  </div>
+
+  <script src="../assets/config.js"></script>
+  <script>
+    // 分科題庫（與工具 1 / 題目包共用內容）
+    const SUBJECTS_DATA = {
+      chinese: { name: "📖 國文", questions: [], note: "題庫整理中｜請至大考中心官網查詢學測國文 PDF" },
+      english: { name: "🔤 英文", questions: [], note: "題庫整理中｜請至大考中心官網查詢學測英文 PDF" },
+      math: {
+        name: "🔢 數學",
+        questions: [
+          { year: "115 學測 數學 A 第 1 題", text: `財神廟抽兩次籤、每次「吉」、「祥」機率各 1/3。兩次都「吉」得 180 元；兩次都「祥」得 90 元；其餘無獎金。學生常卡在「期望值的公式」與「樹狀圖列出所有情境」。請設計三層提示協助計算期望值。` },
+          { year: "115 學測 數學 A 第 3 題", text: `f(x) = a^x，c₁,c₂,c₃ 是公差 10/3 的等差數列，f(c₁),f(c₂),f(c₃) 是公比 4 的等比數列。學生常卡在「等差數列 → 指數函數 → 等比數列」這個轉換。請設計三層提示協助求 f(10), f(8), f(6) 的公比。` },
+          { year: "115 學測 數學 A 第 6 題", text: `平面上 A(2,-2), B(-1,2)，問 y=-6 上有幾個點 C 使 △ABC 為等腰三角形？學生常忘了「等腰」有三種情況（AB=AC, AB=BC, AC=BC）。請設計三層提示。` },
+          { year: "115 學測 數學 A 第 7 題", text: `學生常分不清「不等式定義的區域 vs 象限」之關係。針對不等式組 {2x−y−3>0, x+2y+1<0} 所定義的平面區域，設計三層提示協助學生判斷它經過哪些象限。` },
+          { year: "115 學測 數學 A 第 9 題", text: `T 分數題：T = 50 + 10((S−μ)/σ)。學生常卡在「T 分數的意義」「線性變換對標準差的影響」「迴歸直線斜率不變性」。請針對這些 misconception 設計三層提示。` }
+        ]
+      },
+      physics: {
+        name: "⚛️ 物理",
+        questions: [
+          { year: "115 學測 自然 第 10 題", text: `有一部質量為 1000 公斤的汽車由靜止開始，在水平路面朝正東方直線加速到速度為 10 公尺/秒。接著它保持等速度前進，一段時間後因失去動力而減速至停止。請針對「等加速運動 → 等速 → 等減速」三階段的圖形辨識，設計三層鷹架提示協助學生看懂 v-t 圖。` },
+          { year: "115 學測 自然 第 11 題", text: `一塔式起重機將一個重物自地面甲點從靜止鉛直上拉，經乙、丙到丁點停止：甲→乙加速、乙→丙等速、丙→丁減速。學生常分不清「合力 F 方向」「速度 v 方向」「加速度 a 方向」的關係。請設計三層提示。` },
+          { year: "115 學測 自然 第 12 題", text: `（接第 11 題情境）關於「重力位能變化 ΔU」與「動能變化 ΔK」的關係，學生常分不清能量守恆與動能變化。請設計三層提示。` },
+          { year: "115 學測 自然 第 14 題", text: `氦原子核內有兩個質子兩個中子、核外兩電子。請針對「四種基本作用力（強力 / 弱力 / 靜電力 / 重力）大小比較」這個常見 misconception，設計三層鷹架提示。` },
+          { year: "115 學測 自然 第 15 題", text: `學生常混淆電場、電壓、電位、電位差等概念。請針對「電場的 SI 單位 N/C」設計三層提示，協助學生從定義出發回推單位。` }
+        ]
+      },
+      chemistry: {
+        name: "🧪 化學",
+        questions: [
+          { year: "115 學測 自然 第 22 題", text: `P₄O₆ 與 P₄O₁₀ 從 P₄ + O₂ 反應生成，已知個別生成熱。學生常卡在「混合產物熱化學方程式」如何用赫斯定律求總熱量變化。請設計三層提示。` },
+          { year: "115 學測 自然 第 25 題", text: `（小芬從香蕉萃取鉀鹽的實驗）學生常分不清「過濾、沉澱、萃取、層析」這幾種實驗方法的差異。請設計三層提示協助辨識。` },
+          { year: "115 學測 自然 第 27 題", text: `沉澱物加熱後重量減少 46.2%，學生需推論反應式並判斷氧化還原。請針對「重量百分比減少 → 反推產物」這個推理過程設計三層提示。` }
+        ]
+      },
+      biology: {
+        name: "🧬 生物",
+        questions: [
+          { year: "115 學測 自然 第 29 題", text: `學生常認為「黑暗中植物停止呼吸」這個 misconception。請針對「光合作用 vs 呼吸作用在不同光照條件下的關係」設計三層提示。` },
+          { year: "115 學測 自然 第 30 題", text: `細胞學說的歷史發展常被學生背得很亂（虎克、雷文霍克、許來登、許旺、魏修）。請設計三層提示協助學生釐清「誰發現了什麼」。` },
+          { year: "115 學測 自然 第 33 題", text: `DNA 萃取實驗中各試劑的作用（清潔劑、食鹽、鳳梨汁）學生常混淆。請針對「DNA 的化學本質與水解產物」設計三層提示。` }
+        ]
+      },
+      earth: {
+        name: "🌏 地科",
+        questions: [
+          { year: "115 學測 自然 第 1 題", text: `已知日地距離 1 AU、光速從太陽到地球 500 秒，月地距離 0.0025 AU。學生常不知如何將「天文單位」換算成「光行時間」。請設計三層提示。` },
+          { year: "115 學測 自然 第 2 題", text: `學生常混淆「距離 = 年齡」這個 misconception（5 百萬光年的星系 = 5 百萬歲？）。請針對「光行時間 vs 天體年齡」差異設計三層提示。` },
+          { year: "115 學測 自然 第 3 題", text: `多波段天文觀測（可見光、γ 射線、紅外線、紫外線）的應用差異常讓學生搞混。請針對「不同波長的觀測目標」設計三層提示。` },
+          { year: "115 學測 自然 第 5 題", text: `學生看珊瑚生物時鐘推算地球自轉速率時，常分不清「公轉週期不變、自轉變慢 → 一年天數遞減」這個因果。請設計三層提示。` },
+          { year: "115 學測 自然 第 6 題", text: `颱風通過時的風場、氣壓、降雨變化常讓學生混淆「逆時針旋轉 → 風向變化規律」。請針對「颱風結構與通過時的氣象變化」設計三層提示。` }
+        ]
+      }
+    };
+
+    let currentSubject = "physics";
+
+    function renderTabs() {
+      const tabs = document.getElementById("subject-tabs");
+      tabs.innerHTML = Object.entries(SUBJECTS_DATA).map(([key, sub]) => {
+        const active = key === currentSubject;
+        return `<button class="sample-btn" onclick="selectSubject('${key}')" style="${active ? 'background:var(--bg-1);color:white;border-color:var(--bg-1);' : ''}">${sub.name}</button>`;
+      }).join("");
+    }
+
+    function renderQuestions() {
+      const list = document.getElementById("question-list");
+      const sub = SUBJECTS_DATA[currentSubject];
+      if (sub.questions.length === 0) {
+        list.innerHTML = `<div class="alert alert-warn" style="margin:0;">📌 ${sub.note}</div>`;
+        return;
+      }
+      list.innerHTML = sub.questions.map((q, i) => `
+        <button class="sample-btn" onclick="loadQuestion('${currentSubject}', ${i})"
+                style="text-align:left; padding:8px 12px; font-size:12px; line-height:1.5;">
+          <span style="color:var(--accent); font-weight:700;">${q.year}</span>
+          <span style="color:var(--muted); margin-left:8px;">${q.text.split('\n')[0].slice(0, 40)}…</span>
+        </button>
+      `).join("");
+    }
+
+    function selectSubject(key) {
+      currentSubject = key;
+      renderTabs();
+      renderQuestions();
+    }
+
+    function loadQuestion(subject, idx) {
+      const q = SUBJECTS_DATA[subject].questions[idx];
+      if (q) document.getElementById("input").value = q.text;
+    }
+
+    renderTabs();
+    renderQuestions();
+
+    let lastResult = null;
+
+    async function generate() {
+      const input = document.getElementById("input").value.trim();
+      const status = document.getElementById("status");
+      const goBtn = document.getElementById("go");
+      const resultCard = document.getElementById("result-card");
+
+      if (!input) {
+        status.className = "alert alert-warn";
+        status.textContent = "請先貼題目或寫想要設計的概念";
+        status.classList.remove("hidden");
+        return;
+      }
+
+      goBtn.disabled = true;
+      goBtn.innerHTML = '<span class="spinner"></span>AI 設計中...';
+      status.className = "alert alert-info";
+      status.textContent = "正在呼叫 AI，約需 10-20 秒...";
+      status.classList.remove("hidden");
+      resultCard.classList.add("hidden");
+
+      try {
+        const data = await window.callAPI("/api/dong-tai", input);
+        lastResult = data;
+        renderResult(data);
+        status.classList.add("hidden");
+        resultCard.classList.remove("hidden");
+        resultCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      } catch (err) {
+        status.className = "alert alert-err";
+        status.textContent = "❌ 產生失敗：" + err.message;
+      } finally {
+        goBtn.disabled = false;
+        goBtn.innerHTML = "🎯 產生分層提示";
+      }
+    }
+
+    function renderResult(data) {
+      const itemsEl = document.getElementById("items");
+      if (data._parse_error) {
+        itemsEl.innerHTML = `<div class="alert alert-warn">AI 回傳格式異常，以下是原始輸出：</div><pre style="white-space:pre-wrap;font-size:13px;">${escapeHtml(data._raw || "")}</pre>`;
+        return;
+      }
+
+      const items = data.items || [];
+      let html = "";
+      for (const it of items) {
+        html += `
+          <div style="margin-bottom: 20px; padding: 16px; background: var(--bg-soft); border-radius: 12px;">
+            <h3 style="color: var(--bg-1); margin-bottom: 6px;">
+              ${escapeHtml(it.number || "")} ${escapeHtml(it.topic || "")}
+            </h3>
+            <p style="color: var(--muted); font-size: 13px; margin-bottom: 12px;">
+              <strong>核心概念：</strong>${escapeHtml(it.key_concept || "")}
+            </p>
+            <div class="hint-row">
+              <div class="hint-card" style="background: #d4edda; padding: 12px; border-radius: 10px; margin-bottom: 8px;">
+                <span class="tag tag-easy">高程度</span>
+                <p style="margin-top: 6px;">${escapeHtml(it.hints?.high || "")}</p>
+              </div>
+              <div class="hint-card" style="background: #fff3cd; padding: 12px; border-radius: 10px; margin-bottom: 8px;">
+                <span class="tag tag-mid">中程度</span>
+                <p style="margin-top: 6px;">${escapeHtml(it.hints?.mid || "")}</p>
+              </div>
+              <div class="hint-card" style="background: #f8d7da; padding: 12px; border-radius: 10px;">
+                <span class="tag tag-hard">低程度</span>
+                <p style="margin-top: 6px;">${escapeHtml(it.hints?.low || "")}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      itemsEl.innerHTML = html;
+    }
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    }
+
+    function copyResult() {
+      if (!lastResult) return;
+      navigator.clipboard.writeText(JSON.stringify(lastResult, null, 2)).then(() => alert("已複製"));
+    }
+
+    function printCards() {
+      if (!lastResult) return;
+      window.print();
+    }
+
+    // ============ ✏️ 答題互動：AI 即時批改 ============
+    async function submitAnswer() {
+      const question = (document.getElementById("input").value || "").trim();
+      const answer = (document.getElementById("answer-input").value || "").trim();
+      const btn = document.getElementById("grade-btn");
+      const out = document.getElementById("grade-result");
+
+      if (!question) {
+        out.innerHTML = '<div class="alert alert-warn" style="margin:0;">⚠️ 上方題目區是空的</div>';
+        return;
+      }
+      if (!answer) {
+        out.innerHTML = '<div class="alert alert-warn" style="margin:0;">⚠️ 請先在文字框寫下你的答案</div>';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>AI 批改中...';
+      out.innerHTML = '<div class="alert alert-info" style="margin:0;">⏳ AI 正在看你的答案，約 10–20 秒...</div>';
+
+      try {
+        const userContent = `題目：${question}\n\n學生答案：${answer}`;
+        const data = await window.callAPI("/api/grade", userContent);
+
+        if (data._parse_error) {
+          out.innerHTML = `<div class="alert alert-warn">AI 回應格式異常</div>
+            <pre style="white-space:pre-wrap; font-size:13px;">${escapeHtml(data._raw || "")}</pre>`;
+          return;
+        }
+
+        const correct = data.correct;
+        const isRight = correct === true;
+        const isWrong = correct === false;
+        const isOpen = correct === null || correct === undefined;
+
+        const icon = isRight ? "✅" : isWrong ? "❌" : "💭";
+        const bg = isRight ? "#d4edda" : isWrong ? "#f8d7da" : "#fff3cd";
+        const titleColor = isRight ? "#155724" : isWrong ? "#721c24" : "#856404";
+        const title = isRight ? "答對了！" : isWrong ? "再想想看～沒關係！" : "嗯～這是個值得討論的答案";
+
+        let html = `
+          <div style="padding: 18px; background: ${bg}; border-radius: 14px; animation: fadeIn 0.4s ease;">
+            <h4 style="color: ${titleColor}; font-size: 22px; margin-bottom: 12px; font-weight: 700;">
+              ${icon} ${title}
+            </h4>
+            <div style="background: white; padding: 12px 14px; border-radius: 10px; margin-bottom: 10px;">
+              <strong>💬 AI 回饋：</strong> ${escapeHtml(data.feedback || "")}
+            </div>
+            <div style="background: white; padding: 12px 14px; border-radius: 10px; margin-bottom: 10px;">
+              <strong>📖 為什麼：</strong> ${escapeHtml(data.explanation || "")}
+            </div>`;
+
+        if (isWrong && data.hint_for_retry) {
+          html += `
+            <div style="background: rgba(255,255,255,0.85); padding: 12px 14px; border-radius: 10px;
+                        border-left: 4px solid var(--accent); margin-bottom: 10px;">
+              <strong>🎯 試試這樣想：</strong> ${escapeHtml(data.hint_for_retry)}
+            </div>
+            <button class="btn-ghost" style="font-size:13px; padding: 8px 14px;"
+                    onclick="document.getElementById('answer-input').focus(); document.getElementById('answer-input').select();">
+              🔄 再試一次
+            </button>`;
+        }
+
+        if (data.correct_answer && (isWrong || isOpen)) {
+          html += `<div style="margin-top: 10px; font-size: 12px; color: var(--muted);">
+            📌 標準答案參考：${escapeHtml(data.correct_answer)}
+          </div>`;
+        }
+
+        html += "</div>";
+        out.innerHTML = html;
+      } catch (err) {
+        out.innerHTML = `<div class="alert alert-err" style="margin:0;">❌ ${escapeHtml(err.message)}</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = "📤 送出答案，AI 即時批改";
+      }
+    }
+  </script>
+
+  <style>
+    @media print {
+      .app-header, button, .card:not(#result-card) { display: none; }
+      body { background: white; }
+      .card { box-shadow: none; }
+    }
+  </style>
+</body>
+</html>

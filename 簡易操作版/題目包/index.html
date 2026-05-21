@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>物理 sample 題目包</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .pdf-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 16px; }
+  .pdf-card {
+    padding: 16px;
+    background: var(--bg-soft);
+    border-radius: 12px;
+    border-left: 4px solid var(--bg-1);
+  }
+  .pdf-card h4 { color: var(--bg-1); margin-bottom: 6px; }
+  .pdf-card .actions { margin-top: 10px; display: flex; gap: 6px; }
+  .pdf-card .actions a {
+    flex: 1;
+    text-align: center;
+    padding: 8px 12px;
+    background: white;
+    border: 2px solid var(--bg-1);
+    color: var(--bg-1);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .pdf-card .actions a:hover { background: var(--bg-1); color: white; text-decoration: none; }
+  .pdf-card .actions .primary { background: var(--bg-1); color: white; }
+  .pdf-card .actions .primary:hover { background: var(--bg-2); border-color: var(--bg-2); }
+
+  .demo-q {
+    margin: 14px 0;
+    padding: 16px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .demo-q .meta {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .demo-q .meta .tag { font-size: 11px; }
+  .demo-q .body { font-size: 14px; line-height: 1.7; }
+  .demo-q .body strong { color: var(--bg-1); }
+  .demo-q .ans {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: var(--bg-soft);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .copy-btn {
+    margin-top: 10px;
+    padding: 6px 12px;
+    font-size: 12px;
+    background: white;
+    color: var(--bg-1);
+    border: 1px solid var(--bg-1);
+    cursor: pointer;
+    border-radius: 6px;
+  }
+  .copy-btn:hover { background: var(--bg-1); color: white; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="app-header">
+      <span class="crumb"><a href="../landing.html" style="color:white;">← 回入口</a></span>
+      <h1>📚 物理 sample 題目包</h1>
+      <p>學測精選 + 段考範例｜給工具 1 / 工具 2 練習用</p>
+    </div>
+
+    <div class="card">
+      <h2>🔢 學測數學科（115 學年度）</h2>
+      <p style="color: var(--muted); font-size: 14px;">
+        數學 A（適用甲組、社組需數學）+ 數學 B（適用乙組、社組）。資料來源：<a href="https://www.ceec.edu.tw" target="_blank">大考中心</a>
+      </p>
+      <div class="pdf-list">
+        <div class="pdf-card">
+          <h4>數學 A（115 學測）</h4>
+          <p style="font-size: 13px; color: var(--muted);">7 頁試題 · 1 頁選擇題答案</p>
+          <div class="actions">
+            <a class="primary" href="115學測數學A_試題.pdf" target="_blank">📄 試題</a>
+            <a href="115學測數學A_解答.pdf" target="_blank">✅ 解答</a>
+          </div>
+        </div>
+        <div class="pdf-card">
+          <h4>數學 B（115 學測）</h4>
+          <p style="font-size: 13px; color: var(--muted);">含選擇題與非選題</p>
+          <div class="actions">
+            <a class="primary" href="115學測數學B_試題.pdf" target="_blank">📄 試題</a>
+            <a href="115學測數學B_解答.pdf" target="_blank">✅ 解答</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🎓 學測自然科（含物化生地）</h2>
+      <p style="color: var(--muted); font-size: 14px;">
+        近 3 年學測自然科試題與解答 PDF，物理題通常分布在前半。
+        資料來源：<a href="https://www.ceec.edu.tw" target="_blank">大考中心</a>
+      </p>
+      <div class="pdf-list">
+        <div class="pdf-card">
+          <h4>115 學年度（2026/01）</h4>
+          <p style="font-size: 13px; color: var(--muted);">19 頁試題 · 1 頁選擇題答案</p>
+          <div class="actions">
+            <a class="primary" href="115學測自然_試題.pdf" target="_blank">📄 試題</a>
+            <a href="115學測自然_解答.pdf" target="_blank">✅ 解答</a>
+          </div>
+        </div>
+        <div class="pdf-card">
+          <h4>114 學年度（2025/01）</h4>
+          <p style="font-size: 13px; color: var(--muted);">20 頁試題 · 1 頁選擇題答案</p>
+          <div class="actions">
+            <a class="primary" href="114學測自然_試題.pdf" target="_blank">📄 試題</a>
+            <a href="114學測自然_解答.pdf" target="_blank">✅ 解答</a>
+          </div>
+        </div>
+        <div class="pdf-card">
+          <h4>113 學年度（2024/01）</h4>
+          <p style="font-size: 13px; color: var(--muted);">19 頁試題 · 1 頁選擇題答案</p>
+          <div class="actions">
+            <a class="primary" href="113學測自然_試題.pdf" target="_blank">📄 試題</a>
+            <a href="113學測自然_解答.pdf" target="_blank">✅ 解答</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>⚡ 分科學測題庫（複製即用）</h2>
+      <p style="margin-bottom: 12px; color: var(--muted); font-size: 14px;">
+        選一個科目 → 看 5 題學測真題 → 點「複製這題」直接貼進工具 1 或工具 2。
+        每題後方括號是<strong>學測年度與題號</strong>。
+      </p>
+
+      <div id="subject-tabs" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;"></div>
+      <div id="demo-list"></div>
+
+      <div class="alert alert-info" style="margin-top: 16px;">
+        💡 <strong>使用建議</strong>：
+        ① 挑一題複製 → ② 開「工具 1 審題助手」貼上 → ③ 看 AI 自動分析向度與難度 →
+        ④ 再丟「工具 2 動態評量」產出分層提示。
+      </div>
+    </div>
+
+    <div class="footer">
+      阿亮老師 × AI 差異化教學｜題目包
+    </div>
+  </div>
+
+  <script>
+    // 分科題庫（物理為 115 學測真題；其他科先標示題源 / PDF 連結）
+    const SUBJECTS_DATA = {
+      chinese:   { name: "📖 國文",   questions: [], note: "題庫整理中｜請至大考中心官網查詢學測國文 PDF" },
+      english:   { name: "🔤 英文",   questions: [], note: "題庫整理中｜請至大考中心官網查詢學測英文 PDF" },
+      math: {
+        name: "🔢 數學",
+        questions: [
+          {
+            year: "115 學測 數學 A 第 1 題",
+            body: `財神廟舉辦抽發財金活動：參加者抽兩次籤，每次抽籤出現「吉」、「祥」的機率皆為 1/3。如果兩次都抽得「吉」，獲得獎金 180 元；如果兩次都抽得「祥」，獲得獎金 90 元；其餘情況則無獎金。試問參加者可獲獎金的期望值為何？
+(1) 20 元   (2) 30 元   (3) 45 元   (4) 60 元   (5) 90 元`,
+            ans: "期望值 = (1/9)×180 + (1/9)×90 = 30 元。請對照解答 PDF"
+          },
+          {
+            year: "115 學測 數學 A 第 3 題",
+            body: `設 f(x) = a^x，其中 a 為正實數。已知 c₁, c₂, c₃ 是公差為 10/3 的等差數列，且 f(c₁), f(c₂), f(c₃) 是公比為 4 的等比數列。則等比數列 f(10), f(8), f(6) 的公比為何？
+(1) 2^(-6/5)   (2) 2^(-3/5)   (3) 2^(3/5)   (4) 2^(6/5)   (5) 2^(5/3)`,
+            ans: "a^(10/3) = 4 → a^2 = 4^(3/5) = 2^(6/5)，公比為 a^(-2)。請對照解答 PDF"
+          },
+          {
+            year: "115 學測 數學 A 第 6 題",
+            body: `坐標平面上有 A(2,-2), B(-1,2) 兩點，試問直線 y = -6 上有多少個點 C 使得 △ABC 為等腰三角形？
+(1) 1   (2) 2   (3) 3   (4) 4   (5) 5`,
+            ans: "三種情況：AB=AC、AB=BC、AC=BC。請對照解答 PDF"
+          },
+          {
+            year: "115 學測 數學 A 第 7 題（多選）",
+            body: `坐標平面上同時滿足不等式組 { 2x − y − 3 > 0, x + 2y + 1 < 0 } 的點 P(x, y) 可能位在下列哪些選項？
+(1) 第一象限
+(2) 第二象限
+(3) 第三象限
+(4) 第四象限
+(5) x 軸`,
+            ans: "請對照解答 PDF（多選題）"
+          },
+          {
+            year: "115 學測 數學 A 第 9 題（多選）",
+            body: `T 分數為評量成績的一種方式，計算方式如下：T = 50 + 10((S − μ) / σ)。某班數學和英文平均皆為 60，數學標準差 12，英文標準差 8。試選出正確的選項。
+(1) 若甲生英文原始成績為 52，則其 T 分數為 40
+(2) 各生數學的 T 分數不會超過其原始成績
+(3) 若乙生兩科原始成績平均比丙生高，則乙生兩科 T 分數平均比丙生高
+(4) 若該班級兩科及格標準均為 T 分數 ≥ 40，則數學及格的原始成績比英文及格的原始成績低
+(5) 該班原始成績數學對英文的迴歸直線斜率與該班 T 分數數學對英文的迴歸直線斜率相同`,
+            ans: "請對照解答 PDF（多選題、T 分數線性變換）"
+          }
+        ]
+      },
+      physics: {
+        name: "⚛️ 物理",
+        questions: [
+          {
+            year: "115 學測 自然 第 10 題",
+            body: `有一部質量為 1000 公斤的汽車由靜止開始，在水平路面朝正東方直線加速到速度為 10 公尺/秒。接著它保持等速度前進，一段時間後因失去動力而減速至停止。若汽車的速度隨時間的變化如圖 4 所示（0–5 秒加速；5–10 秒等速 10 m/s；10–20 秒減速至 0），則下列敘述何者正確？
+(A) 汽車的加速度量值在減速階段為加速階段的 2 倍
+(B) 減速過程阻力對汽車所作的功為 −5×10⁶ 焦耳
+(C) 汽車的位移在減速階段為加速階段的 2 倍
+(D) 汽車在加速階段的位移為 50 公尺
+(E) 整個過程中汽車的位移為 200 公尺`,
+            ans: "(A)、(E)（加速 a=2 m/s²、減速 a=−1 m/s²；總位移 = 25+50+50 = 125？實際從圖計算）"
+          },
+          {
+            year: "115 學測 自然 第 11 題",
+            body: `一塔式起重機將一個重物自地面甲點從靜止鉛直上拉，歷經乙、丙兩點後，停止於丁點。其中甲、乙之間保持加速運動，乙、丙之間為等速度運動，丙、丁之間保持減速運動。假設重物的位移、速度、加速度與所受合力分別為 D、v、a 與 F，則下列敘述哪些正確？（應選 2 項）
+(A) 甲至乙、丙至丁兩段路程，F 的方向皆向上
+(B) 甲至乙、丙至丁兩段路程，F 的方向皆向下
+(C) 丙至丁段路程之中 D 與 F 的方向相同
+(D) 丙至丁段路程之中 v 與 F 的方向相反
+(E) 丙至丁段路程之中 a 與 F 的方向相同`,
+            ans: "應選 2 項（依物理原理判斷）"
+          },
+          {
+            year: "115 學測 自然 第 12 題",
+            body: `（延續第 11 題：塔式起重機將重物從甲靜止上拉，經乙、丙到丁停止；甲→乙加速、乙→丙等速、丙→丁減速）
+假設 ΔU 甲乙、ΔU 乙丙、ΔU 丙丁分別代表重物在三段路程的重力位能變化量；ΔK 甲乙、ΔK 乙丙、ΔK 丙丁分別代表三段路程的動能變化量。下列關係哪些正確？（應選 2 項）
+(A) ΔU 甲乙 + ΔK 甲乙 = 0
+(B) ΔK 甲乙 + ΔK 丙丁 = 0
+(C) ΔU 乙丙 + ΔK 乙丙 = 0
+(D) ΔK 甲乙 + ΔK 乙丙 + ΔK 丙丁 > 0
+(E) ΔU 甲乙 + ΔU 乙丙 + ΔU 丙丁 > 0`,
+            ans: "應選 2 項（能量守恆 + 動能變化推論）"
+          },
+          {
+            year: "115 學測 自然 第 14 題",
+            body: `一個氦原子的原子核內有兩個質子與兩個中子，而原子核外則有兩個電子環繞。若氦原子裡兩質子間的靜電力量值為甲，兩中子間的重力量值為乙，一個質子與一個電子間的靜電力量值為丙，兩質子間的強力量值為丁，則這四個量值間的大小關係為下列何者？
+(A) 甲 = 丁 > 丙 > 乙
+(B) 丁 > 甲 = 乙 > 丙
+(C) 甲 > 丙 > 乙
+(D) 甲 = 丙 > 乙
+(E) 甲 > 乙 > 丙 > 丁`,
+            ans: "強力 > 靜電力 > 重力，且質子-電子靜電力 = 兩質子靜電力（電量相同、距離相近）"
+          },
+          {
+            year: "115 學測 自然 第 15 題",
+            body: `電場為單位正電荷在空間中任一位置所受的靜電力，電場內常以電場驅動帶電粒子，進行運算、控制與調節等工作。設 N 為牛頓、C 為庫侖、V 為伏特、A 為安培，則下列何者為電場的 SI 單位？
+(A) C/N
+(B) N/C
+(C) V/A
+(D) A/V
+(E) N²/C`,
+            ans: "(B) N/C （定義：每單位正電荷受到的力）"
+          }
+        ]
+      },
+      chemistry: {
+        name: "🧪 化學",
+        questions: [
+          {
+            year: "115 學測 自然 第 22 題",
+            body: `常溫、常壓下，P₄O₆ 與 P₄O₁₀ 皆為固體，可從 P₄ 固體與氧氣反應而得。在標準狀態下，1 莫耳 P₄ 分別與足量氧氣反應，各自生成 P₄O₆ 與 P₄O₁₀，且依序放出 1640 kJ 與 3000 kJ 的熱量。今有 12.4 克的 P₄ 與氧氣反應後得到 5.5 克 P₄O₆ 與 21.3 克 P₄O₁₀，其未平衡的熱化學反應式為 P₄(s) + O₂(g) → P₄O₆(s) + P₄O₁₀(s)，ΔH = Q，則 Q 值為何？(原子量：O=16.0, P=31.0)
+(A) -4640 kJ
+(B) 464 kJ
+(C) -266 kJ
+(D) 250 kJ
+(E) -232 kJ`,
+            ans: "請對照學測解答 PDF（115 學測自然_解答.pdf）"
+          },
+          {
+            year: "115 學測 自然 第 25 題（題組）",
+            body: `（題組情境：小芬從香蕉果皮與果肉中萃取鉀鹽，依序執行 5 個步驟：1. 整理資料 → 2. 燃燒收集礦物質 → 3. 加水攪拌 → 4. 加 NH₄ClO₄ 沉澱 → 5. 加熱、量沉澱物變化）
+在上述步驟中，包括下列哪些實驗方法？(應選 2 項)
+(A) 濾紙層析法
+(B) 蒸餾法
+(C) 過濾法
+(D) 沉澱法
+(E) 萃取法`,
+            ans: "應選 2 項，請對照解答 PDF"
+          },
+          {
+            year: "115 學測 自然 第 27 題（題組）",
+            body: `（延續第 25 題情境：步驟 5 — 將乾燥沉澱物移入 600 ℃ 烘箱加熱、重量減少 46.2%。莫耳質量：NaClO₄=122.5、KClO₄=138.5、NaCl=58.5、KCl=74.5）
+在步驟 5 中的反應，下列相關敘述，哪些正確？(應選 3 項)
+(A) 此反應可能產生氧氣而導致步驟 5 中的重量減少
+(B) 此反應中 Cl 被還原
+(C) 此反應產生 KClO
+(D) 此反應中，1 莫耳的反應物分解產生 1 莫耳的氧氣
+(E) 平衡反應式的最小整數係數和為 4`,
+            ans: "應選 3 項，請對照解答 PDF"
+          }
+        ]
+      },
+      biology: {
+        name: "🧬 生物",
+        questions: [
+          {
+            year: "115 學測 自然 第 29 題",
+            body: `將正常光照下生長的豆苗移入黑暗處，若仍然存活且未發生凋萎現象，則豆苗生理變化的敘述，何者最合理？
+(A) 呼吸作用停止，細胞中葡萄糖分解產生丙酮酸
+(B) 呼吸作用逐漸下降，細胞中的乳酸因而累積
+(C) 呼吸作用受到抑制，細胞中的酒精因而累積
+(D) 光反應停止，細胞內醣類因能量需求減少而累積
+(E) 固碳反應停止，細胞為維持適當機能而分解醣類`,
+            ans: "黑暗時光合作用停止、呼吸繼續，醣類消耗（請對照解答 PDF）"
+          },
+          {
+            year: "115 學測 自然 第 30 題",
+            body: `研究生物體的細部結構，有賴顯微鏡製作技術的發展。十九世紀前後的科學家們，用逐步改良的顯微鏡觀察生物體的內部結構後，歸納出細胞學說。有關細胞學說的形成，下列歷史性敘述何者正確？
+(A) 虎克觀察軟木塞發現細胞膜，是形成細胞學說的主要基礎
+(B) 雷文霍克改良顯微鏡，將細胞細部結構整理發表為《微物圖誌》
+(C) 布朗在細胞學說大體上被確立後，進一步發現動物細胞內的細胞核
+(D) 許來登觀察動物組織後，推論動物體由細胞及其產物所構成
+(E) 魏修研究細胞的生長後，認為所有的細胞由既存的細胞所產生`,
+            ans: "細胞學說史實題，請對照解答 PDF"
+          },
+          {
+            year: "115 學測 自然 第 33 題",
+            body: `在粗萃取奇異果 DNA 的實驗中，以果汁機打碎果實，依序加入清潔劑、食鹽水和新鮮鳳梨汁，分別攪拌之。接著，以過濾法去除雜質，加酒精於濾液中。最後，濾液和酒精的交界處會出現含 DNA 的棉絮狀物質。若對此棉絮狀物質做後續處理，則理論上何者正確？
+(A) 經染色後會緊密纏繞成棍棒狀，呈現類似細胞內的染色體樣態
+(B) 經水解處理後會產生核苷酸
+(C) 加入胺基酸並水浴於 35 ℃ 會產生蛋白質
+(D) 置於生理食鹽水中會產生 RNA
+(E) 與草莓萃取的 DNA 混合會形成完全互補之雙股 DNA`,
+            ans: "DNA 為長鏈核酸聚合物，水解產生核苷酸（請對照解答 PDF）"
+          }
+        ]
+      },
+      earth: {
+        name: "🌏 地科",
+        questions: [
+          {
+            year: "115 學測 自然 第 1 題",
+            body: `陽光從太陽發射傳遞至地球大約需時 500 秒，又已知月球與地球的平均距離約為 0.0025 天文單位，試問登陸月球的太空船將資訊透過無線電訊號傳達地球大約需時多少秒？
+(A) 0.001
+(B) 0.1
+(C) 1
+(D) 10
+(E) 100`,
+            ans: "0.0025 × 500 ≈ 1.25 秒（請對照解答 PDF）"
+          },
+          {
+            year: "115 學測 自然 第 2 題",
+            body: `從宇宙形成至今不斷有天體陸續生成，科學家可以藉由不同的方法來判斷天體的年齡。以下有關不同天體的敘述何者錯誤？
+(A) 所有的恆星都是在宇宙形成後才出現
+(B) 銀河系存在的時間比太陽系存在的時間長
+(C) 距離地球五百萬光年的星系，其年齡是五百萬年
+(D) 太陽系中的行星和衛星比太陽年輕
+(E) 同一星系內的不同星團，其年齡不盡相同`,
+            ans: "題目問錯誤敘述。距離不等於年齡。請對照解答 PDF"
+          },
+          {
+            year: "115 學測 自然 第 3 題",
+            body: `天文觀測從一開始的可見光逐漸走向多波段觀測，下列有關於天文觀測的描述何者正確？
+(A) 大氣窗是指某些地區讓各種波長的電磁波都可以通過地球大氣層
+(B) 若想要觀測宇宙中低溫的星雲，最適合使用 γ 射線進行觀測
+(C) 天文學家都透過觀測到的顏色來估恆星與行星表面溫度
+(D) 紅外線望遠鏡放在太空中的原因之一，是為了避免溫室氣體的吸收
+(E) 大氣中的臭氧會吸收紫外線，其主要分布在中氣層內`,
+            ans: "請對照學測解答 PDF"
+          },
+          {
+            year: "115 學測 自然 第 5 題",
+            body: `威爾斯（J.W. Wells）在 1963 年提出生物時鐘理論。根據珊瑚的年成長值與日成長值推斷出泥盆紀（419-358 百萬年前）時，地球一年有 402 天；而石炭紀（358-298 百萬年前）早期一年則有 393 天。科學家推論此現象主要是由過去到現在地球自轉速率變化而造成，公轉速率則無太大改變。下列敘述何者錯誤？
+(A) 四億年（400 百萬年）前，地球每一天約 22 小時
+(B) 六億年（600 百萬年）前，地球的一天約 20.7 小時
+(C) 從六億年前至今，平均每經過 10 萬年，地球一年的天數約減少一天
+(D) 由古至今，地球自轉速率有增快的趨勢
+(E) 千年後，地球一年的天數與現在相同`,
+            ans: "公轉週期不變、自轉變慢 → 一年天數遞減。請對照解答 PDF"
+          },
+          {
+            year: "115 學測 自然 第 6 題",
+            body: `颱風抵達前、正通過以及通過後，當地的風場、氣壓及降雨都會呈現變化。若有一颱風以直線路徑往正西前進，於 8 月 18 日下午 2 點從花蓮登陸，於 8 月 19 日清晨 5 點從臺中離開。下列狀況何者最不可能？
+(A) 隨颱風眼逐漸接近，花蓮當地氣壓通常會邊上升後持續下降
+(B) 花蓮當地在颱風到達前風向會偏北風；通過後則偏南風
+(C) 臺灣西南部在 8 月 19 日後須嚴防豪大雨發生
+(D) 颱風中心通過臺中時，臺東地區可能出現焚風現象
+(E) 8 月 17 日到 8 月 19 日期間，太平洋副熱帶高壓強度較強且位置偏西`,
+            ans: "颱風接近時氣壓持續下降（非先上升）。請對照解答 PDF"
+          }
+        ]
+      }
+    };
+
+    let currentSubject = "physics";
+
+    function renderTabs() {
+      const tabs = document.getElementById("subject-tabs");
+      tabs.innerHTML = Object.entries(SUBJECTS_DATA).map(([key, sub]) => {
+        const active = key === currentSubject;
+        const style = active
+          ? "background:var(--bg-1); color:white; border-color:var(--bg-1);"
+          : "";
+        return `<button class="sample-btn" onclick="selectSubject('${key}')" style="${style}">${sub.name}</button>`;
+      }).join("");
+    }
+
+    function renderQuestions() {
+      const list = document.getElementById("demo-list");
+      const sub = SUBJECTS_DATA[currentSubject];
+      if (sub.questions.length === 0) {
+        list.innerHTML = `<div class="alert alert-warn" style="margin:0;">📌 ${sub.note}</div>`;
+        return;
+      }
+      list.innerHTML = sub.questions.map((q, i) => `
+        <div class="demo-q">
+          <div class="meta">
+            <span class="tag tag-blue">${i + 1}</span>
+            <span class="tag" style="background:#ffe3d1; color:#a3501a;">${escapeHtml(q.year)}</span>
+          </div>
+          <div class="body"><pre style="font-family:inherit;white-space:pre-wrap;margin:0;">${escapeHtml(q.body)}</pre></div>
+          <div class="ans">💡 <strong>答題提示</strong>：${escapeHtml(q.ans)}</div>
+          <button class="copy-btn" onclick='copyQ("${currentSubject}", ${i})'>📋 複製這題</button>
+        </div>
+      `).join("");
+    }
+
+    function selectSubject(key) {
+      currentSubject = key;
+      renderTabs();
+      renderQuestions();
+    }
+
+    function copyQ(subject, idx) {
+      const q = SUBJECTS_DATA[subject].questions[idx];
+      if (!q) return;
+      navigator.clipboard.writeText(q.body).then(() => {
+        const btns = document.querySelectorAll(".copy-btn");
+        const btn = btns[idx];
+        if (btn) {
+          const orig = btn.textContent;
+          btn.textContent = "✓ 已複製";
+          setTimeout(() => btn.textContent = orig, 1500);
+        }
+      });
+    }
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    }
+
+    renderTabs();
+    renderQuestions();
+  </script>
+</body>
+</html>
