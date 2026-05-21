@@ -56,11 +56,12 @@
    (C) 只有動能守恆
    (D) 都不守恆"></textarea>
 
-      <div style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
-        <span style="font-size: 13px; color: var(--muted);">快速試試：</span>
-        <button class="sample-btn" onclick="loadSample(1)">範例 1（牛頓運動定律）</button>
-        <button class="sample-btn" onclick="loadSample(2)">範例 2（電路）</button>
-        <button class="sample-btn" onclick="loadSample(3)">範例 3（光學-跨單元）</button>
+      <div style="margin-top: 12px;">
+        <div style="font-size: 13px; color: var(--muted); margin-bottom: 6px;">⚡ 快速試試（選擇科目 → 點題目載入）</div>
+        <div id="subject-tabs"
+             style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;"></div>
+        <div id="question-list"
+             style="display: flex; flex-direction: column; gap: 6px;"></div>
       </div>
 
       <div style="margin-top: 16px;">
@@ -88,30 +89,106 @@
 
   <script src="../assets/config.js"></script>
   <script>
-    const SAMPLES = {
-      1: `1. 一物體質量 2 kg，靜止於光滑水平面上，受 10 N 水平外力作用 3 秒後，求其末速度為多少？
-   (A) 10 m/s  (B) 15 m/s  (C) 20 m/s  (D) 30 m/s
-
-2. 在無摩擦的水平面上，A 物體（質量 4 kg）以 6 m/s 向右移動，撞上靜止的 B 物體（質量 2 kg），若碰撞後 A 速度變為 2 m/s 向右，求 B 物體的速度為何？
-   (A) 4 m/s  (B) 6 m/s  (C) 8 m/s  (D) 10 m/s`,
-
-      2: `1. 三個相同的電阻 R 串聯後接於電壓 V 的電池，每個電阻所消耗的功率為多少？
-   (A) V²/R   (B) V²/(3R)   (C) V²/(9R)   (D) 3V²/R
-
-2. 一條長度為 L、截面積為 A 的均勻導線，電阻為 R。若將其拉長為 2L（體積不變），新電阻為何？
-   (A) R   (B) 2R   (C) 4R   (D) R/2`,
-
-      3: `1. 一束白光通過三稜鏡後分散成彩色光譜，下列敘述何者正確？
-   (A) 紅光偏折最多   (B) 紫光偏折最多
-   (C) 不同顏色光在真空中速度不同   (D) 折射率與顏色無關
-
-2. 楊氏雙狹縫實驗中，若把整個裝置浸入水中（水的折射率 1.33），則屏幕上的干涉條紋間距會：
-   (A) 變寬   (B) 變窄   (C) 不變   (D) 完全消失`
+    // 分科題庫（物理為 115 學測真題；其他科先標示題源/PDF 連結）
+    const SUBJECTS_DATA = {
+      chinese:   { name: "📖 國文",   questions: [], note: "題庫整理中｜請至大考中心官網查詢學測國文 PDF" },
+      english:   { name: "🔤 英文",   questions: [], note: "題庫整理中｜請至大考中心官網查詢學測英文 PDF" },
+      math:      { name: "🔢 數學",   questions: [], note: "題庫整理中｜請至大考中心官網查詢學測數學 A/B PDF" },
+      physics: {
+        name: "⚛️ 物理",
+        questions: [
+          {
+            year: "115 學測 自然 第 10 題",
+            text: `有一部質量為 1000 公斤的汽車由靜止開始，在水平路面朝正東方直線加速到速度為 10 公尺/秒。接著它保持等速度前進，一段時間後因失去動力而減速至停止。若汽車的速度隨時間的變化如圖 4 所示（0–5 秒加速；5–10 秒等速 10 m/s；10–20 秒減速至 0），則下列敘述何者正確？
+(A) 汽車的加速度量值在減速階段為加速階段的 2 倍
+(B) 減速過程阻力對汽車所作的功為 −5×10⁶ 焦耳
+(C) 汽車的位移在減速階段為加速階段的 2 倍
+(D) 汽車在加速階段的位移為 50 公尺
+(E) 整個過程中汽車的位移為 200 公尺`
+          },
+          {
+            year: "115 學測 自然 第 11 題",
+            text: `一塔式起重機將一個重物自地面甲點從靜止鉛直上拉，歷經乙、丙兩點後，停止於丁點。其中甲、乙之間保持加速運動，乙、丙之間為等速度運動，丙、丁之間保持減速運動。假設重物的位移、速度、加速度與所受合力分別為 D、v、a 與 F，則下列敘述哪些正確？（應選 2 項）
+(A) 甲至乙、丙至丁兩段路程，F 的方向皆向上
+(B) 甲至乙、丙至丁兩段路程，F 的方向皆向下
+(C) 丙至丁段路程之中 D 與 F 的方向相同
+(D) 丙至丁段路程之中 v 與 F 的方向相反
+(E) 丙至丁段路程之中 a 與 F 的方向相同`
+          },
+          {
+            year: "115 學測 自然 第 12 題",
+            text: `（延續第 11 題：塔式起重機將重物從甲靜止上拉，經乙、丙到丁停止；甲→乙加速、乙→丙等速、丙→丁減速）
+假設 ΔU 甲乙、ΔU 乙丙、ΔU 丙丁分別代表重物在三段路程的重力位能變化量；ΔK 甲乙、ΔK 乙丙、ΔK 丙丁分別代表三段路程的動能變化量。下列關係哪些正確？（應選 2 項）
+(A) ΔU 甲乙 + ΔK 甲乙 = 0
+(B) ΔK 甲乙 + ΔK 丙丁 = 0
+(C) ΔU 乙丙 + ΔK 乙丙 = 0
+(D) ΔK 甲乙 + ΔK 乙丙 + ΔK 丙丁 > 0
+(E) ΔU 甲乙 + ΔU 乙丙 + ΔU 丙丁 > 0`
+          },
+          {
+            year: "115 學測 自然 第 14 題",
+            text: `一個氦原子的原子核內有兩個質子與兩個中子，而原子核外則有兩個電子環繞。若氦原子裡兩質子間的靜電力量值為甲，兩中子間的重力量值為乙，一個質子與一個電子間的靜電力量值為丙，兩質子間的強力量值為丁，則這四個量值間的大小關係為下列何者？
+(A) 甲 = 丁 > 丙 > 乙
+(B) 丁 > 甲 = 乙 > 丙
+(C) 甲 > 丙 > 乙
+(D) 甲 = 丙 > 乙
+(E) 甲 > 乙 > 丙 > 丁`
+          },
+          {
+            year: "115 學測 自然 第 15 題",
+            text: `電場為單位正電荷在空間中任一位置所受的靜電力，電場內常以電場驅動帶電粒子，進行運算、控制與調節等工作。設 N 為牛頓、C 為庫侖、V 為伏特、A 為安培，則下列何者為電場的 SI 單位？
+(A) C/N
+(B) N/C
+(C) V/A
+(D) A/V
+(E) N²/C`
+          }
+        ]
+      },
+      chemistry: { name: "🧪 化學",  questions: [], note: "題庫整理中｜學測自然 PDF 中第 21–27 題多為化學題（請至「題目包」下載）" },
+      biology:   { name: "🧬 生物",  questions: [], note: "題庫整理中｜學測自然 PDF 中第 28–36 題多為生物題（請至「題目包」下載）" },
+      earth:     { name: "🌏 地科",  questions: [], note: "題庫整理中｜學測自然 PDF 中第 1–9 題多為地科題（請至「題目包」下載）" }
     };
 
-    function loadSample(n) {
-      document.getElementById("input").value = SAMPLES[n];
+    let currentSubject = "physics";
+
+    function renderTabs() {
+      const tabs = document.getElementById("subject-tabs");
+      tabs.innerHTML = Object.entries(SUBJECTS_DATA).map(([key, sub]) => {
+        const active = key === currentSubject;
+        return `<button class="sample-btn" onclick="selectSubject('${key}')" style="${active ? 'background:var(--bg-1);color:white;border-color:var(--bg-1);' : ''}">${sub.name}</button>`;
+      }).join("");
     }
+
+    function renderQuestions() {
+      const list = document.getElementById("question-list");
+      const sub = SUBJECTS_DATA[currentSubject];
+      if (sub.questions.length === 0) {
+        list.innerHTML = `<div class="alert alert-warn" style="margin:0;">📌 ${sub.note}</div>`;
+        return;
+      }
+      list.innerHTML = sub.questions.map((q, i) => `
+        <button class="sample-btn" onclick="loadQuestion('${currentSubject}', ${i})"
+                style="text-align:left; padding:8px 12px; font-size:12px; line-height:1.5;">
+          <span style="color:var(--accent); font-weight:700;">${q.year}</span>
+          <span style="color:var(--muted); margin-left:8px;">${q.text.split('\n')[0].slice(0, 40)}…</span>
+        </button>
+      `).join("");
+    }
+
+    function selectSubject(key) {
+      currentSubject = key;
+      renderTabs();
+      renderQuestions();
+    }
+
+    function loadQuestion(subject, idx) {
+      const q = SUBJECTS_DATA[subject].questions[idx];
+      if (q) document.getElementById("input").value = q.text;
+    }
+
+    renderTabs();
+    renderQuestions();
 
     let lastResult = null;
 
