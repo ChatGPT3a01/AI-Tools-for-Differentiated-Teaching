@@ -2,6 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+    <script src="auth.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI 工具協助差異化教學</title>
     <style>
@@ -319,9 +320,37 @@
             <h1>AI 工具協助差異化教學</h1>
             <p>以 SDT 動機理論為架構，搭配 3 個 AI 教學工具</p>
             <div class="course-info">
-                <span class="badge">適用對象：高中教師（數位前導計畫）</span>
                 <span class="badge">核心理論：自我決定理論 SDT</span>
                 <span class="badge">工具：Google Apps Script + Gemini API</span>
+            </div>
+
+            <!-- ⚡ 學員體驗版入口（兩個並列：QR 閘門 + 直接連結）-->
+            <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:22px;">
+                <button id="show-qr-btn"
+                        style="display:inline-flex; align-items:center; gap:10px;
+                               padding:14px 24px;
+                               background:linear-gradient(135deg, #ff6b35, #f7931e);
+                               color:white; border:none; border-radius:12px;
+                               font-size:16px; font-weight:700; cursor:pointer;
+                               box-shadow:0 6px 20px rgba(255,107,53,0.45);
+                               font-family:inherit; transition:transform 0.15s, box-shadow 0.15s;"
+                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 28px rgba(255,107,53,0.55)';"
+                        onmouseout="this.style.transform=''; this.style.boxShadow='0 6px 20px rgba(255,107,53,0.45)';">
+                    📱 顯示學員 QR Code
+                    <span style="font-size:12px; opacity:0.85; font-weight:500;">（需密碼）</span>
+                </button>
+                <a href="簡易操作版/landing.html" target="_blank"
+                   style="display:inline-flex; align-items:center; gap:10px;
+                          padding:14px 24px;
+                          background:white;
+                          color:#1e3c72; border:2px solid white; border-radius:12px;
+                          font-size:16px; font-weight:700; text-decoration:none;
+                          box-shadow:0 6px 20px rgba(255,255,255,0.25);
+                          font-family:inherit; transition:transform 0.15s;"
+                   onmouseover="this.style.transform='translateY(-2px)';"
+                   onmouseout="this.style.transform='';">
+                    ⚡ 直接進入學員體驗版 →
+                </a>
             </div>
             <div class="sdt-row">
                 <div class="sdt-item">
@@ -462,5 +491,155 @@
             <p class="copyright">© 2026 阿亮老師 版權所有 ｜ 本教材僅供研習學員學習使用</p>
         </div>
     </div>
+
+    <!-- ============= 學員體驗版 QR Code Modal ============= -->
+    <div id="qr-modal" style="display:none; position:fixed; inset:0; z-index:9999;
+                              align-items:center; justify-content:center; padding:20px;">
+      <div id="qr-modal-overlay"
+           style="position:absolute; inset:0; background:rgba(0,0,0,0.65); backdrop-filter:blur(6px);"></div>
+      <div style="position:relative; background:white; border-radius:20px; padding:36px 32px;
+                  max-width:440px; width:100%; box-shadow:0 30px 80px rgba(0,0,0,0.4);
+                  text-align:center; font-family:'Microsoft JhengHei','Segoe UI',sans-serif;
+                  color:#2c3e50;">
+        <button id="qr-close"
+                style="position:absolute; top:14px; right:14px; width:34px; height:34px;
+                       border-radius:50%; border:none; background:#f0f0f0; cursor:pointer;
+                       font-size:18px; line-height:1; color:#666;">×</button>
+
+        <!-- 登入面板 -->
+        <div id="qr-login-view">
+          <div style="font-size:40px; margin-bottom:8px;">🔒</div>
+          <h2 style="color:#1e3c72; font-size:22px; margin-bottom:6px;">學員體驗版 QR Code</h2>
+          <p style="color:#7f8c8d; font-size:13px; margin-bottom:22px;">
+            輸入講師密碼以顯示 QR Code 供學員掃描
+          </p>
+          <input type="password" id="qr-pwd" placeholder="講師密碼" autocomplete="off"
+                 style="width:100%; padding:14px 16px; border:2px solid #e0e6ed;
+                        border-radius:12px; font-size:16px; outline:none; font-family:inherit;
+                        margin-bottom:14px; box-sizing:border-box;">
+          <button id="qr-submit"
+                  style="width:100%; padding:14px; background:#1e3c72; color:white;
+                         border:none; border-radius:12px; font-size:16px; font-weight:600;
+                         cursor:pointer; font-family:inherit;">驗證 →</button>
+          <div id="qr-msg" style="color:#e74c3c; font-size:13px; margin-top:10px; min-height:18px;"></div>
+        </div>
+
+        <!-- QR 顯示面板 -->
+        <div id="qr-display-view" style="display:none;">
+          <div style="font-size:40px; margin-bottom:8px;">📱</div>
+          <h2 style="color:#1e3c72; font-size:22px; margin-bottom:6px;">學員 QR Code</h2>
+          <p style="color:#7f8c8d; font-size:13px; margin-bottom:16px;">
+            請學員用手機掃此 QR Code 或開啟下方連結
+          </p>
+          <div id="qr-canvas"
+               style="background:white; padding:14px; border-radius:14px; display:inline-block;
+                      border:1px solid #e0e6ed; margin-bottom:14px;"></div>
+          <div id="qr-url-text"
+               style="padding:10px 14px; background:#f6f8fa; border-radius:8px;
+                      font-family:'JetBrains Mono','Consolas',monospace; font-size:11px;
+                      word-break:break-all; margin-bottom:14px;"></div>
+          <div style="display:flex; gap:8px;">
+            <button id="qr-copy"
+                    style="flex:1; padding:10px; background:white; color:#1e3c72;
+                           border:2px solid #1e3c72; border-radius:10px; font-weight:600;
+                           cursor:pointer; font-family:inherit; font-size:14px;">複製網址</button>
+            <button id="qr-open"
+                    style="flex:1; padding:10px; background:#1e3c72; color:white;
+                           border:none; border-radius:10px; font-weight:600;
+                           cursor:pointer; font-family:inherit; font-size:14px;">新分頁開啟</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const EXPECTED_HASH = "3ee7f6541f8186b90ad66c06d6e5bf89ca81c3c16c07b48800d751ac21adcd23"; // Aa@0981737608
+        const LANDING_URL = "https://chatgpt3a01.github.io/AI-Tools-for-Differentiated-Teaching/簡易操作版/landing.html";
+
+        async function sha256(t) {
+          const buf = new TextEncoder().encode(t);
+          const h = await crypto.subtle.digest("SHA-256", buf);
+          return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2, "0")).join("");
+        }
+
+        const modal = document.getElementById("qr-modal");
+        const showBtn = document.getElementById("show-qr-btn");
+        const closeBtn = document.getElementById("qr-close");
+        const overlay = document.getElementById("qr-modal-overlay");
+        const pwdInput = document.getElementById("qr-pwd");
+        const submitBtn = document.getElementById("qr-submit");
+        const msg = document.getElementById("qr-msg");
+        const loginView = document.getElementById("qr-login-view");
+        const displayView = document.getElementById("qr-display-view");
+
+        function openModal() {
+          modal.style.display = "flex";
+          loginView.style.display = "";
+          displayView.style.display = "none";
+          pwdInput.value = "";
+          msg.textContent = "";
+          setTimeout(() => pwdInput.focus(), 100);
+        }
+        function closeModal() {
+          modal.style.display = "none";
+        }
+        showBtn.addEventListener("click", openModal);
+        closeBtn.addEventListener("click", closeModal);
+        overlay.addEventListener("click", closeModal);
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && modal.style.display === "flex") closeModal();
+        });
+
+        async function verify() {
+          const val = pwdInput.value.trim();
+          if (!val) { msg.textContent = "請輸入密碼"; return; }
+          submitBtn.disabled = true;
+          submitBtn.textContent = "驗證中...";
+          try {
+            const h = await sha256(val);
+            if (h === EXPECTED_HASH) {
+              loginView.style.display = "none";
+              displayView.style.display = "";
+              document.getElementById("qr-url-text").textContent = LANDING_URL;
+              const canvas = document.getElementById("qr-canvas");
+              const encoded = encodeURIComponent(LANDING_URL);
+              const fallback = "https://quickchart.io/qr?text=" + encoded + "&size=240&dark=1e3c72&light=ffffff&ecLevel=H";
+              const img = document.createElement("img");
+              img.src = "https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=" + encoded + "&color=1e3c72&bgcolor=ffffff&margin=8&ecc=H";
+              img.width = 240; img.height = 240;
+              img.alt = "QR Code";
+              img.style.display = "block";
+              img.onerror = function () { img.onerror = null; img.src = fallback; };
+              canvas.innerHTML = "";
+              canvas.appendChild(img);
+            } else {
+              msg.textContent = "密碼錯誤";
+              pwdInput.value = "";
+              pwdInput.focus();
+            }
+          } catch (err) {
+            msg.textContent = "驗證失敗：" + err.message;
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "驗證 →";
+          }
+        }
+        submitBtn.addEventListener("click", verify);
+        pwdInput.addEventListener("keydown", (e) => { if (e.key === "Enter") verify(); });
+
+        document.getElementById("qr-copy").addEventListener("click", () => {
+          navigator.clipboard.writeText(LANDING_URL).then(() => {
+            const b = document.getElementById("qr-copy");
+            const orig = b.textContent;
+            b.textContent = "已複製 ✓";
+            setTimeout(() => b.textContent = orig, 1500);
+          });
+        });
+        document.getElementById("qr-open").addEventListener("click", () => {
+          window.open(LANDING_URL, "_blank");
+        });
+      })();
+    </script>
 </body>
 </html>
