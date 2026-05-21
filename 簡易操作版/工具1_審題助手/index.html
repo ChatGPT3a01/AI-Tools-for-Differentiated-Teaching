@@ -33,28 +33,39 @@
 
     <!-- 兩階段體驗區 -->
     <div class="card">
-      <h2>🎬 先看：Prompt 好壞差很多</h2>
+      <h2>🧪 動手實驗：Prompt 好壞，AI 回應差多少？</h2>
       <p style="color: var(--muted); font-size: 14px; margin-bottom: 12px;">
-        同一題、不同 prompt，AI 回答的品質天差地別。先感受一下，再開始用。
+        同一題、不同 prompt，AI 的回答品質會天差地別。下面兩個按鈕分別跑「爛 prompt」與「好 prompt」，你<strong>親自按下去</strong>對比看看。
       </p>
+
+      <!-- 示範題 -->
+      <div style="background: var(--bg-soft); padding: 12px 14px; border-radius: 10px; margin: 10px 0; font-size: 13px; line-height: 1.7;">
+        <strong style="color: var(--bg-1);">📝 示範題目（兩邊跑同一題）：</strong><br>
+        一物體質量 2 kg，受 10 N 力作用 3 秒，求其末速度為多少？(取初速為 0)<br>
+        (A) 10 m/s　(B) 15 m/s　(C) 20 m/s　(D) 30 m/s
+      </div>
+
+      <!-- 兩欄對比 -->
       <div class="prompt-compare">
         <div class="prompt-bad">
-          <h4>❌ 爛 prompt（你 30 秒前可能會這樣寫）</h4>
+          <h4>❌ 爛 prompt</h4>
           <code style="font-size: 12px;">「幫我分析這題」</code>
-          <p style="margin-top: 8px; font-size: 12px; color: var(--muted);">
-            → AI 不知道你要什麼，回答鬆散、不能用。
-          </p>
+          <button class="sample-btn" style="background: #fdf2f2; color: #c0392b; border: 1px solid #c0392b; margin-top: 10px; width: 100%;"
+                  id="try-bad-btn" onclick="tryBadPrompt()">▶ 用爛 prompt 跑跑看</button>
+          <div id="bad-result" style="margin-top: 10px; font-size: 12px; max-height: 240px; overflow-y: auto;"></div>
         </div>
         <div class="prompt-good">
-          <h4>✅ 好 prompt（這個工具內建的）</h4>
-          <code style="font-size: 12px;">「依台北市段考雙向細目表標準，判斷：1️⃣內容向度 2️⃣Bloom 認知層次 3️⃣難易度 4️⃣命題建議。輸出 JSON 表格。」</code>
-          <p style="margin-top: 8px; font-size: 12px; color: var(--muted);">
-            → AI 知道要結構化輸出、要對齊既有標準。
-          </p>
+          <h4>✅ 好 prompt（本工具內建）</h4>
+          <code style="font-size: 12px;">「依台北市段考雙向細目表標準：1️⃣內容向度 2️⃣Bloom 認知層次 3️⃣難易度 4️⃣命題建議，輸出結構化 JSON」</code>
+          <button class="sample-btn" style="background: #f0f9f4; color: #155724; border: 1px solid #155724; margin-top: 10px; width: 100%;"
+                  id="try-good-btn" onclick="tryGoodPrompt()">▶ 用好 prompt 跑跑看</button>
+          <div id="good-result" style="margin-top: 10px; font-size: 12px; max-height: 240px; overflow-y: auto;"></div>
         </div>
       </div>
-      <div class="alert alert-info">
-        💡 <strong>這個工具已經把好 prompt 內建好了</strong>——你只要貼題目，後面的事 AI 自動做。
+
+      <div class="alert alert-info" style="margin-top: 14px;">
+        💡 <strong>感受到差別了嗎？</strong>爛 prompt：AI 直接幫你算答案、不分析。好 prompt：AI 給出向度、層次、難易度、命題建議的結構化結果。<br>
+        <strong>這個工具已經把好 prompt 內建好了</strong>——你只要貼題目，下面操作區直接用就行。
       </div>
     </div>
 
@@ -318,6 +329,70 @@
 
     renderTabs();
     renderQuestions();
+
+    // ============ 🧪 Prompt 對比實驗 ============
+    const DEMO_QUESTION = `一物體質量 2 kg，受 10 N 力作用 3 秒，求其末速度為多少？(取初速為 0)
+(A) 10 m/s  (B) 15 m/s  (C) 20 m/s  (D) 30 m/s`;
+
+    function escHtml(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    }
+
+    async function tryBadPrompt() {
+      const btn = document.getElementById("try-bad-btn");
+      const out = document.getElementById("bad-result");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>AI 用爛 prompt 回應中...';
+      out.innerHTML = '<div class="alert alert-info" style="margin:0; font-size:12px;">⏳ 等 10–20 秒...</div>';
+      try {
+        const url = window.WORKER_BASE.replace(/\/$/, "") + "/api/demo-bad";
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ input: DEMO_QUESTION })
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || "HTTP " + resp.status);
+        out.innerHTML = `<div style="padding:10px; background:white; border-radius:8px; border:1px solid #f5b3b3;">
+          <div style="font-size:11px; color:var(--err); font-weight:700; margin-bottom:6px;">📢 AI 回應（鬆散、直接解題、沒做命題分析）：</div>
+          <pre style="white-space:pre-wrap; font-family:inherit; font-size:12px; line-height:1.6; margin:0;">${escHtml(data.raw_text || "")}</pre>
+        </div>`;
+      } catch (e) {
+        out.innerHTML = `<div class="alert alert-err" style="margin:0; font-size:12px;">❌ ${escHtml(e.message)}</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = "▶ 用爛 prompt 跑跑看";
+      }
+    }
+
+    async function tryGoodPrompt() {
+      const btn = document.getElementById("try-good-btn");
+      const out = document.getElementById("good-result");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>AI 用好 prompt 回應中...';
+      out.innerHTML = '<div class="alert alert-info" style="margin:0; font-size:12px;">⏳ 等 10–20 秒...</div>';
+      try {
+        const data = await window.callAPI("/api/shen-ti", DEMO_QUESTION);
+        const items = data.items || [];
+        const sum = data.summary || {};
+        let rows = items.map(it => `
+          <tr><td>${escHtml(it.number)}</td><td>${escHtml(it.content_dimension || "")}</td>
+          <td><span class="tag tag-blue">${escHtml(it.cognitive_dimension || "")}</span></td>
+          <td><span class="tag ${it.difficulty === '易' ? 'tag-easy' : it.difficulty === '中' ? 'tag-mid' : 'tag-hard'}">${escHtml(it.difficulty || "")}</span></td></tr>`).join("");
+        out.innerHTML = `<div style="padding:10px; background:white; border-radius:8px; border:1px solid #a8e6c9;">
+          <div style="font-size:11px; color:var(--ok); font-weight:700; margin-bottom:6px;">📊 AI 回應（結構化、有向度、有層次）：</div>
+          <table style="font-size:12px; width:100%;"><thead><tr><th>#</th><th>內容向度</th><th>認知</th><th>難易</th></tr></thead><tbody>${rows}</tbody></table>
+          <div style="font-size:11px; color:var(--muted); margin-top:6px;">📈 ${escHtml(sum.overall_comment || "")}</div>
+        </div>`;
+      } catch (e) {
+        out.innerHTML = `<div class="alert alert-err" style="margin:0; font-size:12px;">❌ ${escHtml(e.message)}</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = "▶ 用好 prompt 跑跑看";
+      }
+    }
 
     let lastResult = null;
 
