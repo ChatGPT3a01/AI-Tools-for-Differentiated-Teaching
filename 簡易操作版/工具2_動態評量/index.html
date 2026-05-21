@@ -73,6 +73,26 @@
     <div class="card hidden" id="result-card">
       <h2>🪜 三層鷹架提示</h2>
       <div id="items"></div>
+
+      <!-- ✏️ 答題互動區（看完提示後充當學生試答）-->
+      <div style="margin-top: 24px; padding: 20px; background: linear-gradient(135deg, #fff5ee, #ffffff); border-radius: 14px; border-left: 6px solid var(--accent);">
+        <h3 style="color: var(--bg-1); margin-bottom: 6px;">✏️ 換你作答（充當學生體驗看看）</h3>
+        <p style="color: var(--muted); font-size: 13px; margin-bottom: 12px;">
+          看完上方三層提示，把你的答案寫下來。AI 會<strong>即時批改 + 給回饋 + 解釋為什麼</strong>，
+          答錯還會給「下一步可以怎麼想」的引導，不直接給答案。
+        </p>
+        <textarea id="answer-input"
+                  placeholder="例如：(B) 15 m/s&#10;或：我覺得是 B，因為 F=ma → a=5、v=at=15"
+                  style="width: 100%; padding: 12px; border: 2px solid var(--border);
+                         border-radius: 10px; font-size: 14px; font-family: inherit;
+                         min-height: 70px; resize: vertical; box-sizing: border-box;"></textarea>
+        <button id="grade-btn" onclick="submitAnswer()"
+                style="margin-top: 10px; background: var(--accent);">
+          📤 送出答案，AI 即時批改
+        </button>
+        <div id="grade-result" style="margin-top: 14px;"></div>
+      </div>
+
       <div style="margin-top: 16px;">
         <button class="btn-ghost" onclick="copyResult()">📋 複製為文字</button>
         <button class="btn-accent" onclick="printCards()">🖨️ 列印為提示卡</button>
@@ -259,6 +279,86 @@
     function printCards() {
       if (!lastResult) return;
       window.print();
+    }
+
+    // ============ ✏️ 答題互動：AI 即時批改 ============
+    async function submitAnswer() {
+      const question = (document.getElementById("input").value || "").trim();
+      const answer = (document.getElementById("answer-input").value || "").trim();
+      const btn = document.getElementById("grade-btn");
+      const out = document.getElementById("grade-result");
+
+      if (!question) {
+        out.innerHTML = '<div class="alert alert-warn" style="margin:0;">⚠️ 上方題目區是空的</div>';
+        return;
+      }
+      if (!answer) {
+        out.innerHTML = '<div class="alert alert-warn" style="margin:0;">⚠️ 請先在文字框寫下你的答案</div>';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>AI 批改中...';
+      out.innerHTML = '<div class="alert alert-info" style="margin:0;">⏳ AI 正在看你的答案，約 10–20 秒...</div>';
+
+      try {
+        const userContent = `題目：${question}\n\n學生答案：${answer}`;
+        const data = await window.callAPI("/api/grade", userContent);
+
+        if (data._parse_error) {
+          out.innerHTML = `<div class="alert alert-warn">AI 回應格式異常</div>
+            <pre style="white-space:pre-wrap; font-size:13px;">${escapeHtml(data._raw || "")}</pre>`;
+          return;
+        }
+
+        const correct = data.correct;
+        const isRight = correct === true;
+        const isWrong = correct === false;
+        const isOpen = correct === null || correct === undefined;
+
+        const icon = isRight ? "✅" : isWrong ? "❌" : "💭";
+        const bg = isRight ? "#d4edda" : isWrong ? "#f8d7da" : "#fff3cd";
+        const titleColor = isRight ? "#155724" : isWrong ? "#721c24" : "#856404";
+        const title = isRight ? "答對了！" : isWrong ? "再想想看～沒關係！" : "嗯～這是個值得討論的答案";
+
+        let html = `
+          <div style="padding: 18px; background: ${bg}; border-radius: 14px; animation: fadeIn 0.4s ease;">
+            <h4 style="color: ${titleColor}; font-size: 22px; margin-bottom: 12px; font-weight: 700;">
+              ${icon} ${title}
+            </h4>
+            <div style="background: white; padding: 12px 14px; border-radius: 10px; margin-bottom: 10px;">
+              <strong>💬 AI 回饋：</strong> ${escapeHtml(data.feedback || "")}
+            </div>
+            <div style="background: white; padding: 12px 14px; border-radius: 10px; margin-bottom: 10px;">
+              <strong>📖 為什麼：</strong> ${escapeHtml(data.explanation || "")}
+            </div>`;
+
+        if (isWrong && data.hint_for_retry) {
+          html += `
+            <div style="background: rgba(255,255,255,0.85); padding: 12px 14px; border-radius: 10px;
+                        border-left: 4px solid var(--accent); margin-bottom: 10px;">
+              <strong>🎯 試試這樣想：</strong> ${escapeHtml(data.hint_for_retry)}
+            </div>
+            <button class="btn-ghost" style="font-size:13px; padding: 8px 14px;"
+                    onclick="document.getElementById('answer-input').focus(); document.getElementById('answer-input').select();">
+              🔄 再試一次
+            </button>`;
+        }
+
+        if (data.correct_answer && (isWrong || isOpen)) {
+          html += `<div style="margin-top: 10px; font-size: 12px; color: var(--muted);">
+            📌 標準答案參考：${escapeHtml(data.correct_answer)}
+          </div>`;
+        }
+
+        html += "</div>";
+        out.innerHTML = html;
+      } catch (err) {
+        out.innerHTML = `<div class="alert alert-err" style="margin:0;">❌ ${escapeHtml(err.message)}</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = "📤 送出答案，AI 即時批改";
+      }
     }
   </script>
 
