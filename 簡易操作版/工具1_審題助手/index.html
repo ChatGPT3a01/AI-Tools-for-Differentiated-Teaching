@@ -38,11 +38,19 @@
         同一題、不同 prompt，AI 的回答品質會天差地別。下面兩個按鈕分別跑「爛 prompt」與「好 prompt」，你<strong>親自按下去</strong>對比看看。
       </p>
 
-      <!-- 示範題 -->
-      <div style="background: var(--bg-soft); padding: 12px 14px; border-radius: 10px; margin: 10px 0; font-size: 13px; line-height: 1.7;">
-        <strong style="color: var(--bg-1);">📝 示範題目（兩邊跑同一題）：</strong><br>
-        一物體質量 2 kg，受 10 N 力作用 3 秒，求其末速度為多少？(取初速為 0)<br>
-        (A) 10 m/s　(B) 15 m/s　(C) 20 m/s　(D) 30 m/s
+      <!-- 示範題（可編輯）-->
+      <div style="margin: 10px 0;">
+        <label style="font-size: 13px; color: var(--bg-1); font-weight: 600;">
+          📝 示範題目（可改成你想試的題目，兩邊都跑這題）：
+        </label>
+        <textarea id="experiment-input"
+          style="width: 100%; padding: 10px 12px; margin-top: 6px; border: 2px solid var(--border);
+                 border-radius: 10px; font-size: 13px; font-family: inherit; line-height: 1.7;
+                 min-height: 80px; resize: vertical;">一物體質量 2 kg，受 10 N 力作用 3 秒，求其末速度為多少？(取初速為 0)
+(A) 10 m/s  (B) 15 m/s  (C) 20 m/s  (D) 30 m/s</textarea>
+        <div style="margin-top: 4px; font-size: 11px; color: var(--muted);">
+          💡 可以貼自己出的題目、學測題、段考題 — 兩個按鈕都會跑這裡的題目
+        </div>
       </div>
 
       <!-- 兩欄對比 -->
@@ -331,8 +339,10 @@
     renderQuestions();
 
     // ============ 🧪 Prompt 對比實驗 ============
-    const DEMO_QUESTION = `一物體質量 2 kg，受 10 N 力作用 3 秒，求其末速度為多少？(取初速為 0)
-(A) 10 m/s  (B) 15 m/s  (C) 20 m/s  (D) 30 m/s`;
+    function getExperimentInput() {
+      const v = (document.getElementById("experiment-input").value || "").trim();
+      return v;
+    }
 
     function escHtml(s) {
       return String(s == null ? "" : s)
@@ -343,6 +353,11 @@
     async function tryBadPrompt() {
       const btn = document.getElementById("try-bad-btn");
       const out = document.getElementById("bad-result");
+      const input = getExperimentInput();
+      if (!input) {
+        out.innerHTML = '<div class="alert alert-warn" style="margin:0; font-size:12px;">⚠️ 請先在上方填入題目</div>';
+        return;
+      }
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>AI 用爛 prompt 回應中...';
       out.innerHTML = '<div class="alert alert-info" style="margin:0; font-size:12px;">⏳ 等 10–20 秒...</div>';
@@ -351,7 +366,7 @@
         const resp = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ input: DEMO_QUESTION })
+          body: JSON.stringify({ input: input })
         });
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || "HTTP " + resp.status);
@@ -370,11 +385,16 @@
     async function tryGoodPrompt() {
       const btn = document.getElementById("try-good-btn");
       const out = document.getElementById("good-result");
+      const input = getExperimentInput();
+      if (!input) {
+        out.innerHTML = '<div class="alert alert-warn" style="margin:0; font-size:12px;">⚠️ 請先在上方填入題目</div>';
+        return;
+      }
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>AI 用好 prompt 回應中...';
       out.innerHTML = '<div class="alert alert-info" style="margin:0; font-size:12px;">⏳ 等 10–20 秒...</div>';
       try {
-        const data = await window.callAPI("/api/shen-ti", DEMO_QUESTION);
+        const data = await window.callAPI("/api/shen-ti", input);
         const items = data.items || [];
         const sum = data.summary || {};
         let rows = items.map(it => `
