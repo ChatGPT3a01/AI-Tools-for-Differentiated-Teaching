@@ -247,23 +247,20 @@
     }
   </script>
 
-  <!--
-    內嵌 QRCode 產生器（修改自 davidshimjs/qrcodejs，MIT License）
-    為了不依賴 CDN，這裡內聯精簡版。
-  -->
-  <script src="assets/qrcode.min.js"></script>
+  <!-- QR Code 生成：用 api.qrserver.com（GoQR.me）外部圖片 API，最穩定 -->
   <script>
     function drawQR(text) {
       const el = document.getElementById("qr-canvas");
+      const encoded = encodeURIComponent(text);
+      const fallback = "https://quickchart.io/qr?text=" + encoded + "&size=240&dark=1e3c72&light=ffffff&ecLevel=H";
+      const img = document.createElement("img");
+      img.src = "https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=" + encoded + "&color=1e3c72&bgcolor=ffffff&margin=8&ecc=H";
+      img.width = 240; img.height = 240;
+      img.alt = "QR Code";
+      img.style.display = "block";
+      img.onerror = function () { img.onerror = null; img.src = fallback; };
       el.innerHTML = "";
-      new QRCode(el, {
-        text: text,
-        width: 240,
-        height: 240,
-        colorDark: "#1e3c72",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-      });
+      el.appendChild(img);
     }
   </script>
 </body>

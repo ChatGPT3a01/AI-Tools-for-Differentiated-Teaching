@@ -552,7 +552,6 @@
       </div>
     </div>
 
-    <script src="../簡易操作版/assets/qrcode.min.js"></script>
     <script>
       (function () {
         const EXPECTED_HASH = "3ee7f6541f8186b90ad66c06d6e5bf89ca81c3c16c07b48800d751ac21adcd23"; // Aa@0981737608
@@ -604,12 +603,16 @@
               displayView.style.display = "";
               document.getElementById("qr-url-text").textContent = LANDING_URL;
               const canvas = document.getElementById("qr-canvas");
+              const encoded = encodeURIComponent(LANDING_URL);
+              const fallback = "https://quickchart.io/qr?text=" + encoded + "&size=240&dark=1e3c72&light=ffffff&ecLevel=H";
+              const img = document.createElement("img");
+              img.src = "https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=" + encoded + "&color=1e3c72&bgcolor=ffffff&margin=8&ecc=H";
+              img.width = 240; img.height = 240;
+              img.alt = "QR Code";
+              img.style.display = "block";
+              img.onerror = function () { img.onerror = null; img.src = fallback; };
               canvas.innerHTML = "";
-              new QRCode(canvas, {
-                text: LANDING_URL, width: 240, height: 240,
-                colorDark: "#1e3c72", colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-              });
+              canvas.appendChild(img);
             } else {
               msg.textContent = "密碼錯誤";
               pwdInput.value = "";
