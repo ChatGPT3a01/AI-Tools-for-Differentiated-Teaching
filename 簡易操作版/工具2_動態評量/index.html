@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>工具 2 ｜ 動態評量產生器</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="app-header">
+      <span class="crumb"><a href="../landing.html" style="color:white;">← 回入口</a></span>
+      <h1>🎯 動態評量產生器</h1>
+      <p>同一題 × 三層提示｜針對不同程度學生差異化教學</p>
+    </div>
+
+    <div class="card">
+      <h2>💡 什麼是「動態評量」？</h2>
+      <p style="margin-bottom: 10px;">
+        傳統評量問「會不會」，動態評量問「<strong>給多少提示後就會</strong>」。
+        同一題，把<strong>三層鷹架</strong>準備好：
+      </p>
+      <ul style="margin-left: 20px; line-height: 2;">
+        <li><span class="tag tag-easy">高程度</span>只需最小提示，讓他自己回想公式</li>
+        <li><span class="tag tag-mid">中程度</span>點出關鍵概念連結，但不給答案</li>
+        <li><span class="tag tag-hard">低程度</span>把問題拆步驟、給範例對照</li>
+      </ul>
+      <div class="alert alert-info">
+        💡 <strong>用法</strong>：把題目貼進去，AI 自動為這題寫好三層提示——直接拿去印成「提示卡」，課堂上學生卡關時對應發放。
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📥 輸入：題目或概念</h2>
+      <label for="input">貼題目（可多題）、或寫「我想針對 XX 概念設計動態評量」</label>
+      <textarea id="input" placeholder="範例 1（直接貼題目）：
+1. 一物體質量 2 kg，受 10 N 力作用 3 秒，求其末速度為多少？
+
+範例 2（概念導向）：
+我教高一物理「自由落體」，學生常卡在「為什麼初速度為 0 但加速度不為 0」。請針對這個 misconception 設計三層提示。"></textarea>
+
+      <div style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+        <span style="font-size: 13px; color: var(--muted);">快速試試：</span>
+        <button class="sample-btn" onclick="loadSample(1)">範例 1（牛頓第二定律）</button>
+        <button class="sample-btn" onclick="loadSample(2)">範例 2（動量守恆）</button>
+        <button class="sample-btn" onclick="loadSample(3)">範例 3（自由落體 misconception）</button>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <button id="go" onclick="generate()">🎯 產生分層提示</button>
+        <button class="btn-ghost" onclick="document.getElementById('input').value=''">清空</button>
+      </div>
+      <div id="status" class="alert hidden"></div>
+    </div>
+
+    <div class="card hidden" id="result-card">
+      <h2>🪜 三層鷹架提示</h2>
+      <div id="items"></div>
+      <div style="margin-top: 16px;">
+        <button class="btn-ghost" onclick="copyResult()">📋 複製為文字</button>
+        <button class="btn-accent" onclick="printCards()">🖨️ 列印為提示卡</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      阿亮老師 × AI 差異化教學｜工具 2 / 3
+    </div>
+  </div>
+
+  <script src="../assets/config.js"></script>
+  <script>
+    const SAMPLES = {
+      1: `一物體質量 2 kg，靜止於光滑水平面上，受 10 N 水平外力作用 3 秒後，求其末速度為多少？
+(A) 10 m/s  (B) 15 m/s  (C) 20 m/s  (D) 30 m/s`,
+
+      2: `在無摩擦水平面上，A 物體（質量 4 kg）以 6 m/s 向右移動，撞上靜止的 B 物體（質量 2 kg），碰撞後 A 速度變為 2 m/s 向右，求 B 物體的速度為何？
+(A) 4 m/s  (B) 6 m/s  (C) 8 m/s  (D) 10 m/s`,
+
+      3: `我教高一物理「自由落體」，學生常常卡在「為什麼初速度是 0、可是加速度不是 0」這個 misconception，總覺得「速度是 0 物體就不該動」。
+
+請針對這個概念設計三層提示，協助不同程度的學生釐清「速度」和「加速度」的差別。`
+    };
+
+    function loadSample(n) {
+      document.getElementById("input").value = SAMPLES[n];
+    }
+
+    let lastResult = null;
+
+    async function generate() {
+      const input = document.getElementById("input").value.trim();
+      const status = document.getElementById("status");
+      const goBtn = document.getElementById("go");
+      const resultCard = document.getElementById("result-card");
+
+      if (!input) {
+        status.className = "alert alert-warn";
+        status.textContent = "請先貼題目或寫想要設計的概念";
+        status.classList.remove("hidden");
+        return;
+      }
+
+      goBtn.disabled = true;
+      goBtn.innerHTML = '<span class="spinner"></span>AI 設計中...';
+      status.className = "alert alert-info";
+      status.textContent = "正在呼叫 AI，約需 10-20 秒...";
+      status.classList.remove("hidden");
+      resultCard.classList.add("hidden");
+
+      try {
+        const data = await window.callAPI("/api/dong-tai", input);
+        lastResult = data;
+        renderResult(data);
+        status.classList.add("hidden");
+        resultCard.classList.remove("hidden");
+        resultCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      } catch (err) {
+        status.className = "alert alert-err";
+        status.textContent = "❌ 產生失敗：" + err.message;
+      } finally {
+        goBtn.disabled = false;
+        goBtn.innerHTML = "🎯 產生分層提示";
+      }
+    }
+
+    function renderResult(data) {
+      const itemsEl = document.getElementById("items");
+      if (data._parse_error) {
+        itemsEl.innerHTML = `<div class="alert alert-warn">AI 回傳格式異常，以下是原始輸出：</div><pre style="white-space:pre-wrap;font-size:13px;">${escapeHtml(data._raw || "")}</pre>`;
+        return;
+      }
+
+      const items = data.items || [];
+      let html = "";
+      for (const it of items) {
+        html += `
+          <div style="margin-bottom: 20px; padding: 16px; background: var(--bg-soft); border-radius: 12px;">
+            <h3 style="color: var(--bg-1); margin-bottom: 6px;">
+              ${escapeHtml(it.number || "")} ${escapeHtml(it.topic || "")}
+            </h3>
+            <p style="color: var(--muted); font-size: 13px; margin-bottom: 12px;">
+              <strong>核心概念：</strong>${escapeHtml(it.key_concept || "")}
+            </p>
+            <div class="hint-row">
+              <div class="hint-card" style="background: #d4edda; padding: 12px; border-radius: 10px; margin-bottom: 8px;">
+                <span class="tag tag-easy">高程度</span>
+                <p style="margin-top: 6px;">${escapeHtml(it.hints?.high || "")}</p>
+              </div>
+              <div class="hint-card" style="background: #fff3cd; padding: 12px; border-radius: 10px; margin-bottom: 8px;">
+                <span class="tag tag-mid">中程度</span>
+                <p style="margin-top: 6px;">${escapeHtml(it.hints?.mid || "")}</p>
+              </div>
+              <div class="hint-card" style="background: #f8d7da; padding: 12px; border-radius: 10px;">
+                <span class="tag tag-hard">低程度</span>
+                <p style="margin-top: 6px;">${escapeHtml(it.hints?.low || "")}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      itemsEl.innerHTML = html;
+    }
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    }
+
+    function copyResult() {
+      if (!lastResult) return;
+      navigator.clipboard.writeText(JSON.stringify(lastResult, null, 2)).then(() => alert("已複製"));
+    }
+
+    function printCards() {
+      if (!lastResult) return;
+      window.print();
+    }
+  </script>
+
+  <style>
+    @media print {
+      .app-header, button, .card:not(#result-card) { display: none; }
+      body { background: white; }
+      .card { box-shadow: none; }
+    }
+  </style>
+</body>
+</html>

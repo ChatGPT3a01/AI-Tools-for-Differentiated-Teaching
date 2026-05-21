@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>物理 sample 題目包</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .pdf-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 16px; }
+  .pdf-card {
+    padding: 16px;
+    background: var(--bg-soft);
+    border-radius: 12px;
+    border-left: 4px solid var(--bg-1);
+  }
+  .pdf-card h4 { color: var(--bg-1); margin-bottom: 6px; }
+  .pdf-card .actions { margin-top: 10px; display: flex; gap: 6px; }
+  .pdf-card .actions a {
+    flex: 1;
+    text-align: center;
+    padding: 8px 12px;
+    background: white;
+    border: 2px solid var(--bg-1);
+    color: var(--bg-1);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .pdf-card .actions a:hover { background: var(--bg-1); color: white; text-decoration: none; }
+  .pdf-card .actions .primary { background: var(--bg-1); color: white; }
+  .pdf-card .actions .primary:hover { background: var(--bg-2); border-color: var(--bg-2); }
+
+  .demo-q {
+    margin: 14px 0;
+    padding: 16px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .demo-q .meta {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .demo-q .meta .tag { font-size: 11px; }
+  .demo-q .body { font-size: 14px; line-height: 1.7; }
+  .demo-q .body strong { color: var(--bg-1); }
+  .demo-q .ans {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: var(--bg-soft);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .copy-btn {
+    margin-top: 10px;
+    padding: 6px 12px;
+    font-size: 12px;
+    background: white;
+    color: var(--bg-1);
+    border: 1px solid var(--bg-1);
+    cursor: pointer;
+    border-radius: 6px;
+  }
+  .copy-btn:hover { background: var(--bg-1); color: white; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="app-header">
+      <span class="crumb"><a href="../landing.html" style="color:white;">← 回入口</a></span>
+      <h1>📚 物理 sample 題目包</h1>
+      <p>學測精選 + 段考範例｜給工具 1 / 工具 2 練習用</p>
+    </div>
+
+    <div class="card">
+      <h2>🎓 學測自然科（含物理題）</h2>
+      <p style="color: var(--muted); font-size: 14px;">
+        近 3 年學測自然科試題與解答 PDF，物理題通常分布在前半。
+        資料來源：<a href="https://www.ceec.edu.tw" target="_blank">大考中心</a>
+      </p>
+      <div class="pdf-list">
+        <div class="pdf-card">
+          <h4>115 學年度（2026/01）</h4>
+          <p style="font-size: 13px; color: var(--muted);">19 頁試題 · 1 頁選擇題答案</p>
+          <div class="actions">
+            <a class="primary" href="115學測自然_試題.pdf" target="_blank">📄 試題</a>
+            <a href="115學測自然_解答.pdf" target="_blank">✅ 解答</a>
+          </div>
+        </div>
+        <div class="pdf-card">
+          <h4>114 學年度（2025/01）</h4>
+          <p style="font-size: 13px; color: var(--muted);">20 頁試題 · 1 頁選擇題答案</p>
+          <div class="actions">
+            <a class="primary" href="114學測自然_試題.pdf" target="_blank">📄 試題</a>
+            <a href="114學測自然_解答.pdf" target="_blank">✅ 解答</a>
+          </div>
+        </div>
+        <div class="pdf-card">
+          <h4>113 學年度（2024/01）</h4>
+          <p style="font-size: 13px; color: var(--muted);">19 頁試題 · 1 頁選擇題答案</p>
+          <div class="actions">
+            <a class="primary" href="113學測自然_試題.pdf" target="_blank">📄 試題</a>
+            <a href="113學測自然_解答.pdf" target="_blank">✅ 解答</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>⚡ 快速 Demo 題目（複製即用）</h2>
+      <p style="margin-bottom: 12px; color: var(--muted); font-size: 14px;">
+        如果不想翻 PDF，下面 8 題經典高中物理題涵蓋不同單元和難度，
+        <strong>點「複製」直接貼進工具 1 或工具 2</strong>。
+      </p>
+
+      <div id="demo-list"></div>
+
+      <div class="alert alert-info" style="margin-top: 16px;">
+        💡 <strong>建議練習順序</strong>：
+        ① 先複製 1-3 題（基礎難度）丟工具 1 看分析 →
+        ② 再複製 4-6 題（中等難度）丟工具 2 產生分層提示 →
+        ③ 最後挑題 7-8（跨單元高難度）測試 AI 的判斷力。
+      </div>
+    </div>
+
+    <div class="footer">
+      阿亮老師 × AI 差異化教學｜題目包
+    </div>
+  </div>
+
+  <script>
+    const QUESTIONS = [
+      {
+        unit: "牛頓第二定律", difficulty: "易", grade: "高一",
+        body: `一物體質量 2 kg，靜止於光滑水平面上，受 10 N 水平外力作用 3 秒後，求其末速度為多少？
+(A) 10 m/s  (B) 15 m/s  (C) 20 m/s  (D) 30 m/s`,
+        ans: "(B) 15 m/s（a = F/m = 5 m/s²；v = at = 15）"
+      },
+      {
+        unit: "電路（串聯）", difficulty: "易", grade: "高二",
+        body: `三個相同的電阻 R 串聯後接於電壓 V 的電池，每個電阻所消耗的功率為多少？
+(A) V²/R   (B) V²/(3R)   (C) V²/(9R)   (D) 3V²/R`,
+        ans: "(C) V²/(9R)（總電阻 3R，每顆兩端電壓 V/3）"
+      },
+      {
+        unit: "光學（色散）", difficulty: "中", grade: "高一",
+        body: `一束白光通過三稜鏡後分散成彩色光譜，下列敘述何者正確？
+(A) 紅光偏折最多
+(B) 紫光偏折最多
+(C) 不同顏色光在真空中速度不同
+(D) 折射率與顏色無關`,
+        ans: "(B) 紫光偏折最多（紫光折射率最大）"
+      },
+      {
+        unit: "動量守恆", difficulty: "中", grade: "高一",
+        body: `在無摩擦的水平面上，A 物體（質量 4 kg）以 6 m/s 向右移動，撞上靜止的 B 物體（質量 2 kg），若碰撞後 A 速度變為 2 m/s 向右，求 B 物體的速度為何？
+(A) 4 m/s  (B) 6 m/s  (C) 8 m/s  (D) 10 m/s`,
+        ans: "(C) 8 m/s（4×6 + 0 = 4×2 + 2×v_B → v_B = 8）"
+      },
+      {
+        unit: "電阻（拉長）", difficulty: "中", grade: "高二",
+        body: `一條長度為 L、截面積為 A 的均勻導線，電阻為 R。若將其拉長為 2L（體積不變），新電阻為何？
+(A) R   (B) 2R   (C) 4R   (D) R/2`,
+        ans: "(C) 4R（體積不變 → A 變 A/2 → R' = ρ(2L)/(A/2) = 4R）"
+      },
+      {
+        unit: "自由落體", difficulty: "中", grade: "高一",
+        body: `從 80 m 高的塔頂自由落下一物體（g = 10 m/s²，不計空氣阻力），求落地時的速度及落地所需時間？
+(A) 40 m/s, 4 s  (B) 40 m/s, 8 s
+(C) 20 m/s, 4 s  (D) 20 m/s, 2 s`,
+        ans: "(A) v = √(2gh) = 40；t = v/g = 4"
+      },
+      {
+        unit: "干涉（光學跨環境）", difficulty: "難", grade: "高二",
+        body: `楊氏雙狹縫實驗中，若把整個裝置浸入水中（水的折射率 1.33），則屏幕上的干涉條紋間距會：
+(A) 變寬  (B) 變窄  (C) 不變  (D) 完全消失`,
+        ans: "(B) 變窄（條紋間距 ∝ λ，光在水中波長變短為 λ/n）"
+      },
+      {
+        unit: "電磁感應（跨單元）", difficulty: "難", grade: "高二",
+        body: `一長條矩形迴路（長 L、寬 W、電阻 R）以等速 v 進入均勻磁場 B（垂直於迴路面）。從迴路前緣進入磁場到完全進入磁場的過程中，下列何者正確？
+(A) 感應電流方向不變，迴路受向後的力
+(B) 感應電流方向改變，迴路受向前的力
+(C) 感應電動勢隨時間遞增
+(D) 完全進入磁場後感應電流仍存在`,
+        ans: "(A) 楞次定律：感應電流反抗通量變化，產生與運動方向相反的力"
+      }
+    ];
+
+    function diffClass(d) {
+      return d === "易" ? "tag tag-easy" :
+             d === "中" ? "tag tag-mid" :
+             d === "難" ? "tag tag-hard" : "tag tag-blue";
+    }
+
+    function render() {
+      const list = document.getElementById("demo-list");
+      list.innerHTML = QUESTIONS.map((q, i) => `
+        <div class="demo-q">
+          <div class="meta">
+            <span class="tag tag-blue">${i + 1}</span>
+            <span class="tag tag-blue">${q.grade}</span>
+            <span class="tag tag-blue">${q.unit}</span>
+            <span class="${diffClass(q.difficulty)}">${q.difficulty}</span>
+          </div>
+          <div class="body"><pre style="font-family:inherit;white-space:pre-wrap;margin:0;">${escapeHtml(q.body)}</pre></div>
+          <div class="ans">💡 <strong>參考答案</strong>：${escapeHtml(q.ans)}</div>
+          <button class="copy-btn" onclick='copyQ(${i})'>📋 複製這題</button>
+        </div>
+      `).join("");
+    }
+
+    function copyQ(i) {
+      navigator.clipboard.writeText(QUESTIONS[i].body).then(() => {
+        const btns = document.querySelectorAll(".copy-btn");
+        const btn = btns[i];
+        const orig = btn.textContent;
+        btn.textContent = "✓ 已複製";
+        setTimeout(() => btn.textContent = orig, 1500);
+      });
+    }
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    }
+
+    render();
+  </script>
+</body>
+</html>

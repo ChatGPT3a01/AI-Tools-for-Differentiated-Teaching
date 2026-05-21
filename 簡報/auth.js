@@ -1,21 +1,34 @@
 /**
- * 簡報密碼保護系統
- * - 預設密碼：aitool2026
- * - 無敵密碼：可進入管理面板更改密碼
+ * 簡報密碼保護系統（SHA-256 版）
+ * - 學員密碼：@titool2026
+ * - 終極密碼（管理員）：Aa@0981737608
+ * - 密碼以 SHA-256 雜湊比對，不存明文
  * - 同一 session 只需輸入一次
  */
 (function () {
-  const MASTER_KEY = 'Aa@0981737608';
-  const DEFAULT_PWD = 'aitool2026';
-  const STORAGE_KEY = 'slide_pwd';
+  // SHA-256("Aa@0981737608")
+  const MASTER_KEY_HASH  = '3ee7f6541f8186b90ad66c06d6e5bf89ca81c3c16c07b48800d751ac21adcd23';
+  // SHA-256("@titool2026")
+  const DEFAULT_PWD_HASH = 'eff9cbf28fed971fad1635f42f9ce4274e2996359e17b91d5c360eb78eacfab4';
+  // 注意：key 名跟舊版（slide_pwd）不同，避免讀到舊明文殘留
+  const STORAGE_KEY = 'slide_pwd_hash_v2';
   const SESSION_KEY = 'slide_auth_ok';
 
   // 已驗證過就跳過
   if (sessionStorage.getItem(SESSION_KEY) === '1') return;
 
-  // 取得目前密碼（可能被管理員改過）
-  function getCurrentPwd() {
-    return localStorage.getItem(STORAGE_KEY) || DEFAULT_PWD;
+  // SHA-256 helper
+  async function sha256(text) {
+    const buf = new TextEncoder().encode(text);
+    const hash = await crypto.subtle.digest('SHA-256', buf);
+    return Array.from(new Uint8Array(hash))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+  }
+
+  // 取得目前密碼雜湊（可能被管理員改過）
+  function getCurrentPwdHash() {
+    return localStorage.getItem(STORAGE_KEY) || DEFAULT_PWD_HASH;
   }
 
   // 隱藏頁面內容
@@ -131,6 +144,10 @@
           color: #2ecc71; font-size: 14px; margin-top: 14px;
           min-height: 20px;
         }
+        .admin-hint {
+          color: rgba(255,255,255,0.45); font-size: 12px;
+          margin-top: 10px; line-height: 1.6;
+        }
       </style>
 
       <!-- 登入面板 -->
@@ -151,13 +168,13 @@
       <div class="auth-box admin-panel" id="admin-panel">
         <div class="auth-icon">⚙️</div>
         <div class="auth-title">管理員面板</div>
-        <div class="auth-subtitle">使用無敵密碼登入｜可更改研習密碼</div>
-        <label class="admin-label">目前密碼</label>
+        <div class="auth-subtitle">使用終極密碼登入｜可更改學員研習密碼</div>
+        <label class="admin-label">目前學員密碼狀態</label>
         <div class="auth-input-wrap">
           <input type="text" class="auth-input" id="admin-current" readonly
                  style="opacity:0.6; cursor:default;">
         </div>
-        <label class="admin-label">設定新密碼</label>
+        <label class="admin-label">設定新學員密碼（明文輸入，存入時會自動 SHA-256 雜湊）</label>
         <div class="auth-input-wrap">
           <input type="text" class="auth-input" id="admin-new"
                  placeholder="輸入新密碼（至少 4 個字元）" autocomplete="off">
@@ -167,6 +184,10 @@
           <button class="auth-btn" id="admin-save">儲存新密碼</button>
         </div>
         <div class="admin-success" id="admin-msg"></div>
+        <div class="admin-hint">
+          🔐 密碼不以明文儲存，僅保存 SHA-256 雜湊值。<br>
+          清除瀏覽器資料會還原為預設密碼。
+        </div>
       </div>
     `;
     document.body.appendChild(overlay);
@@ -193,8 +214,15 @@
       toggleBtn.textContent = isPassword ? '🙈' : '👁';
     });
 
+    // 顯示目前密碼狀態（雜湊片段，不可逆）
+    function refreshCurrentDisplay() {
+      var h = getCurrentPwdHash();
+      var isDefault = (h === DEFAULT_PWD_HASH);
+      adminCur.value = (isDefault ? '預設密碼' : '已自訂') + '（hash: ' + h.slice(0, 12) + '…）';
+    }
+
     // 驗證
-    function tryAuth() {
+    async function tryAuth() {
       var val = pwdInput.value.trim();
       if (!val) {
         errorEl.textContent = '請輸入密碼';
@@ -202,16 +230,23 @@
         setTimeout(function () { pwdInput.classList.remove('error'); }, 400);
         return;
       }
-      // 無敵密碼 → 管理面板
-      if (val === MASTER_KEY) {
+      var inputHash;
+      try {
+        inputHash = await sha256(val);
+      } catch (e) {
+        errorEl.textContent = '瀏覽器不支援 SHA-256';
+        return;
+      }
+      // 終極密碼 → 管理面板
+      if (inputHash === MASTER_KEY_HASH) {
         loginPanel.style.display = 'none';
         adminPanel.classList.add('show');
-        adminCur.value = getCurrentPwd();
+        refreshCurrentDisplay();
         adminNew.focus();
         return;
       }
       // 一般密碼
-      if (val === getCurrentPwd()) {
+      if (inputHash === getCurrentPwdHash()) {
         unlock();
       } else {
         errorEl.textContent = '密碼錯誤，請重新輸入';
@@ -230,19 +265,27 @@
     // 管理面板 — 直接進入
     adminEnter.addEventListener('click', unlock);
 
-    // 管理面板 — 儲存新密碼
-    adminSave.addEventListener('click', function () {
+    // 管理面板 — 儲存新密碼（先 SHA-256 後儲存）
+    adminSave.addEventListener('click', async function () {
       var newPwd = adminNew.value.trim();
       if (newPwd.length < 4) {
         adminMsg.style.color = '#e74c3c';
         adminMsg.textContent = '密碼至少需要 4 個字元';
         return;
       }
-      localStorage.setItem(STORAGE_KEY, newPwd);
-      adminCur.value = newPwd;
+      var newHash;
+      try {
+        newHash = await sha256(newPwd);
+      } catch (e) {
+        adminMsg.style.color = '#e74c3c';
+        adminMsg.textContent = '雜湊計算失敗';
+        return;
+      }
+      localStorage.setItem(STORAGE_KEY, newHash);
       adminNew.value = '';
       adminMsg.style.color = '#2ecc71';
-      adminMsg.textContent = '✅ 密碼已更新為：' + newPwd;
+      adminMsg.textContent = '✅ 已更新並以 SHA-256 雜湊儲存';
+      refreshCurrentDisplay();
     });
 
     // 解鎖

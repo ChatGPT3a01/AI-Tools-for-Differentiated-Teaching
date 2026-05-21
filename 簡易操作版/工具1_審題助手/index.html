@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>工具 1 ｜ AI 審題助手</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="app-header">
+      <span class="crumb"><a href="../landing.html" style="color:white;">← 回入口</a></span>
+      <h1>📝 AI 審題助手</h1>
+      <p>貼題目 → 一鍵產出雙向細目表 + 難易度</p>
+    </div>
+
+    <!-- 兩階段體驗區 -->
+    <div class="card">
+      <h2>🎬 先看：Prompt 好壞差很多</h2>
+      <p style="color: var(--muted); font-size: 14px; margin-bottom: 12px;">
+        同一題、不同 prompt，AI 回答的品質天差地別。先感受一下，再開始用。
+      </p>
+      <div class="prompt-compare">
+        <div class="prompt-bad">
+          <h4>❌ 爛 prompt（你 30 秒前可能會這樣寫）</h4>
+          <code style="font-size: 12px;">「幫我分析這題」</code>
+          <p style="margin-top: 8px; font-size: 12px; color: var(--muted);">
+            → AI 不知道你要什麼，回答鬆散、不能用。
+          </p>
+        </div>
+        <div class="prompt-good">
+          <h4>✅ 好 prompt（這個工具內建的）</h4>
+          <code style="font-size: 12px;">「依台北市段考雙向細目表標準，判斷：1️⃣內容向度 2️⃣Bloom 認知層次 3️⃣難易度 4️⃣命題建議。輸出 JSON 表格。」</code>
+          <p style="margin-top: 8px; font-size: 12px; color: var(--muted);">
+            → AI 知道要結構化輸出、要對齊既有標準。
+          </p>
+        </div>
+      </div>
+      <div class="alert alert-info">
+        💡 <strong>這個工具已經把好 prompt 內建好了</strong>——你只要貼題目，後面的事 AI 自動做。
+      </div>
+    </div>
+
+    <!-- 操作區 -->
+    <div class="card">
+      <h2>📥 輸入：段考題目</h2>
+      <label for="input">把要分析的題目貼進來（可一次貼多題，記得編號）</label>
+      <textarea id="input" placeholder="例如：
+1. 一物體質量 2 kg，受 10 N 力作用 3 秒，求其末速度為多少？(取初速為 0)
+   (A) 10 m/s  (B) 15 m/s  (C) 20 m/s  (D) 30 m/s
+
+2. 下列關於彈性碰撞的敘述，何者正確？
+   (A) 動能與動量皆守恆
+   (B) 只有動量守恆
+   (C) 只有動能守恆
+   (D) 都不守恆"></textarea>
+
+      <div style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+        <span style="font-size: 13px; color: var(--muted);">快速試試：</span>
+        <button class="sample-btn" onclick="loadSample(1)">範例 1（牛頓運動定律）</button>
+        <button class="sample-btn" onclick="loadSample(2)">範例 2（電路）</button>
+        <button class="sample-btn" onclick="loadSample(3)">範例 3（光學-跨單元）</button>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <button id="go" onclick="analyze()">🔍 開始分析</button>
+        <button class="btn-ghost" onclick="document.getElementById('input').value=''">清空</button>
+      </div>
+      <div id="status" class="alert hidden"></div>
+    </div>
+
+    <!-- 結果區 -->
+    <div class="card hidden" id="result-card">
+      <h2>📊 AI 分析結果</h2>
+      <div id="summary"></div>
+      <div id="items"></div>
+      <div style="margin-top: 16px;">
+        <button class="btn-ghost" onclick="copyResult()">📋 複製為文字</button>
+        <button class="btn-accent" onclick="downloadCSV()">📥 下載 CSV</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      阿亮老師 × AI 差異化教學｜工具 1 / 3
+    </div>
+  </div>
+
+  <script src="../assets/config.js"></script>
+  <script>
+    const SAMPLES = {
+      1: `1. 一物體質量 2 kg，靜止於光滑水平面上，受 10 N 水平外力作用 3 秒後，求其末速度為多少？
+   (A) 10 m/s  (B) 15 m/s  (C) 20 m/s  (D) 30 m/s
+
+2. 在無摩擦的水平面上，A 物體（質量 4 kg）以 6 m/s 向右移動，撞上靜止的 B 物體（質量 2 kg），若碰撞後 A 速度變為 2 m/s 向右，求 B 物體的速度為何？
+   (A) 4 m/s  (B) 6 m/s  (C) 8 m/s  (D) 10 m/s`,
+
+      2: `1. 三個相同的電阻 R 串聯後接於電壓 V 的電池，每個電阻所消耗的功率為多少？
+   (A) V²/R   (B) V²/(3R)   (C) V²/(9R)   (D) 3V²/R
+
+2. 一條長度為 L、截面積為 A 的均勻導線，電阻為 R。若將其拉長為 2L（體積不變），新電阻為何？
+   (A) R   (B) 2R   (C) 4R   (D) R/2`,
+
+      3: `1. 一束白光通過三稜鏡後分散成彩色光譜，下列敘述何者正確？
+   (A) 紅光偏折最多   (B) 紫光偏折最多
+   (C) 不同顏色光在真空中速度不同   (D) 折射率與顏色無關
+
+2. 楊氏雙狹縫實驗中，若把整個裝置浸入水中（水的折射率 1.33），則屏幕上的干涉條紋間距會：
+   (A) 變寬   (B) 變窄   (C) 不變   (D) 完全消失`
+    };
+
+    function loadSample(n) {
+      document.getElementById("input").value = SAMPLES[n];
+    }
+
+    let lastResult = null;
+
+    async function analyze() {
+      const input = document.getElementById("input").value.trim();
+      const status = document.getElementById("status");
+      const goBtn = document.getElementById("go");
+      const resultCard = document.getElementById("result-card");
+
+      if (!input) {
+        status.className = "alert alert-warn";
+        status.textContent = "請先貼上題目";
+        status.classList.remove("hidden");
+        return;
+      }
+
+      goBtn.disabled = true;
+      goBtn.innerHTML = '<span class="spinner"></span>AI 分析中...';
+      status.className = "alert alert-info";
+      status.textContent = "正在呼叫 AI，約需 10-20 秒...";
+      status.classList.remove("hidden");
+      resultCard.classList.add("hidden");
+
+      try {
+        const data = await window.callAPI("/api/shen-ti", input);
+        lastResult = data;
+        renderResult(data);
+        status.classList.add("hidden");
+        resultCard.classList.remove("hidden");
+        resultCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      } catch (err) {
+        status.className = "alert alert-err";
+        status.textContent = "❌ 分析失敗：" + err.message;
+      } finally {
+        goBtn.disabled = false;
+        goBtn.innerHTML = "🔍 開始分析";
+      }
+    }
+
+    function tagClass(d) {
+      if (d === "易") return "tag tag-easy";
+      if (d === "中") return "tag tag-mid";
+      if (d === "難") return "tag tag-hard";
+      return "tag tag-blue";
+    }
+
+    function renderResult(data) {
+      const sumEl = document.getElementById("summary");
+      const itemsEl = document.getElementById("items");
+
+      if (data._parse_error) {
+        sumEl.innerHTML = `<div class="alert alert-warn">AI 回傳格式異常，以下是原始輸出：</div><pre style="white-space:pre-wrap;font-size:13px;">${escapeHtml(data._raw || "")}</pre>`;
+        itemsEl.innerHTML = "";
+        return;
+      }
+
+      const s = data.summary || {};
+      const items = data.items || [];
+
+      sumEl.innerHTML = `
+        <div class="alert alert-ok">
+          <strong>📈 整體分析：</strong>${escapeHtml(s.overall_comment || "—")}<br>
+          <span style="font-size: 13px;">
+            共 ${s.total || items.length} 題 ·
+            難度分布：${renderDist(s.by_difficulty)} ·
+            認知層次：${renderDist(s.by_cognitive)}
+          </span>
+        </div>
+      `;
+
+      let html = `<table>
+        <thead><tr><th>題號</th><th>題幹</th><th>內容向度</th><th>認知層次</th><th>難易度</th><th>命題建議</th></tr></thead>
+        <tbody>`;
+      for (const it of items) {
+        html += `<tr>
+          <td><strong>${escapeHtml(it.number)}</strong></td>
+          <td>${escapeHtml(it.stem || "")}</td>
+          <td>${escapeHtml(it.content_dimension || "")}</td>
+          <td><span class="tag tag-blue">${escapeHtml(it.cognitive_dimension || "")}</span></td>
+          <td><span class="${tagClass(it.difficulty)}">${escapeHtml(it.difficulty || "")}</span><br><span style="font-size:12px;color:var(--muted);">${escapeHtml(it.difficulty_reason || "")}</span></td>
+          <td style="font-size:13px;">${escapeHtml(it.suggestion || "")}</td>
+        </tr>`;
+      }
+      html += `</tbody></table>`;
+      itemsEl.innerHTML = html;
+    }
+
+    function renderDist(obj) {
+      if (!obj) return "—";
+      return Object.entries(obj).map(([k, v]) => `${k} ${v}`).join("、");
+    }
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    }
+
+    function copyResult() {
+      if (!lastResult) return;
+      const text = JSON.stringify(lastResult, null, 2);
+      navigator.clipboard.writeText(text).then(() => alert("已複製到剪貼簿"));
+    }
+
+    function downloadCSV() {
+      if (!lastResult || !lastResult.items) return;
+      const header = ["題號", "題幹", "內容向度", "認知層次", "難易度", "難易理由", "命題建議"];
+      const rows = lastResult.items.map(it => [
+        it.number, it.stem, it.content_dimension, it.cognitive_dimension,
+        it.difficulty, it.difficulty_reason, it.suggestion
+      ]);
+      const csv = "﻿" + [header, ...rows]
+        .map(r => r.map(c => `"${String(c == null ? "" : c).replace(/"/g, '""')}"`).join(","))
+        .join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `審題分析_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 差異化教學工具｜講師端入口</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  :root {
+    --bg-1: #1e3c72;
+    --bg-2: #2a5298;
+    --accent: #ff6b35;
+    --ok: #27ae60;
+    --err: #e74c3c;
+    --card: #ffffff;
+    --text: #2c3e50;
+    --muted: #7f8c8d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    padding: 40px 32px;
+    width: 100%;
+    max-width: 480px;
+  }
+  .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(255,107,53,0.1);
+    color: var(--accent);
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: var(--bg-1);
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+  .field { margin-bottom: 16px; }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  input[type="password"] {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e0e6ed;
+    border-radius: 12px;
+    font-size: 16px;
+    transition: border-color 0.2s;
+    font-family: inherit;
+  }
+  input[type="password"]:focus {
+    outline: none;
+    border-color: var(--bg-2);
+  }
+  button {
+    width: 100%;
+    padding: 14px 20px;
+    background: var(--bg-1);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.05s;
+    font-family: inherit;
+  }
+  button:hover { background: var(--bg-2); }
+  button:active { transform: scale(0.98); }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+  .msg { font-size: 13px; margin-top: 12px; min-height: 18px; }
+  .msg.err { color: var(--err); }
+  .msg.ok { color: var(--ok); }
+  .hidden { display: none !important; }
+
+  /* QR 顯示區 */
+  .qr-wrap {
+    text-align: center;
+    padding: 8px 0;
+  }
+  .qr-canvas {
+    background: white;
+    padding: 16px;
+    border-radius: 16px;
+    display: inline-block;
+    border: 1px solid #e0e6ed;
+  }
+  .qr-url {
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: #f6f8fa;
+    border-radius: 10px;
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 12px;
+    word-break: break-all;
+    color: var(--text);
+  }
+  .qr-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .qr-actions button {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+  }
+  .btn-secondary {
+    background: white !important;
+    color: var(--bg-1) !important;
+    border: 2px solid var(--bg-1) !important;
+  }
+  .footer {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <!-- 登入區 -->
+    <div id="login-view">
+      <span class="badge">講師端</span>
+      <h1>AI 差異化教學工具</h1>
+      <p class="subtitle">
+        2026/05/23 自然科研習｜濃縮版<br>
+        請輸入講師密碼以顯示學員 QR Code
+      </p>
+      <form id="login-form">
+        <div class="field">
+          <label for="pwd">密碼</label>
+          <input type="password" id="pwd" autocomplete="off" required autofocus>
+        </div>
+        <button type="submit" id="login-btn">驗證 →</button>
+        <div class="msg err" id="msg"></div>
+      </form>
+    </div>
+
+    <!-- QR 顯示區 -->
+    <div id="qr-view" class="hidden">
+      <span class="badge">驗證通過</span>
+      <h1>學員 QR Code</h1>
+      <p class="subtitle">
+        請學員用手機掃 QR Code，或筆電開啟下方網址。<br>
+        進入後即可使用 3 個 AI 工具，<strong>無需登入</strong>。
+      </p>
+      <div class="qr-wrap">
+        <div class="qr-canvas" id="qr-canvas"></div>
+        <div class="qr-url" id="qr-url"></div>
+        <div class="qr-actions">
+          <button class="btn-secondary" id="copy-btn">複製網址</button>
+          <button id="open-btn">在新分頁開啟</button>
+        </div>
+      </div>
+      <div class="footer">
+        阿亮老師 × AI 差異化教學<br>
+        Password gate · SHA-256 · 不存明文
+      </div>
+    </div>
+  </div>
+
+  <!-- 內嵌 QRCode 產生器（純 JS，無 CDN 依賴）-->
+  <script>
+    // === 設定 ===
+    // SHA-256("Aa@0981737608") = 3ee7f6541f8186b90ad66c06d6e5bf89ca81c3c16c07b48800d751ac21adcd23
+    const EXPECTED_HASH = "3ee7f6541f8186b90ad66c06d6e5bf89ca81c3c16c07b48800d751ac21adcd23";
+
+    // 學員工具落地頁（自動以同 origin 推算）
+    function landingUrl() {
+      const base = window.location.href.replace(/\/index\.html.*$/, "/").replace(/\?.*$/, "").replace(/#.*$/, "");
+      return base + "landing.html";
+    }
+
+    // === SHA-256（Web Crypto）===
+    async function sha256(text) {
+      const buf = new TextEncoder().encode(text);
+      const hash = await crypto.subtle.digest("SHA-256", buf);
+      return Array.from(new Uint8Array(hash))
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("");
+    }
+
+    // === 登入 ===
+    const loginForm = document.getElementById("login-form");
+    const pwdInput = document.getElementById("pwd");
+    const msg = document.getElementById("msg");
+    const loginBtn = document.getElementById("login-btn");
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      msg.textContent = "";
+      loginBtn.disabled = true;
+      loginBtn.textContent = "驗證中...";
+      const h = await sha256(pwdInput.value);
+      if (h === EXPECTED_HASH) {
+        showQR();
+      } else {
+        msg.textContent = "密碼錯誤";
+        loginBtn.disabled = false;
+        loginBtn.textContent = "驗證 →";
+        pwdInput.value = "";
+        pwdInput.focus();
+      }
+    });
+
+    function showQR() {
+      document.getElementById("login-view").classList.add("hidden");
+      document.getElementById("qr-view").classList.remove("hidden");
+      const url = landingUrl();
+      document.getElementById("qr-url").textContent = url;
+      drawQR(url);
+      document.getElementById("copy-btn").onclick = () => {
+        navigator.clipboard.writeText(url).then(() => {
+          document.getElementById("copy-btn").textContent = "已複製 ✓";
+          setTimeout(() => { document.getElementById("copy-btn").textContent = "複製網址"; }, 1500);
+        });
+      };
+      document.getElementById("open-btn").onclick = () => window.open(url, "_blank");
+    }
+  </script>
+
+  <!--
+    內嵌 QRCode 產生器（修改自 davidshimjs/qrcodejs，MIT License）
+    為了不依賴 CDN，這裡內聯精簡版。
+  -->
+  <script src="assets/qrcode.min.js"></script>
+  <script>
+    function drawQR(text) {
+      const el = document.getElementById("qr-canvas");
+      el.innerHTML = "";
+      new QRCode(el, {
+        text: text,
+        width: 240,
+        height: 240,
+        colorDark: "#1e3c72",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    }
+  </script>
+</body>
+</html>
