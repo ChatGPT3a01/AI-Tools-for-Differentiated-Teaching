@@ -15,6 +15,21 @@
       <p>同一題 × 三層提示｜針對不同程度學生差異化教學</p>
     </div>
 
+    <!-- 🎯 工具說明卡 -->
+    <div class="card" style="background: linear-gradient(135deg, #fff5ee, #ffffff); border-left: 6px solid var(--accent);">
+      <h2>🎯 這個工具能做什麼？</h2>
+      <p style="margin-bottom: 12px;">針對「同一題」自動生成三層鷹架提示，讓不同程度的學生都能進步：</p>
+      <ul style="margin-left: 24px; line-height: 1.9; margin-bottom: 12px;">
+        <li><span class="tag tag-easy">高程度</span>只給最小提示，引導他自己想清楚</li>
+        <li><span class="tag tag-mid">中程度</span>點出關鍵概念連結，但不直接給答案</li>
+        <li><span class="tag tag-hard">低程度</span>把問題拆步驟、給範例對照</li>
+      </ul>
+      <div class="alert alert-info" style="margin: 0;">
+        💡 <strong>適合誰用</strong>：要做差異化教學、想設計分層學習單、想用「鷹架式」評量的老師。<br>
+        🎬 <strong>使用流程</strong>：選一科真學測題（或自己貼題目）→ 按「產生分層提示」→ 拿到三層提示卡，可列印給學生對應使用。
+      </div>
+    </div>
+
     <div class="card">
       <h2>💡 什麼是「動態評量」？</h2>
       <p style="margin-bottom: 10px;">
@@ -40,11 +55,12 @@
 範例 2（概念導向）：
 我教高一物理「自由落體」，學生常卡在「為什麼初速度為 0 但加速度不為 0」。請針對這個 misconception 設計三層提示。"></textarea>
 
-      <div style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
-        <span style="font-size: 13px; color: var(--muted);">快速試試：</span>
-        <button class="sample-btn" onclick="loadSample(1)">範例 1（牛頓第二定律）</button>
-        <button class="sample-btn" onclick="loadSample(2)">範例 2（動量守恆）</button>
-        <button class="sample-btn" onclick="loadSample(3)">範例 3（自由落體 misconception）</button>
+      <div style="margin-top: 12px;">
+        <div style="font-size: 13px; color: var(--muted); margin-bottom: 6px;">⚡ 快速試試（選擇科目 → 點題目載入）</div>
+        <div id="subject-tabs"
+             style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;"></div>
+        <div id="question-list"
+             style="display: flex; flex-direction: column; gap: 6px;"></div>
       </div>
 
       <div style="margin-top: 16px;">
@@ -70,21 +86,88 @@
 
   <script src="../assets/config.js"></script>
   <script>
-    const SAMPLES = {
-      1: `一物體質量 2 kg，靜止於光滑水平面上，受 10 N 水平外力作用 3 秒後，求其末速度為多少？
-(A) 10 m/s  (B) 15 m/s  (C) 20 m/s  (D) 30 m/s`,
-
-      2: `在無摩擦水平面上，A 物體（質量 4 kg）以 6 m/s 向右移動，撞上靜止的 B 物體（質量 2 kg），碰撞後 A 速度變為 2 m/s 向右，求 B 物體的速度為何？
-(A) 4 m/s  (B) 6 m/s  (C) 8 m/s  (D) 10 m/s`,
-
-      3: `我教高一物理「自由落體」，學生常常卡在「為什麼初速度是 0、可是加速度不是 0」這個 misconception，總覺得「速度是 0 物體就不該動」。
-
-請針對這個概念設計三層提示，協助不同程度的學生釐清「速度」和「加速度」的差別。`
+    // 分科題庫（與工具 1 / 題目包共用內容）
+    const SUBJECTS_DATA = {
+      chinese: { name: "📖 國文", questions: [], note: "題庫整理中｜請至大考中心官網查詢學測國文 PDF" },
+      english: { name: "🔤 英文", questions: [], note: "題庫整理中｜請至大考中心官網查詢學測英文 PDF" },
+      math:    { name: "🔢 數學", questions: [], note: "題庫整理中｜請至大考中心官網查詢學測數學 A/B PDF" },
+      physics: {
+        name: "⚛️ 物理",
+        questions: [
+          { year: "115 學測 自然 第 10 題", text: `有一部質量為 1000 公斤的汽車由靜止開始，在水平路面朝正東方直線加速到速度為 10 公尺/秒。接著它保持等速度前進，一段時間後因失去動力而減速至停止。請針對「等加速運動 → 等速 → 等減速」三階段的圖形辨識，設計三層鷹架提示協助學生看懂 v-t 圖。` },
+          { year: "115 學測 自然 第 11 題", text: `一塔式起重機將一個重物自地面甲點從靜止鉛直上拉，經乙、丙到丁點停止：甲→乙加速、乙→丙等速、丙→丁減速。學生常分不清「合力 F 方向」「速度 v 方向」「加速度 a 方向」的關係。請設計三層提示。` },
+          { year: "115 學測 自然 第 12 題", text: `（接第 11 題情境）關於「重力位能變化 ΔU」與「動能變化 ΔK」的關係，學生常分不清能量守恆與動能變化。請設計三層提示。` },
+          { year: "115 學測 自然 第 14 題", text: `氦原子核內有兩個質子兩個中子、核外兩電子。請針對「四種基本作用力（強力 / 弱力 / 靜電力 / 重力）大小比較」這個常見 misconception，設計三層鷹架提示。` },
+          { year: "115 學測 自然 第 15 題", text: `學生常混淆電場、電壓、電位、電位差等概念。請針對「電場的 SI 單位 N/C」設計三層提示，協助學生從定義出發回推單位。` }
+        ]
+      },
+      chemistry: {
+        name: "🧪 化學",
+        questions: [
+          { year: "115 學測 自然 第 22 題", text: `P₄O₆ 與 P₄O₁₀ 從 P₄ + O₂ 反應生成，已知個別生成熱。學生常卡在「混合產物熱化學方程式」如何用赫斯定律求總熱量變化。請設計三層提示。` },
+          { year: "115 學測 自然 第 25 題", text: `（小芬從香蕉萃取鉀鹽的實驗）學生常分不清「過濾、沉澱、萃取、層析」這幾種實驗方法的差異。請設計三層提示協助辨識。` },
+          { year: "115 學測 自然 第 27 題", text: `沉澱物加熱後重量減少 46.2%，學生需推論反應式並判斷氧化還原。請針對「重量百分比減少 → 反推產物」這個推理過程設計三層提示。` }
+        ]
+      },
+      biology: {
+        name: "🧬 生物",
+        questions: [
+          { year: "115 學測 自然 第 29 題", text: `學生常認為「黑暗中植物停止呼吸」這個 misconception。請針對「光合作用 vs 呼吸作用在不同光照條件下的關係」設計三層提示。` },
+          { year: "115 學測 自然 第 30 題", text: `細胞學說的歷史發展常被學生背得很亂（虎克、雷文霍克、許來登、許旺、魏修）。請設計三層提示協助學生釐清「誰發現了什麼」。` },
+          { year: "115 學測 自然 第 33 題", text: `DNA 萃取實驗中各試劑的作用（清潔劑、食鹽、鳳梨汁）學生常混淆。請針對「DNA 的化學本質與水解產物」設計三層提示。` }
+        ]
+      },
+      earth: {
+        name: "🌏 地科",
+        questions: [
+          { year: "115 學測 自然 第 1 題", text: `已知日地距離 1 AU、光速從太陽到地球 500 秒，月地距離 0.0025 AU。學生常不知如何將「天文單位」換算成「光行時間」。請設計三層提示。` },
+          { year: "115 學測 自然 第 2 題", text: `學生常混淆「距離 = 年齡」這個 misconception（5 百萬光年的星系 = 5 百萬歲？）。請針對「光行時間 vs 天體年齡」差異設計三層提示。` },
+          { year: "115 學測 自然 第 3 題", text: `多波段天文觀測（可見光、γ 射線、紅外線、紫外線）的應用差異常讓學生搞混。請針對「不同波長的觀測目標」設計三層提示。` },
+          { year: "115 學測 自然 第 5 題", text: `學生看珊瑚生物時鐘推算地球自轉速率時，常分不清「公轉週期不變、自轉變慢 → 一年天數遞減」這個因果。請設計三層提示。` },
+          { year: "115 學測 自然 第 6 題", text: `颱風通過時的風場、氣壓、降雨變化常讓學生混淆「逆時針旋轉 → 風向變化規律」。請針對「颱風結構與通過時的氣象變化」設計三層提示。` }
+        ]
+      }
     };
 
-    function loadSample(n) {
-      document.getElementById("input").value = SAMPLES[n];
+    let currentSubject = "physics";
+
+    function renderTabs() {
+      const tabs = document.getElementById("subject-tabs");
+      tabs.innerHTML = Object.entries(SUBJECTS_DATA).map(([key, sub]) => {
+        const active = key === currentSubject;
+        return `<button class="sample-btn" onclick="selectSubject('${key}')" style="${active ? 'background:var(--bg-1);color:white;border-color:var(--bg-1);' : ''}">${sub.name}</button>`;
+      }).join("");
     }
+
+    function renderQuestions() {
+      const list = document.getElementById("question-list");
+      const sub = SUBJECTS_DATA[currentSubject];
+      if (sub.questions.length === 0) {
+        list.innerHTML = `<div class="alert alert-warn" style="margin:0;">📌 ${sub.note}</div>`;
+        return;
+      }
+      list.innerHTML = sub.questions.map((q, i) => `
+        <button class="sample-btn" onclick="loadQuestion('${currentSubject}', ${i})"
+                style="text-align:left; padding:8px 12px; font-size:12px; line-height:1.5;">
+          <span style="color:var(--accent); font-weight:700;">${q.year}</span>
+          <span style="color:var(--muted); margin-left:8px;">${q.text.split('\n')[0].slice(0, 40)}…</span>
+        </button>
+      `).join("");
+    }
+
+    function selectSubject(key) {
+      currentSubject = key;
+      renderTabs();
+      renderQuestions();
+    }
+
+    function loadQuestion(subject, idx) {
+      const q = SUBJECTS_DATA[subject].questions[idx];
+      if (q) document.getElementById("input").value = q.text;
+    }
+
+    renderTabs();
+    renderQuestions();
 
     let lastResult = null;
 
