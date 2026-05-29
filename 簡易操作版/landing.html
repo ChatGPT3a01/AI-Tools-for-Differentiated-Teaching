@@ -11,7 +11,30 @@
   <div class="container">
     <div class="app-header">
       <h1>AI 差異化教學工具</h1>
-      <p>濃縮體驗版 · 開箱即用，免登入、免 API Key</p>
+      <p>濃縮體驗版 · 自帶金鑰、資料不外流</p>
+    </div>
+
+    <!-- 🔑 開始前：設定自己的 API 金鑰 -->
+    <div class="card" style="background: linear-gradient(135deg, #fff7ed, #ffffff); border-left: 6px solid #c2410c; margin-bottom: 20px;">
+      <h2>🔑 開始前：設定你自己的 AI 金鑰</h2>
+      <p style="margin-bottom: 10px; line-height: 1.8;">
+        工具 1、工具 2 會呼叫 AI，需要一把 API 金鑰。本站<strong>不提供共用金鑰</strong>，請用<strong>你自己的</strong>
+        <strong>OpenAI</strong> 或 <strong>Google Gemini</strong> Key。
+      </p>
+      <div class="alert alert-info" style="margin: 0 0 12px;">
+        🔒 <strong>安全說明</strong>：你的金鑰只會存在「<strong>你這台電腦的瀏覽器</strong>」，並由瀏覽器<strong>直接</strong>傳給 OpenAI／Google，
+        <strong>不會經過老師或任何第三方伺服器</strong>。換電腦或清除瀏覽器資料就會消失。
+      </div>
+      <ul style="margin-left: 22px; line-height: 1.9; margin-bottom: 12px;">
+        <li><strong>OpenAI</strong>：到 <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com/api-keys</a> 申請（需綁定付款，研習用量極少）。</li>
+        <li><strong>Google Gemini</strong>：到 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> 免費申請（Google 帳號即可，有免費額度）。</li>
+      </ul>
+      <button onclick="window.openAIKeySettings && window.openAIKeySettings()"
+              style="background:#c2410c; color:#fff; border:none; padding:11px 20px; border-radius:10px;
+                     font-size:15px; font-weight:700; cursor:pointer; font-family:inherit;">
+        🔑 立即設定金鑰
+      </button>
+      <span style="font-size:12px; color:var(--muted); margin-left:10px;">（之後也可從右上角按鈕隨時修改）</span>
     </div>
 
     <div class="tool-grid">
@@ -56,8 +79,9 @@
 
     <div class="footer">
       阿亮老師 × AI 差異化教學<br>
-      Powered by OpenAI · Cloudflare Workers · GitHub Pages
+      自帶金鑰 · 瀏覽器直連 OpenAI / Google · GitHub Pages
     </div>
   </div>
+  <script src="assets/config.js"></script>
 </body>
 </html>

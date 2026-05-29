@@ -399,17 +399,10 @@
       btn.innerHTML = '<span class="spinner"></span>AI 用爛 prompt 回應中...';
       out.innerHTML = '<div class="alert alert-info" style="margin:0; font-size:12px;">⏳ 等 10–20 秒...</div>';
       try {
-        const url = window.WORKER_BASE.replace(/\/$/, "") + "/api/demo-bad";
-        const resp = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ input: input })
-        });
-        const data = await resp.json();
-        if (!resp.ok) throw new Error(data.error || "HTTP " + resp.status);
+        const rawText = await window.callDemoBad(input);
         out.innerHTML = `<div style="padding:10px; background:white; border-radius:8px; border:1px solid #f5b3b3;">
           <div style="font-size:11px; color:var(--err); font-weight:700; margin-bottom:6px;">📢 AI 回應（鬆散、直接解題、沒做命題分析）：</div>
-          <pre style="white-space:pre-wrap; font-family:inherit; font-size:12px; line-height:1.6; margin:0;">${escHtml(data.raw_text || "")}</pre>
+          <pre style="white-space:pre-wrap; font-family:inherit; font-size:12px; line-height:1.6; margin:0;">${escHtml(rawText || "")}</pre>
         </div>`;
       } catch (e) {
         out.innerHTML = `<div class="alert alert-err" style="margin:0; font-size:12px;">❌ ${escHtml(e.message)}</div>`;
